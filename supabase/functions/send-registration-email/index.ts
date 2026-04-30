@@ -482,7 +482,7 @@ Deno.serve(async (req) => {
     let subject = interpolate(String(rawSubject), vars);
 
     if (!resendKey) {
-      console.warn("RESEND_API_KEY missing — skip send");
+      console.warn("RESEND_API_KEY missing; skip send");
       return corsJson({
         ok: true,
         skipped_email: true,

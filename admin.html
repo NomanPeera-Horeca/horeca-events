@@ -400,7 +400,7 @@ header { flex-wrap: wrap; row-gap: 12px; }
       <div class="door-counter-label">guests checked in · approved roster</div>
     </div>
     <div class="door-staff-help">
-      <p><strong>No printed badges this event</strong> — registration only. Use this list to verify and check in.</p>
+      <p><strong>No printed badges this event</strong> (registration only). Use this list to verify and check in.</p>
       <p style="margin-top:10px"><strong>Laptop:</strong> search by name, email, or phone, then open the guest and tap check in. <strong>Phone:</strong> open the mobile check-in link (camera QR + same search). <strong>Not registered?</strong> Send them to the iPad at <a href="https://events.thehorecastore.com" target="_blank" rel="noopener">events.thehorecastore.com</a>.</p>
       <div class="door-help-actions">
         <button type="button" class="door-copy-link" id="doorCopyCheckinUrl">Copy mobile check-in link</button>
@@ -799,14 +799,14 @@ function renderDoorTable() {
     .map((r) => {
       const p1 = r.has_plus_one
         ? `<span class="cell-plus-one" style="margin:0">+1 ${escape(r.plus_one_first_name || '')} ${escape(r.plus_one_last_name || '')}</span>`
-        : '—';
+        : '-';
       const m = r.checked_in_at
         ? `<span class="ok">Main ✓</span> · ${escape(formatDate(r.checked_in_at, true))}`
-        : '<span>Main —</span>';
+        : '<span>Main -</span>';
       const p = r.has_plus_one
         ? r.plus_one_checked_in_at
           ? `<span class="ok">+1 ✓</span> · ${escape(formatDate(r.plus_one_checked_in_at, true))}`
-          : '<span>+1 —</span>'
+          : '<span>+1 -</span>'
         : '';
       return `
     <tr onclick="openDoorGuest('${r.id}')">
@@ -908,14 +908,14 @@ function openDoorGuest(id) {
   if (!r.checked_in_at) {
     actions += `<button type="button" class="btn-checkin-door" onclick="doorCheckInSlot('${r.id}','primary',false)">✓ Check in ${host}</button>`;
   } else {
-    actions += `<p style="color:var(--ink-soft);margin-top:12px">Main checked in ${escape(formatDate(r.checked_in_at, true))} · ${escape(r.checked_in_by || '—')}</p>`;
+    actions += `<p style="color:var(--ink-soft);margin-top:12px">Main checked in ${escape(formatDate(r.checked_in_at, true))} · ${escape(r.checked_in_by || '-')}</p>`;
     actions += `<button type="button" class="btn-checkin-door secondary" onclick="doorCheckInSlot('${r.id}','primary',true)">Override main check-in</button>`;
   }
   if (r.has_plus_one) {
     if (!r.plus_one_checked_in_at) {
       actions += `<button type="button" class="btn-checkin-door" style="margin-top:12px" onclick="doorCheckInSlot('${r.id}','plus_one',false)">✓ Check in +1 · ${p1name || '+1'}</button>`;
     } else {
-      actions += `<p style="color:var(--ink-soft);margin-top:12px">+1 checked in ${escape(formatDate(r.plus_one_checked_in_at, true))} · ${escape(r.plus_one_checked_in_by || '—')}</p>`;
+      actions += `<p style="color:var(--ink-soft);margin-top:12px">+1 checked in ${escape(formatDate(r.plus_one_checked_in_at, true))} · ${escape(r.plus_one_checked_in_by || '-')}</p>`;
       actions += `<button type="button" class="btn-checkin-door secondary" onclick="doorCheckInSlot('${r.id}','plus_one',true)">Override +1 check-in</button>`;
     }
   }
@@ -927,8 +927,8 @@ function openDoorGuest(id) {
       <dl>
         <div class="modal-detail"><dt>Business</dt><dd>${escape(r.business_name)}</dd></div>
         <div class="modal-detail"><dt>Email</dt><dd>${escape(r.email)}</dd></div>
-        <div class="modal-detail"><dt>Phone</dt><dd>${escape(r.phone || '—')}</dd></div>
-        ${r.has_plus_one ? `<div class="modal-detail"><dt>+1</dt><dd>${p1name} · ${escape(r.plus_one_email || '—')}${r.plus_one_phone ? ` · ${escape(r.plus_one_phone)}` : ''}</dd></div>` : ''}
+        <div class="modal-detail"><dt>Phone</dt><dd>${escape(r.phone || '-')}</dd></div>
+        ${r.has_plus_one ? `<div class="modal-detail"><dt>+1</dt><dd>${p1name} · ${escape(r.plus_one_email || '-')}${r.plus_one_phone ? ` · ${escape(r.plus_one_phone)}` : ''}</dd></div>` : ''}
       </dl>
       ${actions}
     </div>
@@ -1096,20 +1096,20 @@ function viewDetail(id) {
           <button type="button" class="action-btn approve" style="padding:6px 12px;font-size:12px" onclick="toggleVipFromDetail('${r.id}', ${r.is_vip ? 'false' : 'true'})">${r.is_vip ? 'Remove VIP' : 'Mark as VIP'}</button>
         </dd></div>
         <div class="modal-detail"><dt>Business</dt><dd>${escape(r.business_name)}</dd></div>
-        <div class="modal-detail"><dt>Role</dt><dd>${escape(r.role || '—')}</dd></div>
-        <div class="modal-detail"><dt>Locations</dt><dd>${escape(r.locations || '—')}</dd></div>
+        <div class="modal-detail"><dt>Role</dt><dd>${escape(r.role || '-')}</dd></div>
+        <div class="modal-detail"><dt>Locations</dt><dd>${escape(r.locations || '-')}</dd></div>
         <div class="modal-detail"><dt>Email</dt><dd><a href="mailto:${escape(r.email)}">${escape(r.email)}</a></dd></div>
         <div class="modal-detail"><dt>Phone</dt><dd><a href="tel:${escape(r.phone)}">${escape(r.phone)}</a></dd></div>
-        <div class="modal-detail"><dt>Source</dt><dd>${escape(r.source || '—')}</dd></div>
+        <div class="modal-detail"><dt>Source</dt><dd>${escape(r.source || '-')}</dd></div>
         ${r.challenge ? `<div class="modal-detail"><dt>Challenge</dt><dd>${escape(r.challenge)}</dd></div>` : ''}
         ${r.has_plus_one ? `
           <div class="modal-detail"><dt>+1 Name</dt><dd>${escape(r.plus_one_first_name)} ${escape(r.plus_one_last_name)}</dd></div>
           <div class="modal-detail"><dt>+1 Email</dt><dd>${escape(r.plus_one_email)}</dd></div>
           <div class="modal-detail"><dt>+1 Phone</dt><dd>${escape(r.plus_one_phone)}</dd></div>
-          <div class="modal-detail"><dt>+1 Role</dt><dd>${escape(r.plus_one_role || '—')}</dd></div>
+          <div class="modal-detail"><dt>+1 Role</dt><dd>${escape(r.plus_one_role || '-')}</dd></div>
         ` : ''}
         <div class="modal-detail"><dt>Submitted</dt><dd>${formatDate(r.created_at, true)}</dd></div>
-        ${r.approved_at ? `<div class="modal-detail"><dt>Approved</dt><dd>${formatDate(r.approved_at, true)} by ${escape(r.approved_by || '—')}</dd></div>` : ''}
+        ${r.approved_at ? `<div class="modal-detail"><dt>Approved</dt><dd>${formatDate(r.approved_at, true)} by ${escape(r.approved_by || '-')}</dd></div>` : ''}
         ${r.qr_code_url ? `<div class="modal-detail"><dt>QR Code</dt><dd><a href="${r.qr_code_url}" target="_blank">View QR</a></dd></div>` : ''}
       </dl>
     </div>
@@ -1175,7 +1175,7 @@ function openAction(id, actionType) {
       </p>
       ${actionType === 'approve' && activeRegistration.is_vip ? `
       <p style="color: var(--gold); margin: -8px 0 16px 0; font-size: 13px; line-height: 1.5; padding: 12px 14px; border: 1px solid rgba(201,165,92,0.35); background: rgba(201,165,92,0.08); border-radius: 2px;">
-        This guest is marked <strong style="color: var(--ink);">VIP</strong>. The VIP approval template is selected by default — you can switch to the standard approval if needed.
+        This guest is marked <strong style="color: var(--ink);">VIP</strong>. The VIP approval template is selected by default. You can switch to the standard approval if needed.
       </p>
       ` : ''}
 
@@ -1240,7 +1240,7 @@ function renderTemplatePreview() {
       · template id: <span style="word-break:break-all;">${escape(template.id)}</span><br>
       If this count is <strong>large</strong> but mail still has an <strong>empty body</strong>, the problem is almost always the <strong>Edge Function</strong>:
       it must read the column <code style="color:var(--gold);">body_html</code> (not <code style="color:var(--gold);">body</code>) and pass it to Resend as <code style="color:var(--gold);">html</code>.
-      Or the template renderer is failing and returning an empty string — check Function logs.
+      Or the template renderer is failing and returning an empty string. Check Function logs.
     </div>
   `;
 }

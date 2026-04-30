@@ -477,7 +477,7 @@ function escapeHtml(s) {
 }
 
 function fmtWhen(iso) {
-  if (!iso) return '—';
+  if (!iso) return '-';
   return new Date(iso).toLocaleString('en-US', {
     weekday: 'short',
     month: 'short',
@@ -666,7 +666,7 @@ function renderRosterList() {
       let b = `<div class="roster-group">
         <button type="button" class="roster-item" data-roster-id="${r.id}" data-roster-slot="primary">
           <strong>${escapeHtml(name || 'Guest')}</strong>
-          <span class="rost-meta">${meta || '—'}${r.business_name ? ` · ${escapeHtml(r.business_name)}` : ''}</span>
+          <span class="rost-meta">${meta || '-'}${r.business_name ? ` · ${escapeHtml(r.business_name)}` : ''}</span>
         </button>`;
       if (r.has_plus_one) {
         const p1n = `${r.plus_one_first_name || ''} ${r.plus_one_last_name || ''}`.trim();
@@ -832,10 +832,10 @@ function renderGuestCard() {
       <span class="badge ${badgeClass}">${escapeHtml((r.status || '').replace('_', ' ') || 'unknown')}</span>
 
       <dl style="margin-top:20px">
-        <div class="row"><dt>Business</dt><dd>${escapeHtml(r.business_name || '—')}</dd></div>
-        <div class="row"><dt>Role</dt><dd>${escapeHtml(r.role || '—')}</dd></div>
-        <div class="row"><dt>Email</dt><dd>${escapeHtml(displayEmail || '—')}</dd></div>
-        <div class="row"><dt>Phone</dt><dd>${escapeHtml((isPrimaryView ? r.phone : r.plus_one_phone) || '—')}</dd></div>
+        <div class="row"><dt>Business</dt><dd>${escapeHtml(r.business_name || '-')}</dd></div>
+        <div class="row"><dt>Role</dt><dd>${escapeHtml(r.role || '-')}</dd></div>
+        <div class="row"><dt>Email</dt><dd>${escapeHtml(displayEmail || '-')}</dd></div>
+        <div class="row"><dt>Phone</dt><dd>${escapeHtml((isPrimaryView ? r.phone : r.plus_one_phone) || '-')}</dd></div>
       </dl>
   `;
 

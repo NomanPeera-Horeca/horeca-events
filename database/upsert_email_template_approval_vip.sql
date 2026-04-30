@@ -1,4 +1,4 @@
--- Add is_vip and upsert approval-vip email template
+-- Add is_vip and upsert approval-vip email template (VIP shoutout + plated dinner)
 -- Run: supabase db query --linked < database/upsert_email_template_approval_vip.sql
 
 ALTER TABLE public.registrations
@@ -11,7 +11,7 @@ DELETE FROM public.email_templates WHERE slug = 'approval-vip';
 INSERT INTO public.email_templates (slug, name, subject, category, body_html, is_active)
 VALUES (
   'approval-vip',
-  'Approval — VIP guest',
+  'Approval: VIP guest',
   'Your VIP seat is confirmed · The Horeca Meetup {{event_city}} Vol. {{event_volume}}',
   'approval',
   '<!DOCTYPE html>
@@ -23,7 +23,7 @@ VALUES (
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Your VIP seat is confirmed · The Horeca Meetup</title></head>
 <body style="margin:0;padding:0;background-color:#f5f1e8;font-family:Georgia,''Times New Roman'',serif;">
-<div style="display:none;max-height:0;overflow:hidden;">VIP confirmation: {{event_city}} Vol. {{event_volume}} on {{event_date_short}}. Your personal QR is below — we''re honored to host you.</div>
+<div style="display:none;max-height:0;overflow:hidden;">VIP confirmation: {{event_city}} Vol. {{event_volume}} on {{event_date_short}}. Your personal QR is below. We are honored to host you.</div>
 
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f1e8;padding:40px 20px;"><tr><td align="center">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:#ffffff;border:1px solid #d4b76a;">
@@ -33,21 +33,22 @@ VALUES (
 <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 16px;"><tr><td style="background-color:#c9a55c;color:#0a0a0a;font-family:''Courier New'',monospace;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;padding:8px 20px;border:1px solid #e0c186;">VIP Host</td></tr></table>
 <div style="font-family:''Fraunces'',Georgia,serif;font-size:24px;font-weight:500;color:#ffffff;letter-spacing:-0.01em;">The Horeca <em style="font-style:italic;color:#c9a55c;">Meetup</em></div>
 <div style="font-family:''Courier New'',monospace;font-size:10px;letter-spacing:0.24em;color:#c9a55c;text-transform:uppercase;margin-top:8px;">{{event_city}} · Volume {{event_volume}}</div>
-<div style="font-family:''Fraunces'',Georgia,serif;font-size:14px;font-style:italic;color:#d4c4a8;margin-top:14px;line-height:1.5;">With respect and gratitude — you are receiving our highest tier of hospitality for this edition.</div>
+<div style="font-family:''Fraunces'',Georgia,serif;font-size:14px;font-style:italic;color:#d4c4a8;margin-top:14px;line-height:1.5;">With respect and gratitude: you are receiving our highest tier of hospitality for this edition.</div>
 </td></tr>
 
 <tr><td style="padding:48px 40px 24px 40px;">
 <div style="font-family:''Courier New'',monospace;font-size:10px;letter-spacing:0.24em;color:#8b6f3a;text-transform:uppercase;margin-bottom:16px;">VIP Confirmation · Reservation #{{reservation_id}}</div>
 <h1 style="margin:0 0 24px 0;font-family:''Fraunces'',Georgia,serif;font-size:36px;font-weight:400;line-height:1.1;color:#0a0a0a;letter-spacing:-0.02em;">Your VIP seat is confirmed,<br><em style="font-style:italic;color:#8b6f3a;">{{first_name}}.</em></h1>
-<p style="margin:0 0 16px 0;font-size:16px;line-height:1.65;color:#3a3a3a;">We are honored to confirm you as a <strong style="color:#0a0a0a;">VIP guest</strong> at <strong>The Horeca Meetup {{event_city}} Vol. {{event_volume}}</strong>. The room is built around leaders like you — your voice shapes the evening, and we have held a place with that in mind.</p>
+<p style="margin:0 0 16px 0;font-size:16px;line-height:1.65;color:#3a3a3a;">We are honored to confirm you as a <strong style="color:#0a0a0a;">VIP guest</strong> at <strong>The Horeca Meetup {{event_city}} Vol. {{event_volume}}</strong>. The room is built around leaders like you. Your voice shapes the evening, and we have held a place with that in mind.</p>
+<p style="margin:0 0 16px 0;font-size:16px;line-height:1.65;color:#3a3a3a;">Your <strong>VIP evening</strong> includes a <strong>shoutout from the host</strong> during the program and a <strong>plated dinner</strong> at your table, so you stay in the conversation instead of the buffet line.</p>
 {{#if has_plus_one}}<p style="margin:0 0 16px 0;font-size:16px;line-height:1.65;color:#3a3a3a;">We have also sent <strong>{{plus_one_name}}</strong> their own confirmation at <strong>{{plus_one_email}}</strong> with a personal QR for entry.</p>{{/if}}
-<p style="margin:0;font-size:16px;line-height:1.65;color:#3a3a3a;">If you need anything before doors open — seating, dietary notes, or a quiet moment with the team — reply to this email and we will take care of it.</p>
+<p style="margin:0;font-size:16px;line-height:1.65;color:#3a3a3a;">If you need anything before doors open (seating, dietary notes, or a quiet moment with the team), reply to this email and we will take care of it.</p>
 </td></tr>
 
 <tr><td style="padding:24px 40px;">
 <div style="border:2px solid #c9a55c;background:linear-gradient(180deg,#fffef9 0%,#fdfaf3 100%);padding:32px 24px 36px;text-align:center;box-shadow:0 8px 32px rgba(10,10,10,0.06);">
 <div style="font-family:''Courier New'',monospace;font-size:10px;letter-spacing:0.26em;color:#8b6f3a;text-transform:uppercase;margin-bottom:8px;">VIP Entry Pass</div>
-<div style="font-family:''Fraunces'',Georgia,serif;font-size:19px;font-style:italic;color:#0a0a0a;margin-bottom:20px;">Show this at the door — priority handling</div>
+<div style="font-family:''Fraunces'',Georgia,serif;font-size:19px;font-style:italic;color:#0a0a0a;margin-bottom:20px;">Show this at the door for priority handling</div>
 <img src="{{qr_code_url}}" alt="Your VIP QR Code" width="240" height="240" style="display:block;margin:0 auto;border:0;width:240px;height:240px;background-color:#ffffff;padding:12px;border:1px solid #e8dcc4;">
 <div style="font-family:''Courier New'',monospace;font-size:11px;letter-spacing:0.12em;color:#8b6f3a;margin-top:16px;">{{full_name}} · {{business_name}} · <span style="color:#c9a55c;">VIP</span></div>
 </div>
@@ -60,7 +61,7 @@ VALUES (
 <tr><td style="padding:8px 0;border-bottom:1px solid #f0e8d4;width:140px;font-family:''Courier New'',monospace;font-size:11px;letter-spacing:0.1em;color:#8b6f3a;text-transform:uppercase;vertical-align:top;">Date</td><td style="padding:8px 0;border-bottom:1px solid #f0e8d4;font-family:''Fraunces'',Georgia,serif;font-size:16px;color:#0a0a0a;">{{event_date_long}}</td></tr>
 <tr><td style="padding:8px 0;border-bottom:1px solid #f0e8d4;font-family:''Courier New'',monospace;font-size:11px;letter-spacing:0.1em;color:#8b6f3a;text-transform:uppercase;vertical-align:top;">Doors</td><td style="padding:8px 0;border-bottom:1px solid #f0e8d4;font-family:''Fraunces'',Georgia,serif;font-size:16px;color:#0a0a0a;">{{event_doors}}</td></tr>
 <tr><td style="padding:8px 0;border-bottom:1px solid #f0e8d4;font-family:''Courier New'',monospace;font-size:11px;letter-spacing:0.1em;color:#8b6f3a;text-transform:uppercase;vertical-align:top;">Program Begins</td><td style="padding:8px 0;border-bottom:1px solid #f0e8d4;font-family:''Fraunces'',Georgia,serif;font-size:16px;color:#0a0a0a;">{{event_start}}</td></tr>
-<tr><td style="padding:8px 0;border-bottom:1px solid #f0e8d4;font-family:''Courier New'',monospace;font-size:11px;letter-spacing:0.1em;color:#8b6f3a;text-transform:uppercase;vertical-align:top;">Buffet Dinner</td><td style="padding:8px 0;border-bottom:1px solid #f0e8d4;font-family:''Fraunces'',Georgia,serif;font-size:16px;color:#0a0a0a;">8:30 PM</td></tr>
+<tr><td style="padding:8px 0;border-bottom:1px solid #f0e8d4;font-family:''Courier New'',monospace;font-size:11px;letter-spacing:0.1em;color:#8b6f3a;text-transform:uppercase;vertical-align:top;">Dinner (VIP)</td><td style="padding:8px 0;border-bottom:1px solid #f0e8d4;font-family:''Fraunces'',Georgia,serif;font-size:16px;color:#0a0a0a;">Plated service at your table · from 8:30 PM</td></tr>
 <tr><td style="padding:8px 0;border-bottom:1px solid #f0e8d4;font-family:''Courier New'',monospace;font-size:11px;letter-spacing:0.1em;color:#8b6f3a;text-transform:uppercase;vertical-align:top;">Venue</td><td style="padding:8px 0;border-bottom:1px solid #f0e8d4;font-family:''Fraunces'',Georgia,serif;font-size:16px;color:#0a0a0a;">{{venue_name}}<br><span style="font-size:13px;color:#6b6b6b;">{{venue_address}}</span></td></tr>
 <tr><td style="padding:8px 0;font-family:''Courier New'',monospace;font-size:11px;letter-spacing:0.1em;color:#8b6f3a;text-transform:uppercase;vertical-align:top;">Dress Code</td><td style="padding:8px 0;font-family:''Fraunces'',Georgia,serif;font-size:16px;color:#0a0a0a;">Business / Smart Casual</td></tr>
 </table>
@@ -74,7 +75,8 @@ VALUES (
 <li>Welcome reception with restaurant and hotel owners from across Houston</li>
 <li>A working session on scaling profitably in 2026</li>
 <li>An honest operator panel on growth, franchising, and the real numbers</li>
-<li>Buffet dinner with curated room flow</li>
+<li><strong>VIP shoutout</strong> from the host during the program</li>
+<li><strong>Plated dinner</strong> at your table (VIP service)</li>
 <li>The kind of conversations that turn rooms into networks</li>
 </ul>
 </div>
@@ -93,8 +95,8 @@ VALUES (
 </td></tr>
 
 <tr><td style="padding:0 40px 40px 40px;border-top:1px solid #e8dcc4;padding-top:32px;">
-<p style="margin:0 0 12px 0;font-family:''Fraunces'',Georgia,serif;font-size:16px;color:#3a3a3a;line-height:1.6;">Questions? Reply directly to this email or write to <a href="mailto:events@thehorecastore.com" style="color:#8b6f3a;">events@thehorecastore.com</a> — we read every message.</p>
-<p style="margin:0;font-family:''Fraunces'',Georgia,serif;font-size:16px;font-style:italic;color:#0a0a0a;">We will see you at the table — and thank you for being part of this room.</p>
+<p style="margin:0 0 12px 0;font-family:''Fraunces'',Georgia,serif;font-size:16px;color:#3a3a3a;line-height:1.6;">Questions? Reply directly to this email or write to <a href="mailto:events@thehorecastore.com" style="color:#8b6f3a;">events@thehorecastore.com</a>. We read every message.</p>
+<p style="margin:0;font-family:''Fraunces'',Georgia,serif;font-size:16px;font-style:italic;color:#0a0a0a;">We will see you at the table, and thank you for being part of this room.</p>
 <p style="margin:24px 0 0 0;font-family:''Courier New'',monospace;font-size:11px;letter-spacing:0.1em;color:#8b6f3a;text-transform:uppercase;">Noman Peera<br><span style="color:#6b6b6b;">CEO · Horeca Store</span></p>
 </td></tr>
 

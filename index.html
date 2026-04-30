@@ -579,6 +579,8 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
 <div class="announce">
   <span class="announce-dot"></span>
   Houston · Vol. II · May 5, 2026 · <span id="vol2AnnounceSeats">73</span> of <span id="vol2AnnounceMax">108</span> seats reserved · 
+  <a href="vip.html">VIP experience</a>
+  ·
   <a href="#vol2" onclick="openModal(event,'vol2')">Reserve yours →</a>
 </div>
 
@@ -615,6 +617,7 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
           <span class="btn-arrow">→</span>
         </a>
         <a href="#why" class="btn btn-ghost">Why Attend</a>
+        <a href="vip.html" class="btn btn-ghost">VIP experience</a>
       </div>
     </div>
     
@@ -1290,7 +1293,7 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
     <div class="footer-col">
       <h4>About</h4>
       <ul>
-        <li><a href="#why">Why Attend</a></li>
+        <li><a href="vip.html">VIP experience</a></li>
         <li><a href="#host">The Host · Horeca Store</a></li>
         <li><a href="#manifesto">Manifesto</a></li>
         <li><a href="#testimonials">Voices</a></li>
@@ -1553,8 +1556,8 @@ const EVENT_SLUG_MAP = {
   'Press Inquiry': 'houston-vol-2-may-2026'
 };
 
-// Initialize Supabase client (loads from CDN script in <head>). Use supabaseClient — not
-// const supabase — to avoid clashing with the global the CDN attaches to window.
+// Initialize Supabase client (loads from CDN script in <head>). Use supabaseClient, not
+// const supabase, to avoid clashing with the global the CDN attaches to window.
 const supabaseClient =
   typeof window !== 'undefined' && window.supabase
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
@@ -1562,7 +1565,7 @@ const supabaseClient =
 
 // ── Houston Vol. II live seat counter (marketing floor + real registrations) ──
 const VOL2_SEAT_SLUG = 'houston-vol-2-may-2026';
-/** Display capacity (seats cap) — must match hero + calendar markup. */
+/** Display capacity (seats cap). Must match hero + calendar markup. */
 let vol2SeatCapacity = 108;
 const VOL2_SEAT_BASE = 73;
 const VOL2_SEAT_REFRESH_MS = 60_000;
