@@ -127,19 +127,31 @@ header { flex-wrap: wrap; row-gap: 12px; }
 .door-feed ul { list-style: none; }
 .door-feed li { padding: 10px 0; border-bottom: 1px solid var(--rule); font-size: 13px; color: var(--ink-soft); }
 .door-feed li:last-child { border-bottom: none; }
-.door-print-stub {
-  margin-top: 16px;
-  width: 100%;
-  min-height: 52px;
+.door-staff-help {
+  margin: 0 32px;
+  padding: 18px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-bottom: none;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+.door-staff-help strong { color: var(--ink); }
+.door-staff-help a { color: var(--gold); }
+.door-help-actions { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.door-copy-link {
   font-family: var(--mono);
   font-size: 10px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  padding: 8px 14px;
   background: transparent;
-  border: 1px dashed var(--rule-strong);
-  color: var(--ink-mute);
-  cursor: not-allowed;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  cursor: pointer;
 }
+.door-copy-link:hover { background: rgba(201, 165, 92, 0.12); }
 
 .btn-checkin-door {
   width: 100%;
@@ -387,6 +399,14 @@ header { flex-wrap: wrap; row-gap: 12px; }
       </div>
       <div class="door-counter-label">guests checked in · approved roster</div>
     </div>
+    <div class="door-staff-help">
+      <p><strong>No printed badges this event</strong> — registration only. Use this list to verify and check in.</p>
+      <p style="margin-top:10px"><strong>Laptop:</strong> search by name, email, or phone, then open the guest and tap check in. <strong>Phone:</strong> open the mobile check-in link (camera QR + same search). <strong>Not registered?</strong> Send them to the iPad at <a href="https://events.thehorecastore.com" target="_blank" rel="noopener">events.thehorecastore.com</a>.</p>
+      <div class="door-help-actions">
+        <button type="button" class="door-copy-link" id="doorCopyCheckinUrl">Copy mobile check-in link</button>
+        <span id="doorCopyCheckinStatus" style="font-size:11px;color:var(--ink-mute)"></span>
+      </div>
+    </div>
     <div class="door-toolbar">
       <div class="door-filters">
         <button type="button" class="door-filter active" data-door-filter="pending" id="doorFilterPending">Not checked in</button>
@@ -394,7 +414,7 @@ header { flex-wrap: wrap; row-gap: 12px; }
         <button type="button" class="door-filter" data-door-filter="all" id="doorFilterAll">All</button>
       </div>
       <div class="search-box door-search">
-        <input type="text" id="doorSearchInput" placeholder="Search name, email, business…">
+        <input type="text" id="doorSearchInput" placeholder="Search name, email, phone, or business…">
       </div>
     </div>
     <div class="table-wrapper">
@@ -415,7 +435,6 @@ header { flex-wrap: wrap; row-gap: 12px; }
     <div class="door-feed">
       <div class="door-feed-title">Last 5 check-ins</div>
       <ul id="doorLast5"></ul>
-      <button type="button" class="door-print-stub" id="doorPrintStub" disabled title="Badge printing coming soon">Print badge</button>
     </div>
   </div>
 </div>
@@ -469,6 +488,17 @@ let activeRegistration = null;
 let mainTab = 'rsvp';
 let doorFilter = 'pending';
 let doorChannel = null;
+
+function getStaffMobileCheckinUrl() {
+  if (!currentEventId) return '';
+  const u = new URL('checkin.html', window.location.href);
+  u.searchParams.set('event', currentEventId);
+  return u.toString();
+}
+
+function normPhoneDigits(s) {
+  return String(s || '').replace(/\D/g, '');
+}
 
 
 // ═══════════════════════════════════════════════════════════════
@@ -737,12 +767,22 @@ function renderDoorTable() {
   document.getElementById('doorCheckedNum').textContent = String(checked);
   document.getElementById('doorTotalNum').textContent = String(total);
 
-  const q = (document.getElementById('doorSearchInput')?.value || '').toLowerCase().trim();
+  const qRaw = (document.getElementById('doorSearchInput')?.value || '').trim();
+  const q = qRaw.toLowerCase();
+  const qDigits = normPhoneDigits(qRaw);
   let rows = approved;
-  if (q) {
-    rows = rows.filter((r) =>
-      `${r.first_name} ${r.last_name} ${r.email} ${r.business_name} ${r.plus_one_first_name || ''} ${r.plus_one_last_name || ''} ${r.plus_one_email || ''}`.toLowerCase().includes(q),
-    );
+  if (q || qDigits.length >= 3) {
+    rows = rows.filter((r) => {
+      const hay =
+        `${r.first_name} ${r.last_name} ${r.email} ${r.business_name} ${r.phone || ''} ${r.plus_one_first_name || ''} ${r.plus_one_last_name || ''} ${r.plus_one_email || ''} ${r.plus_one_phone || ''}`.toLowerCase();
+      if (q && hay.includes(q)) return true;
+      if (qDigits.length >= 3) {
+        const pMain = normPhoneDigits(r.phone);
+        const p1 = normPhoneDigits(r.plus_one_phone);
+        if (pMain.includes(qDigits) || p1.includes(qDigits)) return true;
+      }
+      return false;
+    });
   }
   if (doorFilter === 'pending') {
     rows = rows.filter((r) => doorGuestCheckedCount(r) < doorGuestExpectedCount(r));
@@ -771,7 +811,7 @@ function renderDoorTable() {
       return `
     <tr onclick="openDoorGuest('${r.id}')">
       <td><div class="cell-name">${escape(r.first_name)} ${escape(r.last_name)}</div>
-          <div class="cell-meta">${escape(r.email || '')}</div></td>
+          <div class="cell-meta">${escape(r.email || '')}${r.phone ? ` · ${escape(r.phone)}` : ''}</div></td>
       <td><div class="cell-business">${escape(r.business_name)}</div></td>
       <td>${p1}</td>
       <td class="door-check-cell">${m}<br>${p || ''}</td>
@@ -887,10 +927,10 @@ function openDoorGuest(id) {
       <dl>
         <div class="modal-detail"><dt>Business</dt><dd>${escape(r.business_name)}</dd></div>
         <div class="modal-detail"><dt>Email</dt><dd>${escape(r.email)}</dd></div>
-        ${r.has_plus_one ? `<div class="modal-detail"><dt>+1</dt><dd>${p1name} · ${escape(r.plus_one_email || '—')}</dd></div>` : ''}
+        <div class="modal-detail"><dt>Phone</dt><dd>${escape(r.phone || '—')}</dd></div>
+        ${r.has_plus_one ? `<div class="modal-detail"><dt>+1</dt><dd>${p1name} · ${escape(r.plus_one_email || '—')}${r.plus_one_phone ? ` · ${escape(r.plus_one_phone)}` : ''}</dd></div>` : ''}
       </dl>
       ${actions}
-      <button type="button" class="btn-checkin-door secondary" disabled style="margin-top:20px;opacity:0.5" title="Coming soon">Print badge</button>
     </div>
   `;
   document.getElementById('doorModal').classList.add('active');
@@ -961,6 +1001,8 @@ async function doorCheckInSlot(regId, slot, isOverride) {
 function setupEventListeners() {
   document.getElementById('eventSelect').addEventListener('change', async (e) => {
     currentEventId = e.target.value;
+    const doorCopyStatus = document.getElementById('doorCopyCheckinStatus');
+    if (doorCopyStatus) doorCopyStatus.textContent = '';
     await loadRegistrations();
     if (mainTab === 'door') {
       renderDoorTable();
@@ -985,6 +1027,25 @@ function setupEventListeners() {
   document.getElementById('doorSearchInput').addEventListener('input', () => {
     clearTimeout(doorSearchT);
     doorSearchT = setTimeout(renderDoorTable, 200);
+  });
+
+  document.getElementById('doorCopyCheckinUrl').addEventListener('click', async () => {
+    const url = getStaffMobileCheckinUrl();
+    const status = document.getElementById('doorCopyCheckinStatus');
+    if (!url) {
+      status.textContent = 'Select an event first.';
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      status.textContent = 'Copied for staff phones.';
+      setTimeout(() => {
+        status.textContent = '';
+      }, 4000);
+    } catch (_) {
+      window.prompt('Copy this URL for mobile check-in:', url);
+      status.textContent = '';
+    }
   });
   
   document.querySelectorAll('.stat-card').forEach(card => {

@@ -285,6 +285,83 @@ body {
   font-size: 11px;
   color: var(--gold-light);
 }
+
+.help-callout {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin-bottom: 18px;
+}
+.help-callout a { color: var(--gold); }
+.help-callout strong { color: var(--ink); }
+
+.roster-select {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 4px;
+  border: 1px solid var(--rule);
+  background: var(--black);
+  color: var(--ink);
+  font-size: 15px;
+}
+.roster-select:focus { outline: none; border-color: var(--gold); }
+
+.roster-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: min(52vh, 420px);
+  overflow-y: auto;
+  margin-top: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+.roster-group { border: 1px solid var(--rule); overflow: hidden; }
+.roster-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.03);
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+}
+.roster-group .roster-item:last-child { border-bottom: none; }
+.roster-item:hover { background: rgba(201, 165, 92, 0.1); }
+.roster-item.sub { font-size: 13px; padding: 12px 16px; color: var(--ink-soft); }
+.roster-item strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: 17px;
+  margin-bottom: 6px;
+  color: var(--ink);
+}
+.roster-item .rost-meta { font-size: 12px; color: var(--ink-mute); line-height: 1.4; }
+
+.scan-wrap { margin-top: 14px; padding: 12px; border: 1px solid var(--rule); background: rgba(0,0,0,0.35); }
+.scan-wrap video { width: 100%; border-radius: 4px; background: #000; display: block; }
+
+.btn-secondary-ui {
+  width: 100%;
+  min-height: 52px;
+  margin-top: 10px;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: var(--label);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.btn-secondary-ui:hover { background: rgba(201, 165, 92, 0.1); }
+.btn-secondary-ui.danger-zone { border-color: var(--red); color: var(--red); }
+.btn-secondary-ui.danger-zone:hover { background: rgba(212, 98, 106, 0.12); }
+
+.empty-roster { padding: 20px; text-align: center; color: var(--ink-mute); font-size: 14px; }
 </style>
 </head>
 <body>
@@ -328,7 +405,34 @@ body {
       <div class="card">
         <div class="eyebrow">Scan result</div>
         <p class="guest-name" style="font-size:26px">✗ Invalid QR</p>
-        <p style="color:var(--ink-soft)">This link is not a valid guest pass. Ask them to open the confirmation email or search by name in the admin <strong>DOOR</strong> tab.</p>
+        <p style="color:var(--ink-soft)">This link is not a valid guest pass. Ask them to open the confirmation email, <strong>search by name, email, or phone</strong> on this page after you sign in, or use the admin <strong>DOOR</strong> tab on a laptop.</p>
+        <p style="color:var(--ink-mute);margin-top:14px;font-size:14px">Walk-in? They can register on the iPad at <a href="https://events.thehorecastore.com" target="_blank" rel="noopener" style="color:var(--gold)">events.thehorecastore.com</a>.</p>
+        <button type="button" class="btn-primary alt" id="btnInvalidToRoster" style="margin-top:20px;min-height:52px">Search approved roster instead</button>
+      </div>
+    </div>
+    <div id="phaseRoster" class="hidden">
+      <div class="card">
+        <div class="eyebrow">Find a guest</div>
+        <p class="help-callout"><strong>No QR?</strong> Pick the event, then search the approved list by name, email, or phone. <strong>Phone with camera:</strong> use <em>Scan QR</em> or paste the link from the guest email. <strong>Walk-in?</strong> Send them to <a href="https://events.thehorecastore.com" target="_blank" rel="noopener">events.thehorecastore.com</a> on the iPad.</p>
+        <div class="field">
+          <label>Event</label>
+          <select id="checkinEventSelect" class="roster-select" aria-label="Event"></select>
+        </div>
+        <div class="field">
+          <label>Search roster</label>
+          <input type="search" id="rosterSearchInput" placeholder="Name, email, or mobile number" autocomplete="off" />
+        </div>
+        <div id="rosterList" class="roster-list" aria-live="polite"></div>
+        <div class="field" style="margin-top:20px">
+          <label>Paste check-in link or token</label>
+          <input type="text" id="pasteTokenInput" placeholder="https://…checkin.html?t=… or HRC-…" autocomplete="off" />
+        </div>
+        <button type="button" class="btn-primary alt" id="pasteTokenBtn">Look up from paste</button>
+        <button type="button" class="btn-secondary-ui" id="btnScanQr">Scan QR with camera</button>
+        <button type="button" class="btn-secondary-ui danger-zone hidden" id="btnStopScan">Stop camera</button>
+        <div id="scanWrap" class="scan-wrap hidden">
+          <video id="scanVideo" playsinline muted></video>
+        </div>
       </div>
     </div>
     <div id="phaseGuest" class="hidden"></div>
@@ -424,15 +528,245 @@ function showMain() {
   document.getElementById('appMain').classList.remove('hidden');
 }
 
-async function loadGuest() {
+function extractTokenFromPaste(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return '';
+  if (/^HRC-[A-Za-z0-9_-]+$/i.test(s)) return s;
+  try {
+    const u = new URL(s);
+    const t = u.searchParams.get('t');
+    if (t) return t.trim();
+  } catch (_) {}
+  const m = s.match(/[?&]t=([^&\s#]+)/i);
+  if (m) {
+    try {
+      return decodeURIComponent(m[1]).trim();
+    } catch (_) {
+      return m[1].trim();
+    }
+  }
+  return '';
+}
+
+function normPhoneDigits(s) {
+  return String(s || '').replace(/\D/g, '');
+}
+
+function fmtEventOptLabel(e) {
+  const d = e.event_date
+    ? new Date(e.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : '';
+  const live = e.status === 'open' ? ' (LIVE)' : '';
+  return `${e.city} · Vol. ${e.volume_roman} · ${d}${live}`;
+}
+
+let rosterRows = [];
+let barcodeDetector = null;
+let scanStream = null;
+let scanRaf = 0;
+
+function stopBarcodeScan() {
+  if (scanRaf) {
+    cancelAnimationFrame(scanRaf);
+    scanRaf = 0;
+  }
+  if (scanStream) {
+    scanStream.getTracks().forEach((t) => t.stop());
+    scanStream = null;
+  }
+  barcodeDetector = null;
+  const wrap = document.getElementById('scanWrap');
+  const v = document.getElementById('scanVideo');
+  if (v) v.srcObject = null;
+  if (wrap) wrap.classList.add('hidden');
+  const stopB = document.getElementById('btnStopScan');
+  const scanB = document.getElementById('btnScanQr');
+  if (stopB) stopB.classList.add('hidden');
+  if (scanB) scanB.classList.remove('hidden');
+}
+
+async function startBarcodeScan() {
+  if (typeof BarcodeDetector === 'undefined') {
+    alert(
+      'Camera QR scan needs a browser with Barcode Detector (often Chrome on Android). On iPhone, use roster search below or paste the check-in link from the guest email.',
+    );
+    return;
+  }
+  stopBarcodeScan();
+  const wrap = document.getElementById('scanWrap');
+  const v = document.getElementById('scanVideo');
+  document.getElementById('btnScanQr').classList.add('hidden');
+  document.getElementById('btnStopScan').classList.remove('hidden');
+  wrap.classList.remove('hidden');
+  try {
+    scanStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' } },
+      audio: false,
+    });
+    v.srcObject = scanStream;
+    await v.play();
+    barcodeDetector = new BarcodeDetector({ formats: ['qr_code'] });
+  } catch (err) {
+    stopBarcodeScan();
+    alert(err.message || 'Could not open camera.');
+    return;
+  }
+
+  const tick = async () => {
+    if (!barcodeDetector || !scanStream) return;
+    try {
+      const codes = await barcodeDetector.detect(v);
+      if (codes.length) {
+        const t = extractTokenFromPaste(codes[0].rawValue);
+        if (t) {
+          stopBarcodeScan();
+          qrToken = t;
+          document.getElementById('phaseRoster').classList.add('hidden');
+          document.getElementById('phaseLoading').classList.remove('hidden');
+          await loadGuestByToken();
+          return;
+        }
+      }
+    } catch (_) {}
+    scanRaf = requestAnimationFrame(tick);
+  };
+  scanRaf = requestAnimationFrame(tick);
+}
+
+function rosterRowMatches(r, qLower, qDigits) {
+  const hay =
+    `${r.first_name} ${r.last_name} ${r.email} ${r.business_name} ${r.phone || ''} ${r.plus_one_first_name || ''} ${r.plus_one_last_name || ''} ${r.plus_one_email || ''} ${r.plus_one_phone || ''}`.toLowerCase();
+  if (qLower && hay.includes(qLower)) return true;
+  if (qDigits.length >= 3) {
+    if (normPhoneDigits(r.phone).includes(qDigits)) return true;
+    if (normPhoneDigits(r.plus_one_phone).includes(qDigits)) return true;
+  }
+  return false;
+}
+
+function renderRosterList() {
+  const el = document.getElementById('rosterList');
+  const qRaw = (document.getElementById('rosterSearchInput')?.value || '').trim();
+  const qLower = qRaw.toLowerCase();
+  const qDigits = normPhoneDigits(qRaw);
+  let list = rosterRows;
+  if (qLower || qDigits.length >= 3) {
+    list = rosterRows.filter((r) => rosterRowMatches(r, qLower, qDigits));
+  }
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-roster">${rosterRows.length ? 'No matches. Try another spelling or phone digits.' : 'No approved guests for this event yet.'}</div>`;
+    return;
+  }
+  el.innerHTML = list
+    .map((r) => {
+      const name = `${r.first_name || ''} ${r.last_name || ''}`.trim();
+      const phone = r.phone ? escapeHtml(r.phone) : '';
+      const email = r.email ? escapeHtml(r.email) : '';
+      const meta = [email, phone].filter(Boolean).join(' · ');
+      let b = `<div class="roster-group">
+        <button type="button" class="roster-item" data-roster-id="${r.id}" data-roster-slot="primary">
+          <strong>${escapeHtml(name || 'Guest')}</strong>
+          <span class="rost-meta">${meta || '—'}${r.business_name ? ` · ${escapeHtml(r.business_name)}` : ''}</span>
+        </button>`;
+      if (r.has_plus_one) {
+        const p1n = `${r.plus_one_first_name || ''} ${r.plus_one_last_name || ''}`.trim();
+        const p1meta = [r.plus_one_email, r.plus_one_phone].filter(Boolean).map(escapeHtml).join(' · ');
+        b += `<button type="button" class="roster-item sub" data-roster-id="${r.id}" data-roster-slot="plus_one">+1 · ${escapeHtml(p1n || 'Guest')}${p1meta ? `<span class="rost-meta" style="display:block;margin-top:6px">${p1meta}</span>` : ''}</button>`;
+      }
+      b += '</div>';
+      return b;
+    })
+    .join('');
+}
+
+async function loadApprovedRoster() {
+  const sel = document.getElementById('checkinEventSelect');
+  const eventId = sel?.value;
+  if (!eventId) {
+    rosterRows = [];
+    renderRosterList();
+    return;
+  }
+  sessionStorage.setItem('horeca_checkin_event', eventId);
+  const { data, error } = await supabaseClient
+    .from('registrations')
+    .select('*')
+    .eq('event_id', eventId)
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false });
+  if (error) {
+    document.getElementById('rosterList').innerHTML = `<div class="empty-roster">${escapeHtml(error.message)}</div>`;
+    rosterRows = [];
+    return;
+  }
+  rosterRows = data || [];
+  renderRosterList();
+}
+
+async function populateCheckinEvents() {
+  const { data } = await supabaseClient.from('events').select('*').order('event_date', { ascending: false });
+  const sel = document.getElementById('checkinEventSelect');
+  sel.innerHTML = (data || [])
+    .map((e) => `<option value="${e.id}">${escapeHtml(fmtEventOptLabel(e))}</option>`)
+    .join('');
+  const urlEv = new URLSearchParams(window.location.search).get('event');
+  const stored = sessionStorage.getItem('horeca_checkin_event');
+  const prefer = urlEv || stored;
+  if (prefer && (data || []).some((e) => e.id === prefer)) sel.value = prefer;
+  else {
+    const live = (data || []).find((e) => e.status === 'open') || (data || [])[0];
+    if (live) sel.value = live.id;
+  }
+  await loadApprovedRoster();
+}
+
+function showRosterPanel() {
+  stopBarcodeScan();
+  document.getElementById('phaseLoading').classList.add('hidden');
+  document.getElementById('phaseInvalid').classList.add('hidden');
+  document.getElementById('phaseGuest').classList.add('hidden');
+  document.getElementById('phaseRoster').classList.remove('hidden');
+  populateCheckinEvents();
+}
+
+function openRosterGuest(regId, slot) {
+  const row = rosterRows.find((x) => x.id === regId);
+  if (!row) return;
+  registration = row;
+  guestMode = slot === 'plus_one' ? 'plus_one' : 'primary';
+  qrToken =
+    guestMode === 'plus_one' ? String(row.plus_one_qr_token || '') : String(row.qr_token || '');
+  stopBarcodeScan();
+  document.getElementById('phaseRoster').classList.add('hidden');
+  document.getElementById('phaseGuest').classList.remove('hidden');
+  renderGuestCard();
+}
+
+async function continueAfterLogin() {
   qrToken = parseToken();
+  document.getElementById('phaseRoster').classList.add('hidden');
+  document.getElementById('phaseInvalid').classList.add('hidden');
+
+  if (qrToken) {
+    document.getElementById('phaseLoading').classList.remove('hidden');
+    document.getElementById('phaseGuest').classList.add('hidden');
+    await loadGuestByToken();
+    return;
+  }
+
+  document.getElementById('phaseLoading').classList.add('hidden');
+  showRosterPanel();
+}
+
+async function loadGuestByToken() {
   document.getElementById('phaseLoading').classList.remove('hidden');
   document.getElementById('phaseInvalid').classList.add('hidden');
   document.getElementById('phaseGuest').classList.add('hidden');
+  document.getElementById('phaseRoster').classList.add('hidden');
 
   if (!qrToken) {
     document.getElementById('phaseLoading').classList.add('hidden');
-    document.getElementById('phaseInvalid').classList.remove('hidden');
+    showRosterPanel();
     return;
   }
 
@@ -501,6 +835,7 @@ function renderGuestCard() {
         <div class="row"><dt>Business</dt><dd>${escapeHtml(r.business_name || '—')}</dd></div>
         <div class="row"><dt>Role</dt><dd>${escapeHtml(r.role || '—')}</dd></div>
         <div class="row"><dt>Email</dt><dd>${escapeHtml(displayEmail || '—')}</dd></div>
+        <div class="row"><dt>Phone</dt><dd>${escapeHtml((isPrimaryView ? r.phone : r.plus_one_phone) || '—')}</dd></div>
       </dl>
   `;
 
@@ -526,7 +861,7 @@ function renderGuestCard() {
   } else if (status !== 'approved') {
     html += `
       <div class="state-box bad">
-        ✗ This registration is not approved for entry. Direct the guest to registration or a lead admin.
+        ✗ This registration is not approved for entry. Point them to <a href="https://events.thehorecastore.com" target="_blank" rel="noopener" style="color:var(--gold)">events.thehorecastore.com</a> to register, or flag a lead admin.
       </div>
     `;
   } else {
@@ -537,6 +872,7 @@ function renderGuestCard() {
     `;
   }
 
+  html += `<p style="margin-top:18px"><button type="button" class="btn-ghost" id="btnBackRoster" style="font-size:11px;padding:8px 14px">← Back to search / scan</button></p>`;
   html += '</div>';
   document.getElementById('phaseGuest').innerHTML = html;
 
@@ -547,6 +883,14 @@ function renderGuestCard() {
     if (confirm('Record another check-in now? This replaces the previous check-in time for this guest slot.')) {
       doCheckIn(true);
     }
+  });
+  document.getElementById('btnBackRoster')?.addEventListener('click', () => {
+    registration = null;
+    qrToken = '';
+    const u = new URL(window.location.href);
+    u.searchParams.delete('t');
+    window.history.replaceState({}, '', u.pathname + u.search + u.hash);
+    showRosterPanel();
   });
 }
 
@@ -589,7 +933,7 @@ async function doCheckIn(isOverride) {
     details: {
       slot: isPrimaryView ? 'primary' : 'plus_one',
       override: isOverride,
-      qr_token_prefix: qrToken.slice(0, 12),
+      qr_token_prefix: qrToken && String(qrToken).length ? String(qrToken).slice(0, 12) : 'roster',
     },
   });
 
@@ -616,9 +960,18 @@ async function doCheckIn(isOverride) {
         Checked in at ${fmtWhen(t)}<br>
         <span style="color:var(--ink-soft);font-size:13px">Staff: ${escapeHtml(currentUser.email)}</span>
       </div>
-      <p style="margin-top:20px;color:var(--ink-mute);font-size:13px">You can close this tab or scan the next guest.</p>
+      <button type="button" class="btn-secondary-ui" id="btnNextGuest" style="margin-top:20px">Find next guest</button>
+      <p style="margin-top:16px;color:var(--ink-mute);font-size:13px">Or close this tab when your shift ends.</p>
     </div>
   `;
+  document.getElementById('btnNextGuest')?.addEventListener('click', () => {
+    registration = null;
+    qrToken = '';
+    const u = new URL(window.location.href);
+    u.searchParams.delete('t');
+    window.history.replaceState({}, '', u.pathname + u.search + u.hash);
+    showRosterPanel();
+  });
 }
 
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -640,7 +993,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     currentUser = data.user;
     showMain();
     document.getElementById('staffEmail').textContent = currentUser.email;
-    await loadGuest();
+    await continueAfterLogin();
   } catch (x) {
     err.textContent = x.message || String(x);
     err.classList.remove('hidden');
@@ -650,6 +1003,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 });
 
 document.getElementById('logoutBtn').addEventListener('click', async () => {
+  stopBarcodeScan();
   await supabaseClient.auth.signOut();
   currentUser = null;
   window.location.reload();
@@ -667,11 +1021,44 @@ async function boot() {
     currentUser = session.user;
     showMain();
     document.getElementById('staffEmail').textContent = currentUser.email;
-    await loadGuest();
+    await continueAfterLogin();
   } else {
     showLogin();
   }
 }
+
+document.getElementById('checkinEventSelect').addEventListener('change', () => loadApprovedRoster());
+let rosterSearchT;
+document.getElementById('rosterSearchInput').addEventListener('input', () => {
+  clearTimeout(rosterSearchT);
+  rosterSearchT = setTimeout(renderRosterList, 180);
+});
+document.getElementById('pasteTokenBtn').addEventListener('click', async () => {
+  const t = extractTokenFromPaste(document.getElementById('pasteTokenInput').value);
+  if (!t) {
+    alert('Could not find a token. Paste the full check-in URL or the HRC-… code from the email.');
+    return;
+  }
+  qrToken = t;
+  stopBarcodeScan();
+  document.getElementById('phaseRoster').classList.add('hidden');
+  document.getElementById('phaseLoading').classList.remove('hidden');
+  await loadGuestByToken();
+});
+document.getElementById('rosterList').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-roster-id]');
+  if (!btn) return;
+  openRosterGuest(btn.getAttribute('data-roster-id'), btn.getAttribute('data-roster-slot') || 'primary');
+});
+document.getElementById('btnScanQr').addEventListener('click', () => startBarcodeScan());
+document.getElementById('btnStopScan').addEventListener('click', () => stopBarcodeScan());
+document.getElementById('btnInvalidToRoster').addEventListener('click', () => {
+  qrToken = '';
+  const u = new URL(window.location.href);
+  u.searchParams.delete('t');
+  window.history.replaceState({}, '', u.pathname + u.search + u.hash);
+  showRosterPanel();
+});
 
 boot();
 </script>
