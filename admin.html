@@ -748,8 +748,8 @@ async function confirmAction(actionType) {
     
     if (updateErr) throw updateErr;
     
-    // Call Edge Function to send email + generate QR if approving
-    const { error: fnErr } = await supabaseClient.functions.invoke('send-registration-email', {
+    // Call Edge Function to send email + generate QR (Resend, etc.)
+    const { data: fnData, error: fnErr } = await supabaseClient.functions.invoke('send-registration-email', {
       body: {
         registration_id: activeRegistration.id,
         template_id: templateId,
@@ -758,19 +758,48 @@ async function confirmAction(actionType) {
         admin_email: currentUser.email
       }
     });
-    
-    if (fnErr) console.warn('Email function error:', fnErr);
-    
+
+    let emailProblem = null;
+    if (fnErr) {
+      const msg = fnErr.message || String(fnErr);
+      const ctx = fnErr.context;
+      emailProblem = ctx?.body ? `${msg}: ${typeof ctx.body === 'string' ? ctx.body : JSON.stringify(ctx.body)}` : msg;
+      console.error('send-registration-email:', fnErr, fnData);
+    } else if (fnData && typeof fnData === 'object' && fnData.error) {
+      emailProblem = typeof fnData.error === 'string' ? fnData.error : JSON.stringify(fnData.error);
+      console.error('send-registration-email response error:', fnData);
+    }
+
     // Log the action
     await supabaseClient.from('activity_log').insert({
       registration_id: activeRegistration.id,
       admin_email: currentUser.email,
       action: actionType,
-      details: { template_id: templateId, custom_message: customMessage }
+      details: {
+        template_id: templateId,
+        custom_message: customMessage,
+        email_dispatch_error: emailProblem || null
+      }
     });
-    
+
     closeAction();
-    showToast(`<strong>${actionType === 'approve' ? 'Approved' : actionType === 'reject' ? 'Rejected' : actionType === 'question' ? 'Question sent' : 'Reminder sent'}.</strong> Email sent to ${activeRegistration.email}.`);
+
+    const actionLabel =
+      actionType === 'approve' ? 'Approved' : actionType === 'reject' ? 'Rejected' : actionType === 'question' ? 'Question logged' : 'Reminder queued';
+    if (emailProblem) {
+      showToast(
+        `<strong>${actionLabel},</strong> but the email did not send.<br><span style="color:var(--red);font-size:12px;">${escape(emailProblem)}</span><br><small style="color:var(--ink-mute);">Check Supabase → Edge Functions → send-registration-email → Logs. Confirm RESEND_API_KEY, FROM_EMAIL, domain verify, and deploy.</small>`
+      );
+      alert(
+        'Status was saved, but email failed:\n\n' +
+          emailProblem +
+          '\n\nOpen browser DevTools → Network → find the functions/v1/send-registration-email call for details.\nIn Supabase: Edge Functions → send-registration-email → Logs.'
+      );
+    } else {
+      showToast(
+        `<strong>${actionType === 'approve' ? 'Approved' : actionType === 'reject' ? 'Rejected' : actionType === 'question' ? 'Question sent' : 'Reminder sent'}.</strong> Email dispatched to ${escape(activeRegistration.email)}.`
+      );
+    }
     
     // Reload data
     await loadRegistrations();
