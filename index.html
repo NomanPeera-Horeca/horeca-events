@@ -326,7 +326,7 @@ section { position: relative; padding: 140px 40px; }
 
 /* SPONSORS */
 .sponsors-tiers { display: grid; grid-template-columns: 1fr; gap: 24px; }
-.sponsor-tier { border: 1px solid var(--rule); padding: 40px 48px; display: grid; grid-template-columns: 220px 1fr; gap: 60px; align-items: center; transition: border-color 0.3s ease; }
+.sponsor-tier { border: 1px solid var(--rule); padding: 40px 48px; display: grid; grid-template-columns: 200px 1fr; gap: 48px; align-items: center; transition: border-color 0.3s ease; }
 .sponsor-tier:hover { border-color: var(--rule-strong); }
 .sponsor-tier-label { display: flex; flex-direction: column; gap: 8px; }
 .tier-rank { font-family: var(--mono); font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--ink-mute); }
@@ -337,9 +337,11 @@ section { position: relative; padding: 140px 40px; }
 .tier-name.host { color: var(--ink); }
 .sponsor-name-large { font-family: var(--serif); font-size: 32px; font-weight: 400; letter-spacing: -0.02em; color: var(--ink); }
 .sponsor-name-large small { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; color: var(--ink-soft); text-transform: uppercase; margin-top: 8px; font-weight: 400; }
-.sponsor-logo-wrap { margin-top: 20px; }
-.sponsor-logo-img { max-height: 52px; max-width: 220px; width: auto; height: auto; object-fit: contain; display: block; }
-.sponsor-logo-img--light-bg { background: #f5f5f5; border-radius: 8px; padding: 10px 14px; }
+.sponsor-brand-block { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; min-height: 56px; justify-content: center; }
+.sponsor-brand-logo { display: block; width: auto; height: auto; object-fit: contain; object-position: left center; max-width: min(100%, 360px); max-height: 88px; }
+.sponsor-brand-logo--light { background: #f5f5f5; border-radius: 10px; padding: 14px 20px; max-height: 96px; }
+.sponsor-brand-logo--on-dark { max-height: 72px; max-width: min(100%, 320px); }
+.sponsor-tagline { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; color: var(--ink-soft); text-transform: uppercase; font-weight: 400; line-height: 1.5; max-width: 420px; margin: 0; }
 
 /* SPONSOR APPLY CTA */
 .sponsor-apply { margin-top: 60px; background: linear-gradient(135deg, rgba(201,165,92,0.08), rgba(114,47,55,0.05)); border: 1px solid var(--gold-deep); padding: 56px 48px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 60px; align-items: center; position: relative; overflow: hidden; }
@@ -1204,13 +1206,10 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
         <div class="sponsor-tier-label">
           <div class="tier-rank">Tier I · Patron</div>
           <div class="tier-name gold">Gold</div>
-          <div class="sponsor-logo-wrap">
-            <img class="sponsor-logo-img sponsor-logo-img--light-bg" src="images/sponsors/rapid-hotel-supplies.png" width="200" height="52" alt="Rapid Hotel Supplies logo">
-          </div>
         </div>
-        <div class="sponsor-name-large">
-          Rapid Hotel Supplies
-          <small>Hotel Operating Supplies &amp; Equipment</small>
+        <div class="sponsor-brand-block">
+          <img class="sponsor-brand-logo sponsor-brand-logo--light" src="images/sponsors/rapid-hotel-supplies.png" alt="Rapid Hotel Supplies">
+          <p class="sponsor-tagline">Hotel Operating Supplies &amp; Equipment</p>
         </div>
       </div>
       
@@ -1218,13 +1217,10 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
         <div class="sponsor-tier-label">
           <div class="tier-rank">Tier II · Patron</div>
           <div class="tier-name silver">Silver</div>
-          <div class="sponsor-logo-wrap">
-            <img class="sponsor-logo-img sponsor-logo-img--light-bg" src="images/sponsors/silverchef.png" width="200" height="48" alt="SilverChef logo">
-          </div>
         </div>
-        <div class="sponsor-name-large">
-          SilverChef
-          <small>Equipment Financing for Hospitality</small>
+        <div class="sponsor-brand-block">
+          <img class="sponsor-brand-logo sponsor-brand-logo--light" src="images/sponsors/silverchef.png" alt="SilverChef">
+          <p class="sponsor-tagline">Equipment Financing for Hospitality</p>
         </div>
       </div>
       
@@ -1232,13 +1228,10 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
         <div class="sponsor-tier-label">
           <div class="tier-rank">Tier III · Patron</div>
           <div class="tier-name bronze">Bronze</div>
-          <div class="sponsor-logo-wrap">
-            <img class="sponsor-logo-img" src="images/sponsors/frankit-app.png" width="200" height="52" alt="Frankit.app logo">
-          </div>
         </div>
-        <div class="sponsor-name-large">
-          Frankit.app
-          <small>Restaurant Equipment &amp; Solutions</small>
+        <div class="sponsor-brand-block">
+          <img class="sponsor-brand-logo sponsor-brand-logo--on-dark" src="images/sponsors/frankit-app.png" alt="Frankit.app">
+          <p class="sponsor-tagline">Restaurant Equipment &amp; Solutions</p>
         </div>
       </div>
     </div>
