@@ -1,0 +1,12 @@
+# Admin static site: serve admin dashboard at /. (repo root has public index.html for the events site.)
+# After connecting this repo on Render, use this service or set Dashboard → Build manually:
+#   Build Command:  mkdir -p dist && cp admin.html dist/index.html
+#   Publish Directory: dist
+services:
+  - type: web
+    name: horeca-admin
+    runtime: static
+    repo: https://github.com/NomanPeera-Horeca/horeca-events.git
+    branch: main
+    buildCommand: mkdir -p dist && cp admin.html dist/index.html
+    staticPublishPath: dist
