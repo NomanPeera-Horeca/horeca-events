@@ -1342,6 +1342,7 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
       <form id="rsvpForm" onsubmit="submitRSVP(event)">
         <input type="hidden" id="eventName" name="event" value="Houston Vol. II - May 5, 2026">
         <input type="hidden" id="formType" name="formType" value="rsvp">
+        <input type="hidden" id="vipApplication" name="vipApplication" value="">
         
         <div class="form-grid">
           <div class="field">
@@ -1502,7 +1503,16 @@ function openModal(e, key) {
   const data = events[key] || events.vol2;
   document.getElementById('modalTitle').innerHTML = data.title;
   document.getElementById('modalEyebrow').textContent = data.eyebrow;
-  document.getElementById('modalSub').textContent = data.sub;
+  const subEl = document.getElementById('modalSub');
+  const p = new URLSearchParams(window.location.search || '');
+  const vipFromUrl = p.get('vip') === '1' || p.get('vip') === 'true';
+  const vipField = document.getElementById('vipApplication');
+  if (vipField) vipField.value = vipFromUrl && data.type === 'rsvp' ? '1' : '';
+  let subText = data.sub;
+  if (vipFromUrl && data.type === 'rsvp') {
+    subText += ' This is a VIP application: our team will see the VIP flag on your registration.';
+  }
+  subEl.textContent = subText;
   document.getElementById('eventName').value = data.eventName;
   document.getElementById('formType').value = data.type;
   document.querySelector('#businessField label').firstChild.textContent = data.businessLabel + ' ';
@@ -1793,6 +1803,9 @@ async function submitRSVP(e) {
         plus_one_phone: hasPlusOne ? raw.plusOnePhone.trim() : null,
         plus_one_role: hasPlusOne ? raw.plusOneRole : null,
         attendee_count: hasPlusOne ? 2 : 1,
+        is_vip:
+          (raw.formType || 'rsvp') === 'rsvp' &&
+          (raw.vipApplication === '1' || raw.vipApplication === 'true'),
         user_agent: navigator.userAgent,
         utm_source: new URLSearchParams(window.location.search).get('utm_source'),
         utm_medium: new URLSearchParams(window.location.search).get('utm_medium'),
@@ -1826,7 +1839,7 @@ async function submitRSVP(e) {
   document.getElementById('modalSuccess').classList.add('active');
   
   // Show toast notification
-  showToast(raw.formType, hasPlusOne);
+  showToast(raw.formType, hasPlusOne, raw.vipApplication);
   
   // Reset form for next use
   form.reset();
@@ -1839,13 +1852,19 @@ async function submitRSVP(e) {
   submitBtn.style.opacity = '1';
 }
 
-function showToast(formType, hasPlusOne) {
+function showToast(formType, hasPlusOne, vipApplication) {
   const toast = document.getElementById('toast');
   const toastText = toast.querySelector('.toast-text');
   
   let message = '<strong>Application sent.</strong> Our team will review and respond before the event.';
+  if (formType === 'rsvp' && (vipApplication === '1' || vipApplication === 'true')) {
+    message = '<strong>VIP application sent.</strong> Our team will review and respond before the event.';
+  }
   if (hasPlusOne) {
     message = '<strong>Application sent for you and your guest.</strong> Our team will review and respond before the event.';
+    if (formType === 'rsvp' && (vipApplication === '1' || vipApplication === 'true')) {
+      message = '<strong>VIP application sent for you and your guest.</strong> Our team will review and respond before the event.';
+    }
   }
   if (formType === 'sponsor') {
     message = '<strong>Inquiry received.</strong> Our partnerships team will be in touch within 48 hours.';
