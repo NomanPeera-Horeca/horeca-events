@@ -730,6 +730,7 @@ function renderTable() {
             <button class="action-btn reject" onclick="openAction('${r.id}', 'reject')">✗ Reject</button>
           ` : ''}
           ${r.status === 'approved' ? `
+            <button class="action-btn approve" onclick="openAction('${r.id}', 'resend_approval')">Resend confirmation</button>
             <button class="action-btn" onclick="openAction('${r.id}', 'reminder')">📧 Send Reminder</button>
           ` : ''}
         </div>
@@ -1102,6 +1103,13 @@ function viewDetail(id) {
         <div class="modal-detail"><dt>Phone</dt><dd><a href="tel:${escape(r.phone)}">${escape(r.phone)}</a></dd></div>
         <div class="modal-detail"><dt>Source</dt><dd>${escape(r.source || '-')}</dd></div>
         ${r.challenge ? `<div class="modal-detail"><dt>Challenge</dt><dd>${escape(r.challenge)}</dd></div>` : ''}
+        ${r.vip_optional_note ? `<div class="modal-detail"><dt>VIP · Note</dt><dd>${escape(r.vip_optional_note)}</dd></div>` : ''}
+        ${r.is_vip && (r.vip_interest_keynote || r.vip_interest_qa || (r.vip_topic_note && String(r.vip_topic_note).trim())) ? `
+        <div class="modal-detail"><dt>VIP · Program</dt><dd>
+          ${r.vip_interest_keynote ? '<span class="status-pill" style="border-color:var(--gold);color:var(--gold);margin-right:8px">Keynote / featured</span>' : ''}
+          ${r.vip_interest_qa ? '<span class="status-pill" style="border-color:var(--gold);color:var(--gold);margin-right:8px">Q&amp;A</span>' : ''}
+          ${r.vip_topic_note && String(r.vip_topic_note).trim() ? `<div style="margin-top:8px;color:var(--ink-soft)">Topic: ${escape(r.vip_topic_note)}</div>` : ''}
+        </dd></div>` : ''}
         ${r.has_plus_one ? `
           <div class="modal-detail"><dt>+1 Name</dt><dd>${escape(r.plus_one_first_name)} ${escape(r.plus_one_last_name)}</dd></div>
           <div class="modal-detail"><dt>+1 Email</dt><dd>${escape(r.plus_one_email)}</dd></div>
@@ -1130,13 +1138,13 @@ function openAction(id, actionType) {
   activeRegistration = allRegistrations.find(x => x.id === id);
   if (!activeRegistration) return;
   
-  const categoryMap = { approve: 'approval', reject: 'rejection', question: 'question', reminder: 'reminder' };
+  const categoryMap = { approve: 'approval', resend_approval: 'approval', reject: 'rejection', question: 'question', reminder: 'reminder' };
   const category = categoryMap[actionType];
   const templates = emailTemplates.filter(t => t.category === category);
 
   let orderedTemplates = templates;
   let defaultTplId = templates[0]?.id;
-  if (actionType === 'approve' && templates.length) {
+  if ((actionType === 'approve' || actionType === 'resend_approval') && templates.length) {
     const tplRank = (t) => {
       if (t.slug === 'approval-vip') return 0;
       if (t.slug === 'approval') return 1;
@@ -1154,6 +1162,7 @@ function openAction(id, actionType) {
 
   const titleMap = {
     approve: 'Approve <em>& Send QR</em>',
+    resend_approval: 'Resend <em>confirmation</em>',
     reject: 'Politely <em>Reject</em>',
     question: 'Ask a <em>Question</em>',
     reminder: 'Send <em>Reminder</em>'
@@ -1161,6 +1170,7 @@ function openAction(id, actionType) {
   
   const buttonText = {
     approve: '✓ Approve & Send Email',
+    resend_approval: '✉ Resend confirmation email',
     reject: '✗ Send Rejection',
     question: '? Send Question',
     reminder: '📧 Send Reminder'
@@ -1173,9 +1183,14 @@ function openAction(id, actionType) {
       <p style="color: var(--ink-soft); margin-bottom: 20px; font-size: 14px;">
         For <strong style="color: var(--ink);">${escape(activeRegistration.first_name)} ${escape(activeRegistration.last_name)}</strong> · ${escape(activeRegistration.business_name)}
       </p>
-      ${actionType === 'approve' && activeRegistration.is_vip ? `
+      ${actionType === 'resend_approval' ? `
+      <p style="color: var(--ink-soft); margin: -8px 0 16px 0; font-size: 13px; line-height: 1.55; padding: 12px 14px; border: 1px solid var(--rule); background: var(--bg-card); border-radius: 2px;">
+        Sends the selected <strong>approval</strong> template again. Existing check-in QR codes and tokens are <strong>not</strong> changed. Use this after marking someone VIP or if they did not receive the first email.
+      </p>
+      ` : ''}
+      ${(actionType === 'approve' || actionType === 'resend_approval') && activeRegistration.is_vip ? `
       <p style="color: var(--gold); margin: -8px 0 16px 0; font-size: 13px; line-height: 1.5; padding: 12px 14px; border: 1px solid rgba(201,165,92,0.35); background: rgba(201,165,92,0.08); border-radius: 2px;">
-        This guest is marked <strong style="color: var(--ink);">VIP</strong>. The VIP approval template is selected by default. You can switch to the standard approval if needed.
+        This guest is marked <strong style="color: var(--ink);">VIP</strong>.${actionType === 'resend_approval' ? ' Same QR links as before. ' : ' '}The VIP approval template is selected by default. You can switch to the standard approval if needed.
       </p>
       ` : ''}
 
@@ -1198,7 +1213,7 @@ function openAction(id, actionType) {
     
     <div class="modal-actions">
       <button class="action-btn" onclick="closeAction()">Cancel</button>
-      <button class="action-btn ${actionType}" id="confirmActionBtn" onclick="confirmAction('${actionType}')">${buttonText[actionType]}</button>
+      <button class="action-btn ${actionType === 'resend_approval' ? 'approve' : actionType}" id="confirmActionBtn" onclick="confirmAction('${actionType}')">${buttonText[actionType]}</button>
     </div>
   `;
   
@@ -1252,6 +1267,7 @@ async function confirmAction(actionType) {
   
   const btnLabels = {
     approve: '✓ Approve & Send Email',
+    resend_approval: '✉ Resend confirmation email',
     reject: '✗ Send Rejection',
     question: '? Send Question',
     reminder: '📧 Send Reminder'
@@ -1266,10 +1282,70 @@ async function confirmAction(actionType) {
     return;
   }
 
+  if (actionType === 'resend_approval') {
+    const s = tpl.slug || '';
+    const ok =
+      s === 'approval' ||
+      s === 'approval-vip' ||
+      (s.startsWith('approval') && s !== 'approval-plus-one');
+    if (!ok) {
+      alert('Resend confirmation only works with an approval template for the main guest (not plus-one).');
+      return;
+    }
+  }
+
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Processing...';
   
   try {
+    if (actionType === 'resend_approval') {
+      const { data: fnData, error: fnErr } = await supabaseClient.functions.invoke('send-registration-email', {
+        body: {
+          registration_id: activeRegistration.id,
+          template_id: templateId,
+          action_type: 'resend_approval',
+          custom_message: customMessage,
+          admin_email: currentUser.email
+        }
+      });
+
+      let emailProblem = null;
+      if (fnErr) {
+        const msg = fnErr.message || String(fnErr);
+        const ctx = fnErr.context;
+        emailProblem = ctx?.body ? `${msg}: ${typeof ctx.body === 'string' ? ctx.body : JSON.stringify(ctx.body)}` : msg;
+        console.error('send-registration-email:', fnErr, fnData);
+      } else if (fnData && typeof fnData === 'object' && fnData.error) {
+        emailProblem = typeof fnData.error === 'string' ? fnData.error : JSON.stringify(fnData.error);
+        console.error('send-registration-email response error:', fnData);
+      }
+
+      await supabaseClient.from('activity_log').insert({
+        registration_id: activeRegistration.id,
+        admin_email: currentUser.email,
+        action: 'resend_approval',
+        details: {
+          template_id: templateId,
+          custom_message: customMessage,
+          email_dispatch_error: emailProblem || null
+        }
+      });
+
+      closeAction();
+
+      if (emailProblem) {
+        showToast(
+          `<strong>Resend failed.</strong><br><span style="color:var(--red);font-size:12px;">${escape(emailProblem)}</span>`
+        );
+        alert('Email did not send:\n\n' + emailProblem);
+      } else {
+        showToast(`<strong>Confirmation resent.</strong> Email sent to ${escape(activeRegistration.email)}. QR unchanged.`);
+      }
+
+      await loadRegistrations();
+      return;
+    }
+
     // Status mapping
     const statusMap = { approve: 'approved', reject: 'rejected', question: 'needs_info', reminder: 'approved' };
     const newStatus = statusMap[actionType];
