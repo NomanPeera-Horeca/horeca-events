@@ -3,18 +3,16 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Access Request · Houston Vol. II · The Horeca Meetup</title>
-<meta name="description" content="Request VIP access for The Horeca Meetup Houston Vol. II. A dedicated application for hosts we want at the center of the room." />
+<title>VIP access closed · Houston Vol. II · The Horeca Meetup</title>
+<meta name="description" content="VIP applications for Houston Vol. II are closed. Explore upcoming Horeca Meetup editions." />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230a0a0a'/%3E%3Ctext x='50' y='65' font-family='Georgia,serif' font-size='52' font-weight='700' fill='%23d4a574' text-anchor='middle'%3EH%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0a0a0a;
   --bg-card: #141414;
-  --bg-elev: #1a1a1a;
   --ink: #ededed;
   --ink-soft: #a8a8a8;
   --ink-mute: #6b6b6b;
@@ -28,10 +26,8 @@
   --mono: 'JetBrains Mono', monospace;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
-body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.6; min-height: 100vh; }
-a { color: inherit; text-decoration: none; }
-::selection { background: var(--gold); color: var(--bg); }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); min-height: 100vh; }
+a { color: var(--gold); }
 
 .vip-nav {
   position: sticky;
@@ -42,28 +38,23 @@ a { color: inherit; text-decoration: none; }
   border-bottom: 1px solid var(--rule);
 }
 .vip-nav-inner {
-  max-width: 720px;
+  max-width: 640px;
   margin: 0 auto;
   padding: 18px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  flex-wrap: wrap;
 }
-.vip-nav a.back { font-size: 13px; font-weight: 500; color: var(--ink-soft); }
+.vip-nav a.back { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; }
 .vip-nav a.back:hover { color: var(--gold); }
-.vip-nav .logo { font-family: var(--serif); font-size: 17px; font-weight: 600; display: flex; align-items: baseline; gap: 8px; }
+.vip-nav .logo { font-family: var(--serif); font-size: 17px; font-weight: 600; display: flex; align-items: baseline; gap: 8px; text-decoration: none; color: var(--ink); }
 .vip-nav .logo-mark {
   width: 26px; height: 26px; border: 1.5px solid var(--gold); color: var(--gold);
   display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;
 }
 
-main {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 48px 24px 100px;
-}
+main { max-width: 640px; margin: 0 auto; padding: 48px 24px 80px; }
 
 .page-eyebrow {
   font-family: var(--mono);
@@ -75,11 +66,11 @@ main {
 }
 .page-title {
   font-family: var(--serif);
-  font-size: clamp(28px, 6vw, 40px);
+  font-size: clamp(26px, 5vw, 36px);
   font-weight: 300;
   letter-spacing: -0.02em;
-  line-height: 1.1;
-  margin-bottom: 16px;
+  line-height: 1.15;
+  margin-bottom: 20px;
 }
 .page-title em { font-style: italic; color: var(--gold); }
 .page-lead {
@@ -87,15 +78,14 @@ main {
   font-size: 17px;
   font-weight: 300;
   color: var(--ink-soft);
-  line-height: 1.55;
-  margin-bottom: 36px;
-  max-width: 560px;
+  line-height: 1.65;
+  margin-bottom: 32px;
 }
 
 .form-card {
   background: var(--bg-card);
   border: 1px solid var(--rule-strong);
-  padding: 40px 36px 36px;
+  padding: 36px 32px;
   position: relative;
 }
 .form-card::before {
@@ -106,206 +96,37 @@ main {
   background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light));
 }
 
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-.field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-.field-full { grid-column: 1 / -1; }
-.field label {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-}
-.field label .required { color: var(--gold); }
-.field input, .field select, .field textarea {
-  background: var(--bg);
-  border: 1px solid var(--rule);
-  padding: 14px 16px;
-  color: var(--ink);
-  font-family: var(--sans);
-  font-size: 14px;
-  transition: border-color 0.2s ease;
-}
-.field input:focus, .field select:focus, .field textarea:focus {
-  outline: none;
-  border-color: var(--gold);
-}
-.field textarea { resize: vertical; min-height: 88px; }
-.field-hint { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; color: var(--ink-mute); margin-top: 4px; }
-.field-hint.error { color: #d4626a; }
-.field input.error, .field select.error { border-color: #d4626a; }
-
-.vip-opps {
-  margin: 28px 0;
-  padding: 24px;
-  border: 1px solid rgba(201, 165, 92, 0.28);
-  background: rgba(201, 165, 92, 0.05);
-}
-.vip-opps-title {
-  font-family: var(--serif);
-  font-size: 18px;
-  font-weight: 400;
-  font-style: italic;
-  color: var(--ink);
-  margin-bottom: 8px;
-}
-.vip-opps-sub {
-  font-size: 14px;
-  color: var(--ink-soft);
-  margin-bottom: 20px;
-  line-height: 1.5;
-}
-.check-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 16px;
-  cursor: pointer;
-  font-size: 15px;
-  color: var(--ink-soft);
-  line-height: 1.45;
-}
-.check-row input {
-  margin-top: 3px;
-  width: 18px;
-  height: 18px;
-  accent-color: var(--gold);
-  flex-shrink: 0;
-}
-.check-row:hover { color: var(--ink); }
-
-.plus-one-section {
-  margin: 24px 0;
-  padding: 24px;
-  border: 1px solid var(--rule);
-  background: rgba(20,20,20,0.5);
-}
-.plus-one-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.plus-one-eyebrow {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--gold);
-}
-.plus-one-title {
-  font-family: var(--serif);
-  font-size: 17px;
-  font-weight: 400;
-  color: var(--ink);
-  font-style: italic;
-}
-.plus-one-toggle {
-  display: flex;
+.btn {
+  display: inline-flex;
   align-items: center;
   gap: 10px;
-  cursor: pointer;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  color: var(--ink-soft);
-  text-transform: uppercase;
-  user-select: none;
-}
-.plus-one-toggle input { display: none; }
-.toggle-slider {
-  width: 38px;
-  height: 22px;
-  background: var(--rule-strong);
-  border-radius: 11px;
-  position: relative;
-  flex-shrink: 0;
-}
-.toggle-slider::after {
-  content: '';
-  position: absolute;
-  top: 3px; left: 3px;
-  width: 16px;
-  height: 16px;
-  background: var(--ink-soft);
-  border-radius: 50%;
-  transition: transform 0.3s ease, background 0.3s ease;
-}
-.plus-one-toggle input:checked + .toggle-slider { background: var(--gold); }
-.plus-one-toggle input:checked + .toggle-slider::after {
-  transform: translateX(16px);
-  background: var(--bg);
-}
-.plus-one-fields { display: none; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--rule); }
-.plus-one-fields.active { display: block; }
-.plus-one-note {
-  font-family: var(--serif);
-  font-size: 14px;
-  font-style: italic;
-  color: var(--ink-soft);
-  margin-bottom: 20px;
-  line-height: 1.5;
-}
-
-.submit-btn {
-  width: 100%;
-  background: var(--gold);
-  color: var(--bg);
-  border: none;
-  padding: 18px;
+  padding: 16px 28px;
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  text-decoration: none;
+  border: 1.5px solid transparent;
   cursor: pointer;
-  margin-top: 8px;
-  transition: filter 0.2s ease, transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.submit-btn:hover:not(:disabled) { filter: brightness(1.05); transform: translateY(-1px); }
-.submit-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+.btn-primary { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(201, 165, 92, 0.2); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+.btn-arrow { transition: transform 0.2s ease; display: inline-block; }
+.btn:hover .btn-arrow { transform: translateX(4px); }
 
-.form-fine {
-  font-family: var(--serif);
-  font-size: 13px;
-  font-style: italic;
-  color: var(--ink-mute);
-  text-align: center;
-  margin-top: 20px;
-  line-height: 1.55;
-}
-
-.toast {
-  position: fixed;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%) translateY(140%);
-  background: var(--bg-card);
-  border: 1px solid var(--gold);
-  border-left: 4px solid var(--gold);
-  padding: 20px 28px;
-  z-index: 2000;
-  max-width: 420px;
-  width: calc(100% - 40px);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.55);
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
-.toast-text { font-size: 14px; color: var(--ink); line-height: 1.5; }
-.toast-text strong { color: var(--gold); font-weight: 600; }
-
-@media (max-width: 560px) {
-  .form-grid { grid-template-columns: 1fr; }
-  .form-card { padding: 28px 20px 24px; }
-}
+.actions { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 24px; }
+.skip-hint { font-size: 13px; color: var(--ink-mute); font-family: var(--serif); font-style: italic; }
 </style>
 </head>
 <body>
 
 <header class="vip-nav">
   <div class="vip-nav-inner">
-    <a href="vip.html" class="back">← VIP experience</a>
+    <a href="vip.html#apply" class="back">← VIP experience</a>
     <a href="/" class="logo">
       <span class="logo-mark">H</span>
       <span>The Horeca Meetup</span>
@@ -314,327 +135,18 @@ main {
 </header>
 
 <main>
-  <p class="page-eyebrow">VIP access · Houston Vol. II · May 5, 2026</p>
-  <h1 class="page-title">Request <em>VIP access</em></h1>
-  <p class="page-lead">This is the dedicated VIP path. Every seat is still reviewed with care. Share what helps us host you well, and tell us if you would like to be part of the program.</p>
+  <p class="page-eyebrow">Houston Vol. II · May 5, 2026</p>
+  <h1 class="page-title">VIP access is <em>closed</em> for this edition.</h1>
+  <p class="page-lead">With sincerity: thank you. Applications are no longer open for <strong>Houston Vol. II</strong>; the evening is fully curated and we are grateful for the interest this room has earned. The series moves forward with real momentum—we would be honored to see you at a <strong>future table</strong>.</p>
 
   <div class="form-card">
-    <form id="vipApplyForm" onsubmit="submitVipApply(event)">
-      <input type="hidden" name="event" value="Houston Vol. II - May 5, 2026">
-      <input type="hidden" name="formType" value="rsvp">
-
-      <div class="form-grid">
-        <div class="field">
-          <label>First Name <span class="required">*</span></label>
-          <input type="text" name="firstName" required autocomplete="given-name">
-        </div>
-        <div class="field">
-          <label>Last Name <span class="required">*</span></label>
-          <input type="text" name="lastName" required autocomplete="family-name">
-        </div>
-      </div>
-
-      <div class="field field-full">
-        <label>Email <span class="required">*</span></label>
-        <input type="email" name="email" required autocomplete="email">
-      </div>
-
-      <div class="field field-full">
-        <label>Mobile / WhatsApp <span class="required">*</span></label>
-        <input type="tel" name="phone" required autocomplete="tel">
-      </div>
-
-      <div class="field field-full">
-        <label>Restaurant or Business Name <span class="required">*</span></label>
-        <input type="text" name="business" required autocomplete="organization">
-      </div>
-
-      <div class="form-grid">
-        <div class="field">
-          <label>Your Role <span class="required">*</span></label>
-          <select name="role" required>
-            <option value="">Select...</option>
-            <option>Owner / Founder</option>
-            <option>General Manager</option>
-            <option>F&amp;B Director</option>
-            <option>Operations Manager</option>
-            <option>Multi-Unit Operator</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Locations <span class="required">*</span></label>
-          <select name="locations" required>
-            <option value="">Select...</option>
-            <option>1 location</option>
-            <option>2-5 locations</option>
-            <option>6-10 locations</option>
-            <option>10+ locations</option>
-            <option>Pre-opening</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="field field-full">
-        <label>What would you like us to know about you or your group before the evening?</label>
-        <textarea name="vipOptionalNote" rows="3" placeholder="Optional. A few lines is fine."></textarea>
-      </div>
-
-      <div class="vip-opps">
-        <div class="vip-opps-title">Program opportunities</div>
-        <p class="vip-opps-sub">If you would like to be considered for a moment on stage, let us know. There is no obligation; we simply want to hear your interest.</p>
-        <label class="check-row">
-          <input type="checkbox" name="vipInterestKeynote" value="yes">
-          <span>I would like to be considered for <strong style="color:var(--ink);font-weight:500">keynote or featured remarks</strong> (brief).</span>
-        </label>
-        <label class="check-row">
-          <input type="checkbox" name="vipInterestQa" value="yes">
-          <span>I would like to be considered for <strong style="color:var(--ink);font-weight:500">Q&amp;A with the audience</strong>.</span>
-        </label>
-        <div class="field field-full" style="margin-bottom:0">
-          <label>Topic or angle (optional)</label>
-          <input type="text" name="vipTopicNote" maxlength="500" placeholder="e.g. scaling multi-unit ops, labor, design">
-        </div>
-      </div>
-
-      <div class="plus-one-section" id="plusOneSection">
-        <div class="plus-one-header">
-          <div>
-            <div class="plus-one-eyebrow">Optional</div>
-            <div class="plus-one-title">Bringing someone with you?</div>
-          </div>
-          <label class="plus-one-toggle">
-            <input type="checkbox" id="plusOneToggle" name="hasPlusOne" value="yes">
-            <span class="toggle-slider"></span>
-            <span class="toggle-text">Add a guest</span>
-          </label>
-        </div>
-        <div class="plus-one-fields" id="plusOneFields">
-          <p class="plus-one-note">We will reserve their seat alongside yours.</p>
-          <div class="form-grid">
-            <div class="field">
-              <label>Guest First Name <span class="required">*</span></label>
-              <input type="text" name="plusOneFirstName" id="plusOneFirstName">
-            </div>
-            <div class="field">
-              <label>Guest Last Name <span class="required">*</span></label>
-              <input type="text" name="plusOneLastName" id="plusOneLastName">
-            </div>
-          </div>
-          <div class="field field-full">
-            <label>Guest Email <span class="required">*</span></label>
-            <input type="email" name="plusOneEmail" id="plusOneEmail">
-            <small class="field-hint" id="plusOneEmailHint">Must be different from your email above</small>
-          </div>
-          <div class="field field-full">
-            <label>Guest Mobile / WhatsApp <span class="required">*</span></label>
-            <input type="tel" name="plusOnePhone" id="plusOnePhone">
-            <small class="field-hint" id="plusOnePhoneHint">Must be different from your phone above</small>
-          </div>
-          <div class="field field-full">
-            <label>Guest Role at Their Business</label>
-            <select name="plusOneRole" id="plusOneRole">
-              <option value="">Select...</option>
-              <option>Owner / Founder</option>
-              <option>Co-Founder / Partner</option>
-              <option>General Manager</option>
-              <option>F&amp;B Director</option>
-              <option>Operations Manager</option>
-              <option>Spouse / Family</option>
-              <option>Other</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="field field-full">
-        <label>How did you hear about this dinner?</label>
-        <select name="source">
-          <option value="">Select...</option>
-          <option>WhatsApp invitation</option>
-          <option>LinkedIn</option>
-          <option>Instagram</option>
-          <option>Email from Horeca Store</option>
-          <option>Word of mouth · Referral</option>
-          <option>VIP invitation</option>
-          <option>Other</option>
-        </select>
-      </div>
-
-      <button type="submit" class="submit-btn" id="vipSubmitBtn">Apply for VIP access →</button>
-      <p class="form-fine">By sending this, you understand we review VIP access thoughtfully. You will hear from us at the email you provide.</p>
-    </form>
+    <div class="actions">
+      <a class="btn btn-primary" href="/index.html#calendar">Upcoming editions <span class="btn-arrow">→</span></a>
+      <a class="btn btn-ghost" href="vip.html#apply">Full message</a>
+    </div>
+    <p class="skip-hint">Questions about a future edition: <a href="mailto:events@thehorecastore.com">events@thehorecastore.com</a></p>
   </div>
 </main>
 
-<div class="toast" id="vipToast" role="status" aria-live="polite">
-  <div class="toast-text" id="vipToastText"></div>
-</div>
-
-<script>
-const SUPABASE_URL = 'https://hgvfixbopldwptnfpxwc.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_MI0yJ7Lw1j3HCwDveLZWLg_vs9n3ojJ';
-
-const EVENT_SLUG_MAP = {
-  'Houston Vol. II - May 5, 2026': 'houston-vol-2-may-2026',
-};
-
-const supabaseClient =
-  typeof window !== 'undefined' && window.supabase
-    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    : null;
-
-function showVipToast(html) {
-  const toast = document.getElementById('vipToast');
-  const toastText = document.getElementById('vipToastText');
-  toastText.innerHTML = html;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 9000);
-}
-
-document.getElementById('plusOneToggle').addEventListener('change', function (e) {
-  const wrap = document.getElementById('plusOneFields');
-  if (e.target.checked) {
-    wrap.classList.add('active');
-    document.getElementById('plusOneFirstName').required = true;
-    document.getElementById('plusOneLastName').required = true;
-    document.getElementById('plusOneEmail').required = true;
-    document.getElementById('plusOnePhone').required = true;
-  } else {
-    wrap.classList.remove('active');
-    ['plusOneFirstName', 'plusOneLastName', 'plusOneEmail', 'plusOnePhone'].forEach((id) => {
-      const el = document.getElementById(id);
-      el.required = false;
-      el.classList.remove('error');
-    });
-    document.getElementById('plusOneEmailHint').classList.remove('error');
-    document.getElementById('plusOnePhoneHint').classList.remove('error');
-  }
-});
-
-async function submitVipApply(e) {
-  e.preventDefault();
-  const form = e.target;
-  const submitBtn = document.getElementById('vipSubmitBtn');
-  const plusOneToggle = document.getElementById('plusOneToggle');
-  const hasPlusOne = plusOneToggle && plusOneToggle.checked;
-
-  if (hasPlusOne) {
-    const mainEmail = form.querySelector('[name="email"]').value.trim().toLowerCase();
-    const mainPhone = form.querySelector('[name="phone"]').value.replace(/\s|-|\(|\)/g, '');
-    const guestEmail = document.getElementById('plusOneEmail').value.trim().toLowerCase();
-    const guestPhone = document.getElementById('plusOnePhone').value.replace(/\s|-|\(|\)/g, '');
-    const guestFirstName = document.getElementById('plusOneFirstName').value.trim();
-    const guestLastName = document.getElementById('plusOneLastName').value.trim();
-
-    document.querySelectorAll('.plus-one-fields .error').forEach((el) => el.classList.remove('error'));
-
-    if (!guestFirstName || !guestLastName || !guestEmail || !guestPhone) {
-      alert('Please fill in your guest\u2019s first name, last name, email, and phone number.');
-      return;
-    }
-    if (guestEmail === mainEmail) {
-      document.getElementById('plusOneEmail').classList.add('error');
-      document.getElementById('plusOneEmailHint').classList.add('error');
-      document.getElementById('plusOneEmailHint').textContent = 'Guest email cannot be the same as yours';
-      return;
-    }
-    if (guestPhone === mainPhone) {
-      document.getElementById('plusOnePhone').classList.add('error');
-      document.getElementById('plusOnePhoneHint').classList.add('error');
-      document.getElementById('plusOnePhoneHint').textContent = 'Guest phone cannot be the same as yours';
-      return;
-    }
-  }
-
-  const formData = new FormData(form);
-  const raw = Object.fromEntries(formData);
-
-  const originalText = submitBtn.textContent;
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Sending...';
-
-  const isConfigured =
-    supabaseClient &&
-    !SUPABASE_URL.includes('YOUR_PROJECT_ID') &&
-    !SUPABASE_ANON_KEY.includes('YOUR_PUBLIC_ANON_KEY_HERE');
-
-  if (isConfigured) {
-    try {
-      const eventSlug = EVENT_SLUG_MAP[raw.event];
-      if (!eventSlug) throw new Error('Unknown event: ' + raw.event);
-
-      const { data: eventData, error: eventError } = await supabaseClient
-        .from('events')
-        .select('id')
-        .eq('slug', eventSlug)
-        .single();
-
-      if (eventError || !eventData) throw new Error('Event lookup failed');
-
-      const registration = {
-        event_id: eventData.id,
-        form_type: 'rsvp',
-        status: 'pending',
-        first_name: raw.firstName,
-        last_name: raw.lastName,
-        email: raw.email.toLowerCase().trim(),
-        phone: raw.phone.trim(),
-        business_name: raw.business,
-        role: raw.role || null,
-        locations: raw.locations || null,
-        challenge: null,
-        source: raw.source || null,
-        has_plus_one: hasPlusOne,
-        plus_one_first_name: hasPlusOne ? raw.plusOneFirstName : null,
-        plus_one_last_name: hasPlusOne ? raw.plusOneLastName : null,
-        plus_one_email: hasPlusOne ? raw.plusOneEmail.toLowerCase().trim() : null,
-        plus_one_phone: hasPlusOne ? raw.plusOnePhone.trim() : null,
-        plus_one_role: hasPlusOne ? raw.plusOneRole : null,
-        attendee_count: hasPlusOne ? 2 : 1,
-        is_vip: true,
-        vip_optional_note: (raw.vipOptionalNote && raw.vipOptionalNote.trim()) || null,
-        vip_interest_keynote: raw.vipInterestKeynote === 'yes',
-        vip_interest_qa: raw.vipInterestQa === 'yes',
-        vip_topic_note: (raw.vipTopicNote && raw.vipTopicNote.trim()) || null,
-        user_agent: navigator.userAgent,
-        utm_source: new URLSearchParams(window.location.search).get('utm_source'),
-        utm_medium: new URLSearchParams(window.location.search).get('utm_medium'),
-        utm_campaign: new URLSearchParams(window.location.search).get('utm_campaign'),
-      };
-
-      const { error: insertError } = await supabaseClient.from('registrations').insert([registration]);
-      if (insertError) throw insertError;
-    } catch (err) {
-      console.error('VIP apply failed:', err);
-      alert('Sorry, something went wrong. Please email events@thehorecastore.com or noman.peera@thehorecastore.com.');
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalText;
-      return;
-    }
-  } else {
-    console.warn('Supabase not configured; dry run');
-    console.log(raw);
-  }
-
-  let toastMsg =
-    '<strong>Thank you for your VIP request.</strong> Our management will review it personally and get back to you soon. We truly appreciate your interest in The Horeca Meetup and will treat it with care.';
-  if (hasPlusOne) {
-    toastMsg =
-      '<strong>Thank you for your VIP request for you and your guest.</strong> Our management will review it personally and get back to you soon. We truly appreciate your interest in The Horeca Meetup.';
-  }
-  showVipToast(toastMsg);
-
-  form.reset();
-  plusOneToggle.checked = false;
-  document.getElementById('plusOneFields').classList.remove('active');
-  ['plusOneFirstName', 'plusOneLastName', 'plusOneEmail', 'plusOnePhone'].forEach((id) => {
-    document.getElementById(id).required = false;
-  });
-
-  submitBtn.disabled = false;
-  submitBtn.textContent = originalText;
-}
-</script>
 </body>
 </html>
