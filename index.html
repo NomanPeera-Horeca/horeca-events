@@ -302,8 +302,8 @@ section { position: relative; padding: 140px 40px; }
 .event-card.past .event-link { color: var(--ink-soft); }
 
 /* TESTIMONIALS */
-.testimonials-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
-.testimonial { background: var(--bg); padding: 56px 48px; position: relative; }
+.testimonials-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+.testimonial { background: var(--bg); padding: 56px 48px; position: relative; border: 1px solid var(--rule); }
 .testimonial-quote { font-family: var(--serif); font-size: 22px; font-weight: 400; font-style: italic; line-height: 1.5; color: var(--ink); margin-bottom: 32px; letter-spacing: -0.01em; }
 .testimonial-quote::before { content: '"'; font-family: var(--serif); font-size: 80px; font-style: italic; color: var(--gold); line-height: 0.5; display: block; margin-bottom: 16px; opacity: 0.6; }
 .testimonial-author { display: flex; align-items: center; gap: 16px; padding-top: 24px; border-top: 1px solid var(--rule); }
@@ -337,6 +337,9 @@ section { position: relative; padding: 140px 40px; }
 .tier-name.host { color: var(--ink); }
 .sponsor-name-large { font-family: var(--serif); font-size: 32px; font-weight: 400; letter-spacing: -0.02em; color: var(--ink); }
 .sponsor-name-large small { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; color: var(--ink-soft); text-transform: uppercase; margin-top: 8px; font-weight: 400; }
+.sponsor-logo-wrap { margin-top: 20px; }
+.sponsor-logo-img { max-height: 52px; max-width: 220px; width: auto; height: auto; object-fit: contain; display: block; }
+.sponsor-logo-img--light-bg { background: #f5f5f5; border-radius: 8px; padding: 10px 14px; }
 
 /* SPONSOR APPLY CTA */
 .sponsor-apply { margin-top: 60px; background: linear-gradient(135deg, rgba(201,165,92,0.08), rgba(114,47,55,0.05)); border: 1px solid var(--gold-deep); padding: 56px 48px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 60px; align-items: center; position: relative; overflow: hidden; }
@@ -971,24 +974,6 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
         </div>
         <div class="agenda-meta">15 min</div>
       </div>
-      
-      <div class="agenda-item">
-        <div class="agenda-time">8:30 PM</div>
-        <div class="agenda-content">
-          <h4>Buffet Dinner &amp; <em>Open Networking</em></h4>
-          <p>The reason most attendees say they came back. Curated stations, generous service, and the conversations that turn rooms into networks.</p>
-        </div>
-        <div class="agenda-meta">60 min</div>
-      </div>
-      
-      <div class="agenda-item">
-        <div class="agenda-time">9:30 PM</div>
-        <div class="agenda-content">
-          <h4>Closing &amp; <em>Vol. III Save the Date</em></h4>
-          <p>A toast. A reservation card for September. The night ends, the network does not.</p>
-        </div>
-        <div class="agenda-meta">15 min</div>
-      </div>
     </div>
   </div>
 </section>
@@ -1104,7 +1089,7 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
           <div class="author-avatar">SK</div>
           <div>
             <div class="author-info-name">Sarah Kim</div>
-            <div class="author-info-meta">Founder · Bento Bar Cafe</div>
+            <div class="author-info-meta">Founder · Food Panda</div>
             <div class="author-info-vol">Houston · Vol. I</div>
           </div>
         </div>
@@ -1125,10 +1110,10 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
       <div class="testimonial">
         <div class="testimonial-quote">Found my next franchise partner over dinner. Closed the deal six weeks later. The room is the value.</div>
         <div class="testimonial-author">
-          <div class="author-avatar">AR</div>
+          <div class="author-avatar">MA</div>
           <div>
-            <div class="author-info-name">Ana Rodriguez</div>
-            <div class="author-info-meta">Founder · Mesa Hospitality Group</div>
+            <div class="author-info-name">Mansoor Alam Khan</div>
+            <div class="author-info-meta">Founder · Shaghaf Cafe</div>
             <div class="author-info-vol">Houston · Vol. I</div>
           </div>
         </div>
@@ -1219,10 +1204,13 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
         <div class="sponsor-tier-label">
           <div class="tier-rank">Tier I · Patron</div>
           <div class="tier-name gold">Gold</div>
+          <div class="sponsor-logo-wrap">
+            <img class="sponsor-logo-img sponsor-logo-img--light-bg" src="images/sponsors/rapid-hotel-supplies.png" width="200" height="52" alt="Rapid Hotel Supplies logo">
+          </div>
         </div>
         <div class="sponsor-name-large">
-          Frankit
-          <small>Restaurant Equipment &amp; Solutions</small>
+          Rapid Hotel Supplies
+          <small>Hotel Operating Supplies &amp; Equipment</small>
         </div>
       </div>
       
@@ -1230,6 +1218,9 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
         <div class="sponsor-tier-label">
           <div class="tier-rank">Tier II · Patron</div>
           <div class="tier-name silver">Silver</div>
+          <div class="sponsor-logo-wrap">
+            <img class="sponsor-logo-img sponsor-logo-img--light-bg" src="images/sponsors/silverchef.png" width="200" height="48" alt="SilverChef logo">
+          </div>
         </div>
         <div class="sponsor-name-large">
           SilverChef
@@ -1241,10 +1232,13 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
         <div class="sponsor-tier-label">
           <div class="tier-rank">Tier III · Patron</div>
           <div class="tier-name bronze">Bronze</div>
+          <div class="sponsor-logo-wrap">
+            <img class="sponsor-logo-img" src="images/sponsors/frankit-app.png" width="200" height="52" alt="Frankit.app logo">
+          </div>
         </div>
         <div class="sponsor-name-large">
-          Rapid Hotel Supply
-          <small>Hotel Operating Supplies &amp; Equipment</small>
+          Frankit.app
+          <small>Restaurant Equipment &amp; Solutions</small>
         </div>
       </div>
     </div>
