@@ -119,7 +119,7 @@ nav { position: sticky; top: 0; z-index: 90; background: rgba(10,10,10,0.85); ba
 .progress-row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 10px; }
 .progress-row strong { color: var(--gold); font-weight: 600; }
 .progress-bar { height: 4px; background: var(--rule); position: relative; overflow: hidden; }
-.progress-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 73%; background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light)); }
+.progress-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 73%; transition: width 0.55s ease; background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light)); }
 .hero-card-cta { display: block; width: 100%; text-align: center; background: var(--ink); color: var(--bg); padding: 16px; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; transition: background 0.3s ease; }
 .hero-card-cta:hover { background: var(--gold); }
 
@@ -576,7 +576,7 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
 <!-- ANNOUNCE -->
 <div class="announce">
   <span class="announce-dot"></span>
-  Houston · Vol. II · May 5, 2026 · 73 of 100 seats reserved · 
+  Houston · Vol. II · May 5, 2026 · <span id="vol2AnnounceSeats">73</span> of 100 seats reserved · 
   <a href="#vol2" onclick="openModal(event,'vol2')">Reserve yours →</a>
 </div>
 
@@ -639,10 +639,10 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
         <div class="hero-card-progress">
           <div class="progress-row">
             <span>Seats Reserved</span>
-            <span><strong>73</strong> / 100</span>
+            <span><strong id="vol2HeroSeats">73</strong> / 100</span>
           </div>
           <div class="progress-bar">
-            <div class="progress-fill"></div>
+            <div class="progress-fill" id="vol2HeroProgress" style="width:73%"></div>
           </div>
         </div>
         <a href="#vol2" class="hero-card-cta" onclick="openModal(event,'vol2')">Apply for Approval →</a>
@@ -1005,7 +1005,7 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
         <div class="event-vol">Vol. <em>II</em></div>
         <div class="event-date">May 5, 2026</div>
         <div class="event-meta">
-          <div><span>Reserved</span><strong>73 / 100</strong></div>
+          <div><span>Reserved</span><strong><span id="vol2CalendarSeats">73</span> / 100</strong></div>
           <div><span>Venue</span><strong>Marriott Energy Corridor</strong></div>
         </div>
         <a href="#" class="event-link" onclick="openModal(event,'vol2')">Apply for Approval</a>
@@ -1566,6 +1566,92 @@ const supabaseClient =
   typeof window !== 'undefined' && window.supabase
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     : null;
+
+// ── Houston Vol. II live seat counter (marketing floor + real registrations) ──
+const VOL2_SEAT_SLUG = 'houston-vol-2-may-2026';
+const VOL2_SEAT_CAPACITY = 100;
+const VOL2_SEAT_BASE = 73;
+const VOL2_SEAT_REFRESH_MS = 75_000;
+
+async function fetchVol2ReservedSeatCount() {
+  if (!supabaseClient) return VOL2_SEAT_BASE;
+  try {
+    const { data: ev, error: evErr } = await supabaseClient
+      .from('events')
+      .select('id')
+      .eq('slug', VOL2_SEAT_SLUG)
+      .maybeSingle();
+    if (evErr || !ev) return VOL2_SEAT_BASE;
+
+    const { data: rows, error: regErr } = await supabaseClient
+      .from('registrations')
+      .select('attendee_count')
+      .eq('event_id', ev.id)
+      .neq('status', 'rejected');
+
+    if (regErr || !rows) return VOL2_SEAT_BASE;
+
+    const sumSeats = rows.reduce((acc, r) => {
+      const n = Number(r.attendee_count);
+      return acc + (n > 0 ? n : 1);
+    }, 0);
+    return Math.max(VOL2_SEAT_BASE, Math.min(sumSeats, VOL2_SEAT_CAPACITY));
+  } catch {
+    return VOL2_SEAT_BASE;
+  }
+}
+
+function applyVol2SeatUI(n) {
+  const safe = Math.max(VOL2_SEAT_BASE, Math.min(Math.round(n), VOL2_SEAT_CAPACITY));
+  ['vol2AnnounceSeats', 'vol2HeroSeats', 'vol2CalendarSeats'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = String(safe);
+  });
+  const progressEl = document.getElementById('vol2HeroProgress');
+  if (progressEl) progressEl.style.width = `${(safe / VOL2_SEAT_CAPACITY) * 100}%`;
+  return safe;
+}
+
+function animateVol2SeatsTo(target) {
+  const els = [
+    document.getElementById('vol2AnnounceSeats'),
+    document.getElementById('vol2HeroSeats'),
+    document.getElementById('vol2CalendarSeats'),
+  ].filter(Boolean);
+  const progressEl = document.getElementById('vol2HeroProgress');
+  const dest = Math.max(VOL2_SEAT_BASE, Math.min(Math.round(target), VOL2_SEAT_CAPACITY));
+  const startRaw = els.length ? parseInt(els[0].textContent, 10) : VOL2_SEAT_BASE;
+  const start = Number.isFinite(startRaw) ? startRaw : VOL2_SEAT_BASE;
+  if (start === dest) {
+    applyVol2SeatUI(dest);
+    return;
+  }
+  const durationMs = 900;
+  const t0 = performance.now();
+  function frame(now) {
+    const t = Math.min(1, (now - t0) / durationMs);
+    const eased = 1 - (1 - t) * (1 - t);
+    const val = Math.round(start + (dest - start) * eased);
+    els.forEach((el) => {
+      el.textContent = String(val);
+    });
+    if (progressEl) progressEl.style.width = `${(val / VOL2_SEAT_CAPACITY) * 100}%`;
+    if (t < 1) requestAnimationFrame(frame);
+    else applyVol2SeatUI(dest);
+  }
+  requestAnimationFrame(frame);
+}
+
+async function refreshVol2SeatCount() {
+  const next = await fetchVol2ReservedSeatCount();
+  animateVol2SeatsTo(next);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  applyVol2SeatUI(VOL2_SEAT_BASE);
+  refreshVol2SeatCount();
+  setInterval(refreshVol2SeatCount, VOL2_SEAT_REFRESH_MS);
+});
 
 async function submitRSVP(e) {
   e.preventDefault();
