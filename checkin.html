@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Door Check-In · The Horeca Meetup</title>
+<meta name="robots" content="noindex,nofollow">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  --black: #0a0a0a;
+  --gold: #c9a55c;
+  --gold-light: #e0c186;
+  --gold-deep: #8b6f3a;
+  --cream: #f5f1e8;
+  --off: #fdfaf3;
+  --ink: #ededed;
+  --ink-soft: #a8a8a8;
+  --ink-mute: #6b6b6b;
+  --green: #4a9b6e;
+  --red: #d4626a;
+  --orange: #d4a574;
+  --rule: rgba(255,255,255,0.1);
+  --serif: 'Fraunces', Georgia, serif;
+  --label: 'Courier New', Courier, monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; }
+body {
+  min-height: 100vh;
+  background: var(--black);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.header-strip {
+  height: 4px;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light));
+}
+
+.top-bar {
+  background: var(--black);
+  border-bottom: 1px solid var(--rule);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.brand {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 500;
+}
+.brand em { font-style: italic; color: var(--gold); }
+.sub {
+  font-family: var(--label);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: var(--gold);
+  text-transform: uppercase;
+  width: 100%;
+  margin-top: 4px;
+}
+.user-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.user-row span {
+  font-family: var(--label);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+.btn-ghost {
+  font-family: var(--label);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink-soft);
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+.wrap { padding: 20px 16px 48px; max-width: 520px; margin: 0 auto; }
+
+.login-card {
+  background: linear-gradient(180deg, #141414 0%, #0f0f0f 100%);
+  border: 1px solid var(--rule);
+  padding: 36px 28px;
+  position: relative;
+}
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light));
+}
+.login-card h1 {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+.login-card .hint { color: var(--ink-mute); font-size: 13px; margin-bottom: 24px; }
+.field { margin-bottom: 16px; }
+.field label {
+  display: block;
+  font-family: var(--label);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+.field input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  background: var(--black);
+  color: var(--ink);
+  font-size: 16px;
+}
+.field input:focus { outline: none; border-color: var(--gold); }
+.btn-primary {
+  width: 100%;
+  min-height: 60px;
+  background: var(--gold);
+  color: var(--black);
+  border: none;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 8px;
+}
+.btn-primary:disabled { opacity: 0.5; cursor: wait; }
+.btn-primary.alt { background: var(--green); color: #fff; }
+.err {
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid var(--red);
+  color: var(--red);
+  font-size: 13px;
+  background: rgba(212, 98, 106, 0.08);
+}
+
+.card {
+  background: linear-gradient(180deg, #161616 0%, #101010 100%);
+  border: 1px solid var(--rule);
+  padding: 28px 22px;
+  position: relative;
+}
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light));
+}
+.eyebrow {
+  font-family: var(--label);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+.guest-name {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.guest-name em { font-style: italic; color: var(--gold); }
+.row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 8px 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14px;
+}
+.row:last-child { border-bottom: none; }
+.row dt {
+  font-family: var(--label);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  padding-top: 2px;
+}
+.row dd { color: var(--ink); word-break: break-word; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-family: var(--label);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid var(--rule);
+  margin-top: 16px;
+}
+.badge.approved { color: var(--green); border-color: var(--green); }
+.badge.pending { color: var(--orange); border-color: var(--orange); }
+.badge.needs_info { color: var(--gold-light); border-color: var(--gold); }
+.badge.rejected { color: var(--red); border-color: var(--red); opacity: 0.85; }
+
+.state-box {
+  margin-top: 20px;
+  padding: 18px;
+  border: 1px solid var(--rule);
+  background: rgba(201, 165, 92, 0.06);
+  font-size: 14px;
+}
+.state-box.warn { border-color: var(--orange); background: rgba(212, 165, 116, 0.08); }
+.state-box.bad { border-color: var(--red); background: rgba(212, 98, 106, 0.08); }
+.state-box.ok { border-color: var(--green); background: rgba(74, 155, 110, 0.1); }
+
+.actions { margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
+.btn-checkin {
+  min-height: 64px;
+  background: var(--gold);
+  color: var(--black);
+  border: none;
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--gold-light);
+}
+.btn-checkin:active { transform: scale(0.99); }
+.btn-checkin:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-override {
+  min-height: 52px;
+  background: transparent;
+  border: 1px solid var(--orange);
+  color: var(--orange);
+  font-family: var(--label);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.loading {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--ink-soft);
+}
+.spinner {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--rule);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.hidden { display: none !important; }
+
+.plus-pill {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(201, 165, 92, 0.12);
+  border: 1px solid rgba(201, 165, 92, 0.35);
+  font-family: var(--label);
+  font-size: 11px;
+  color: var(--gold-light);
+}
+</style>
+</head>
+<body>
+<div class="header-strip"></div>
+
+<div id="appLogin">
+  <div class="top-bar">
+    <div>
+      <div class="brand">The Horeca <em>Meetup</em></div>
+      <div class="sub">Door check-in · Staff only</div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="login-card">
+      <h1>Staff <em>login</em></h1>
+      <p class="hint">Use the same email and password as the admin dashboard. Only accounts listed in <strong>admin_users</strong> can check guests in.</p>
+      <form id="loginForm">
+        <div class="field"><label>Email</label><input type="email" id="loginEmail" autocomplete="email" required /></div>
+        <div class="field"><label>Password</label><input type="password" id="loginPassword" autocomplete="current-password" required /></div>
+        <button type="submit" class="btn-primary" id="loginBtn">Sign in</button>
+        <div id="loginErr" class="err hidden"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="appMain" class="hidden">
+  <div class="top-bar">
+    <div>
+      <div class="brand">The Horeca <em>Meetup</em></div>
+      <div class="sub">Door check-in</div>
+    </div>
+    <div class="user-row">
+      <span id="staffEmail"></span>
+      <button type="button" class="btn-ghost" id="logoutBtn">Sign out</button>
+    </div>
+  </div>
+  <div class="wrap">
+    <div id="phaseLoading" class="loading"><div class="spinner"></div><p style="margin-top:16px">Loading guest…</p></div>
+    <div id="phaseInvalid" class="hidden">
+      <div class="card">
+        <div class="eyebrow">Scan result</div>
+        <p class="guest-name" style="font-size:26px">✗ Invalid QR</p>
+        <p style="color:var(--ink-soft)">This link is not a valid guest pass. Ask them to open the confirmation email or search by name in the admin <strong>DOOR</strong> tab.</p>
+      </div>
+    </div>
+    <div id="phaseGuest" class="hidden"></div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://hgvfixbopldwptnfpxwc.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_MI0yJ7Lw1j3HCwDveLZWLg_vs9n3ojJ';
+
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+let registration = null;
+let guestMode = 'primary';
+let qrToken = '';
+
+function normalizeEmail(s) {
+  return (s || '').trim().toLowerCase();
+}
+
+async function verifyAdminRowForEmail(emailRaw) {
+  const email = normalizeEmail(emailRaw);
+  const { data, error } = await supabaseClient
+    .from('admin_users')
+    .select('email')
+    .eq('email', email)
+    .maybeSingle();
+  if (error) return { ok: false, message: error.message };
+  if (!data) return { ok: false, message: 'Not authorized for check-in. Add this email to admin_users in Supabase.' };
+  return { ok: true };
+}
+
+function parseToken() {
+  const q = new URLSearchParams(window.location.search);
+  return (q.get('t') || '').trim();
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+function fmtWhen(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+}
+
+function playChime() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.value = 880;
+    o.connect(g);
+    g.connect(ctx.destination);
+    g.gain.setValueAtTime(0.06, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+    o.start(ctx.currentTime);
+    o.stop(ctx.currentTime + 0.25);
+  } catch (_) {}
+}
+
+function bumpVibrate() {
+  try {
+    if (navigator.vibrate) navigator.vibrate([35, 30, 35]);
+  } catch (_) {}
+}
+
+function showLogin(msg) {
+  document.getElementById('appLogin').classList.remove('hidden');
+  document.getElementById('appMain').classList.add('hidden');
+  const box = document.getElementById('loginErr');
+  if (msg) {
+    box.textContent = msg;
+    box.classList.remove('hidden');
+  } else {
+    box.classList.add('hidden');
+  }
+}
+
+function showMain() {
+  document.getElementById('appLogin').classList.add('hidden');
+  document.getElementById('appMain').classList.remove('hidden');
+}
+
+async function loadGuest() {
+  qrToken = parseToken();
+  document.getElementById('phaseLoading').classList.remove('hidden');
+  document.getElementById('phaseInvalid').classList.add('hidden');
+  document.getElementById('phaseGuest').classList.add('hidden');
+
+  if (!qrToken) {
+    document.getElementById('phaseLoading').classList.add('hidden');
+    document.getElementById('phaseInvalid').classList.remove('hidden');
+    return;
+  }
+
+  let row = null;
+  let mode = 'primary';
+
+  const { data: byMain, error: e1 } = await supabaseClient
+    .from('registrations')
+    .select('*')
+    .eq('qr_token', qrToken)
+    .maybeSingle();
+
+  if (e1) {
+    document.getElementById('phaseLoading').classList.add('hidden');
+    document.getElementById('phaseInvalid').classList.remove('hidden');
+    return;
+  }
+  if (byMain) {
+    row = byMain;
+    mode = 'primary';
+  } else {
+    const { data: byPlus, error: e2 } = await supabaseClient
+      .from('registrations')
+      .select('*')
+      .eq('plus_one_qr_token', qrToken)
+      .maybeSingle();
+    if (e2 || !byPlus) {
+      document.getElementById('phaseLoading').classList.add('hidden');
+      document.getElementById('phaseInvalid').classList.remove('hidden');
+      return;
+    }
+    row = byPlus;
+    mode = 'plus_one';
+  }
+
+  registration = row;
+  guestMode = mode;
+  document.getElementById('phaseLoading').classList.add('hidden');
+  renderGuestCard();
+  document.getElementById('phaseGuest').classList.remove('hidden');
+}
+
+function renderGuestCard() {
+  const r = registration;
+  const status = (r.status || '').toLowerCase();
+  const isPrimaryView = guestMode === 'primary';
+  const displayName = isPrimaryView
+    ? `${r.first_name || ''} ${r.last_name || ''}`.trim()
+    : `${r.plus_one_first_name || ''} ${r.plus_one_last_name || ''}`.trim();
+  const displayEmail = isPrimaryView ? (r.email || '') : (r.plus_one_email || '');
+  const checkedAt = isPrimaryView ? r.checked_in_at : r.plus_one_checked_in_at;
+  const checkedBy = isPrimaryView ? r.checked_in_by : r.plus_one_checked_in_by;
+
+  let badgeClass = 'pending';
+  if (status === 'approved') badgeClass = 'approved';
+  else if (status === 'rejected') badgeClass = 'rejected';
+  else if (status === 'needs_info') badgeClass = 'needs_info';
+
+  let html = `
+    <div class="card" id="guestCard">
+      <div class="eyebrow">${isPrimaryView ? 'Primary guest' : 'Plus-one guest'}</div>
+      <h1 class="guest-name">${escapeHtml(displayName) || 'Guest'}</h1>
+      <span class="badge ${badgeClass}">${escapeHtml((r.status || '').replace('_', ' ') || 'unknown')}</span>
+
+      <dl style="margin-top:20px">
+        <div class="row"><dt>Business</dt><dd>${escapeHtml(r.business_name || '—')}</dd></div>
+        <div class="row"><dt>Role</dt><dd>${escapeHtml(r.role || '—')}</dd></div>
+        <div class="row"><dt>Email</dt><dd>${escapeHtml(displayEmail || '—')}</dd></div>
+      </dl>
+  `;
+
+  if (r.has_plus_one && isPrimaryView) {
+    const pn = `${r.plus_one_first_name || ''} ${r.plus_one_last_name || ''}`.trim();
+    html += `<div class="plus-pill">Bringing +1 · ${escapeHtml(pn || 'Guest')} ${r.plus_one_checked_in_at ? '· +1 checked in' : ''}</div>`;
+  }
+  if (!isPrimaryView) {
+    const host = `${r.first_name || ''} ${r.last_name || ''}`.trim();
+    html += `<div class="plus-pill">Guest of ${escapeHtml(host || 'primary registrant')}</div>`;
+  }
+
+  if (checkedAt) {
+    html += `
+      <div class="state-box warn" id="stateDup">
+        ⚠ Already checked in<br>
+        <span style="color:var(--ink-soft);font-size:13px">${fmtWhen(checkedAt)}${checkedBy ? ` · by ${escapeHtml(checkedBy)}` : ''}</span>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn-override" id="btnOverride">Override check-in</button>
+      </div>
+    `;
+  } else if (status !== 'approved') {
+    html += `
+      <div class="state-box bad">
+        ✗ This registration is not approved for entry. Direct the guest to registration or a lead admin.
+      </div>
+    `;
+  } else {
+    html += `
+      <div class="actions">
+        <button type="button" class="btn-checkin" id="btnCheckIn">✓ Check in guest</button>
+      </div>
+    `;
+  }
+
+  html += '</div>';
+  document.getElementById('phaseGuest').innerHTML = html;
+
+  const btn = document.getElementById('btnCheckIn');
+  if (btn) btn.addEventListener('click', () => doCheckIn(false));
+  const ov = document.getElementById('btnOverride');
+  if (ov) ov.addEventListener('click', () => {
+    if (confirm('Record another check-in now? This replaces the previous check-in time for this guest slot.')) {
+      doCheckIn(true);
+    }
+  });
+}
+
+async function doCheckIn(isOverride) {
+  if (!registration || !currentUser) return;
+  const r = registration;
+  const isPrimaryView = guestMode === 'primary';
+  const patch = { updated_at: new Date().toISOString() };
+  const now = new Date().toISOString();
+  if (isPrimaryView) {
+    patch.checked_in_at = now;
+    patch.checked_in_by = currentUser.email;
+  } else {
+    patch.plus_one_checked_in_at = now;
+    patch.plus_one_checked_in_by = currentUser.email;
+  }
+
+  const card = document.getElementById('guestCard');
+  const optimistic = !isOverride && card;
+  if (optimistic) {
+    const actions = card.querySelector('.actions');
+    if (actions) actions.innerHTML = '<div class="state-box ok">Checking in…</div>';
+  }
+
+  const { error: upErr } = await supabaseClient
+    .from('registrations')
+    .update(patch)
+    .eq('id', r.id);
+
+  if (upErr) {
+    alert(upErr.message);
+    renderGuestCard();
+    return;
+  }
+
+  await supabaseClient.from('activity_log').insert({
+    registration_id: r.id,
+    admin_email: currentUser.email,
+    action: 'check_in',
+    details: {
+      slot: isPrimaryView ? 'primary' : 'plus_one',
+      override: isOverride,
+      qr_token_prefix: qrToken.slice(0, 12),
+    },
+  });
+
+  playChime();
+  bumpVibrate();
+
+  const { data: fresh } = await supabaseClient
+    .from('registrations')
+    .select('*')
+    .eq('id', r.id)
+    .single();
+  if (fresh) registration = fresh;
+
+  const name = isPrimaryView
+    ? `${registration.first_name || ''} ${registration.last_name || ''}`.trim()
+    : `${registration.plus_one_first_name || ''} ${registration.plus_one_last_name || ''}`.trim();
+  const t = isPrimaryView ? registration.checked_in_at : registration.plus_one_checked_in_at;
+
+  document.getElementById('phaseGuest').innerHTML = `
+    <div class="card">
+      <div class="eyebrow">Success</div>
+      <h1 class="guest-name">✓ Welcome,<br><em>${escapeHtml(name)}!</em></h1>
+      <div class="state-box ok">
+        Checked in at ${fmtWhen(t)}<br>
+        <span style="color:var(--ink-soft);font-size:13px">Staff: ${escapeHtml(currentUser.email)}</span>
+      </div>
+      <p style="margin-top:20px;color:var(--ink-mute);font-size:13px">You can close this tab or scan the next guest.</p>
+    </div>
+  `;
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = normalizeEmail(document.getElementById('loginEmail').value);
+  const password = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('loginErr');
+  btn.disabled = true;
+  err.classList.add('hidden');
+  try {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    const gate = await verifyAdminRowForEmail(email);
+    if (!gate.ok) {
+      await supabaseClient.auth.signOut();
+      throw new Error(gate.message);
+    }
+    currentUser = data.user;
+    showMain();
+    document.getElementById('staffEmail').textContent = currentUser.email;
+    await loadGuest();
+  } catch (x) {
+    err.textContent = x.message || String(x);
+    err.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await supabaseClient.auth.signOut();
+  currentUser = null;
+  window.location.reload();
+});
+
+async function boot() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (session) {
+    const gate = await verifyAdminRowForEmail(session.user.email);
+    if (!gate.ok) {
+      await supabaseClient.auth.signOut();
+      showLogin(gate.message);
+      return;
+    }
+    currentUser = session.user;
+    showMain();
+    document.getElementById('staffEmail').textContent = currentUser.email;
+    await loadGuest();
+  } else {
+    showLogin();
+  }
+}
+
+boot();
+</script>
+</body>
+</html>
