@@ -256,44 +256,6 @@ section.alt .benefit { background: var(--bg-card); }
 .callout p em { color: var(--gold); font-style: italic; }
 .callout-cta { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: flex-start; }
 
-.final-cta {
-  text-align: center;
-  padding: 100px 28px 96px;
-  position: relative;
-  overflow: hidden;
-  border-top: 1px solid var(--rule);
-}
-.final-cta::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse at 30% 30%, rgba(201, 165, 92, 0.12) 0%, transparent 55%),
-    radial-gradient(ellipse at 70% 70%, rgba(114, 47, 55, 0.12) 0%, transparent 55%),
-    linear-gradient(135deg, #0a0a0a 0%, #1a1410 50%, #0a0a0a 100%);
-}
-.final-cta-inner { position: relative; z-index: 1; max-width: 820px; margin: 0 auto; }
-.final-cta .section-label { margin-bottom: 14px; }
-.final-cta h2 {
-  font-family: var(--serif);
-  font-size: clamp(32px, 5vw, 52px);
-  font-weight: 300;
-  line-height: 1.08;
-  letter-spacing: -0.03em;
-  margin-bottom: 20px;
-}
-.final-cta h2 em { font-style: italic; color: var(--gold); }
-.final-cta-lead {
-  font-family: var(--serif);
-  font-size: clamp(17px, 2vw, 20px);
-  font-weight: 300;
-  color: var(--ink-soft);
-  line-height: 1.55;
-  margin-bottom: 32px;
-}
-.final-cta-actions { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; align-items: center; }
-
 footer {
   border-top: 1px solid var(--rule);
   padding: 80px 40px 40px;
@@ -426,22 +388,10 @@ footer {
     </div>
 
     <div class="callout">
-      <p><em>VIP is extended by invitation or by approval.</em> We cap the room on purpose. When you are ready, submit your application below. If you need a conversation before you apply, use the <a href="#benefits">direct line</a> in item 06.</p>
+      <p><em>VIP is extended by invitation or by approval.</em> We cap the room on purpose. When you are ready, use the button here. If you need a conversation before you apply, use the <a href="#benefits">direct line</a> in item 06.</p>
       <div class="callout-cta">
         <a class="btn btn-primary" href="/vip-apply.html">Apply for VIP Access <span class="btn-arrow">→</span></a>
       </div>
-    </div>
-  </div>
-</section>
-
-<section class="final-cta" id="apply">
-  <div class="final-cta-inner">
-    <p class="section-label">Application · Houston Vol. II</p>
-    <h2>Submit your application <em>for the room.</em></h2>
-    <p class="final-cta-lead">One form, the same review process as every guest. Starting here tells us you are requesting <strong>VIP consideration</strong> for May 5, 2026. We respond before the event.</p>
-    <div class="final-cta-actions">
-      <a class="btn btn-primary" href="/vip-apply.html">Apply for VIP Access <span class="btn-arrow">→</span></a>
-      <a class="btn btn-ghost" href="/">Return to home</a>
     </div>
   </div>
 </section>
