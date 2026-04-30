@@ -116,16 +116,31 @@ nav {
 .hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; text-align: center; }
 
 .badge-vip {
-  display: inline-block;
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.28em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-size: clamp(13px, 2.2vw, 19px);
+  font-weight: 500;
+  letter-spacing: 0.42em;
   text-transform: uppercase;
   color: var(--bg);
-  background: var(--gold);
-  padding: 8px 18px;
-  margin-bottom: 28px;
-  border: 1px solid var(--gold-light);
+  padding: clamp(16px, 2.5vw, 22px) clamp(28px, 5vw, 48px);
+  margin-bottom: clamp(28px, 4vw, 40px);
+  border: 1px solid rgba(255, 248, 235, 0.45);
+  background: linear-gradient(
+    155deg,
+    var(--gold-deep) 0%,
+    #b8924a 22%,
+    var(--gold) 45%,
+    var(--gold-light) 52%,
+    #c9a55c 78%,
+    #9a7030 100%
+  );
+  box-shadow:
+    0 8px 40px rgba(201, 165, 92, 0.35),
+    0 2px 0 rgba(255, 255, 255, 0.22) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.15) inset;
 }
 .hero h1 {
   font-family: var(--serif);
@@ -302,6 +317,7 @@ footer {
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
 }
 @media (max-width: 640px) {
+  .badge-vip { font-size: 10px; letter-spacing: 0.18em; padding: 14px 16px; }
   .benefit { grid-template-columns: 1fr; gap: 12px; }
   .nav-links { width: 100%; justify-content: flex-start; }
   .footer-grid { grid-template-columns: 1fr; }
@@ -331,7 +347,7 @@ footer {
 
 <header class="hero">
   <div class="hero-inner">
-    <div class="badge-vip">Invitation tier</div>
+    <div class="badge-vip">VIP Guest Invitation</div>
     <h1>A seat reserved for the people we want<br>at the <em>center</em> of the room.</h1>
     <p class="hero-lead">This evening is hosted by <strong>Horeca Store</strong> for restaurant and hotel owners we want in one real conversation. <strong>VIP</strong> is not an upsell. It is how we mark guests who should get unmistakable hospitality: a clear welcome, a host shoutout, plated dinner, and no doubt their seat was meant for them.</p>
     <div class="hero-actions">
