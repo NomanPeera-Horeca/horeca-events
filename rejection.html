@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     REJECTION EMAILS · 3 VARIANTS WITH CANONICAL HEADER/FOOTER
+     ═══════════════════════════════════════════════════════════════════════
+     Store as 3 separate rows in email_templates with these slugs:
+       1. rejection-fully-booked      (Subject: Update on your application)
+       2. rejection-not-fit           (Subject: Update on your application)
+       3. rejection-future-edition    (Subject: Looking forward to seeing you at Vol. III)
+     
+     The HEADER and FOOTER are IDENTICAL across all emails for brand consistency.
+     Only the middle BODY block changes per variant.
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- VARIANT 1: FULLY BOOKED                                              -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Update on your application</title></head>
+<body style="margin:0;padding:0;background-color:#f5f1e8;font-family:Georgia,'Times New Roman',serif;">
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f1e8;padding:40px 20px;"><tr><td align="center">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:#ffffff;border:1px solid #e8dcc4;">
+
+<!-- ━━━ CANONICAL HEADER ━━━ -->
+<tr><td style="height:4px;background:linear-gradient(90deg,#8b6f3a,#c9a55c,#e0c186);font-size:0;line-height:0;">&nbsp;</td></tr>
+<tr><td style="background-color:#0a0a0a;padding:32px 40px;text-align:center;">
+<div style="font-family:'Fraunces',Georgia,serif;font-size:24px;font-weight:500;color:#ffffff;letter-spacing:-0.01em;">The Horeca <em style="font-style:italic;color:#c9a55c;">Meetup</em></div>
+<div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.24em;color:#c9a55c;text-transform:uppercase;margin-top:8px;">{{event_city}} · Volume {{event_volume}}</div>
+</td></tr>
+
+<!-- ━━━ BODY: FULLY BOOKED ━━━ -->
+<tr><td style="padding:48px 40px 24px 40px;">
+<div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.24em;color:#8b6f3a;text-transform:uppercase;margin-bottom:16px;">Application Update</div>
+<h1 style="margin:0 0 24px 0;font-family:'Fraunces',Georgia,serif;font-size:32px;font-weight:400;line-height:1.2;color:#0a0a0a;">Thank you, <em style="font-style:italic;color:#8b6f3a;">{{first_name}}.</em></h1>
+<p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#3a3a3a;">Thank you sincerely for applying to <strong>The Horeca Meetup {{event_city}} Vol. {{event_volume}}</strong>. We were genuinely glad to receive your application.</p>
+<p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#3a3a3a;">Unfortunately, we have reached our seating capacity for this edition. We keep the room small on purpose, which means we are not able to extend an invitation this time.</p>
+<p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#3a3a3a;">We would love to invite you to <strong>Vol. III on September 8, 2026</strong>, also at the Marriott Energy Corridor. Early reservations are open and we will hold a seat for you if you let us know.</p>
+<p style="margin:0;font-size:16px;line-height:1.7;color:#3a3a3a;">Until then, thank you for being part of this community.</p>
+</td></tr>
+<tr><td style="padding:24px 40px 40px 40px;text-align:center;">
+<a href="https://events.thehorecastore.com#calendar" style="display:inline-block;background-color:#0a0a0a;color:#c9a55c;padding:14px 32px;text-decoration:none;font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;border:1px solid #c9a55c;">Reserve for Vol. III</a>
+</td></tr>
+<tr><td style="padding:0 40px 40px 40px;border-top:1px solid #e8dcc4;padding-top:32px;">
+<p style="margin:0;font-family:'Fraunces',Georgia,serif;font-size:16px;font-style:italic;color:#0a0a0a;">With our warmest regards,</p>
+<p style="margin:16px 0 0 0;font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.1em;color:#8b6f3a;text-transform:uppercase;">Noman Peera<br><span style="color:#6b6b6b;">CEO · Horeca Store</span></p>
+</td></tr>
+
+<!-- ━━━ CANONICAL FOOTER ━━━ -->
+<tr><td style="background-color:#0a0a0a;padding:36px 40px;text-align:center;">
+<div style="font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:500;color:#ffffff;margin-bottom:8px;letter-spacing:-0.01em;">Horeca <em style="font-style:italic;color:#c9a55c;">Store</em></div>
+<div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.2em;color:#a8a8a8;text-transform:uppercase;margin-bottom:24px;">Global Hospitality Supply · 11 Countries · 3 Continents</div>
+<div style="font-family:'Fraunces',Georgia,serif;font-size:13px;font-style:italic;color:#a8a8a8;line-height:1.7;max-width:380px;margin:0 auto;">Trusted by 15,000+ hotels and restaurants across the Middle East, Asia, and the United States</div>
+<div style="margin-top:28px;padding-top:24px;border-top:1px solid #2a2a2a;">
+<a href="https://thehorecastore.com" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.18em;color:#c9a55c;text-decoration:none;text-transform:uppercase;">thehorecastore.com</a>
+<span style="color:#3a3a3a;margin:0 12px;">·</span>
+<a href="mailto:events@thehorecastore.com" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.18em;color:#c9a55c;text-decoration:none;text-transform:uppercase;">events@thehorecastore.com</a>
+</div>
+</td></tr>
+
+</table>
+</td></tr></table>
+</body></html>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- VARIANT 2: NOT THE RIGHT FIT                                         -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- Replace the BODY section above with this for variant 2:
+
+<tr><td style="padding:48px 40px 24px 40px;">
+<div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.24em;color:#8b6f3a;text-transform:uppercase;margin-bottom:16px;">Application Update</div>
+<h1 style="margin:0 0 24px 0;font-family:'Fraunces',Georgia,serif;font-size:32px;font-weight:400;line-height:1.2;color:#0a0a0a;">Thank you for <em style="font-style:italic;color:#8b6f3a;">applying.</em></h1>
+<p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#3a3a3a;">Hi {{first_name}}, thank you for your interest in The Horeca Meetup {{event_city}} Vol. {{event_volume}}. We genuinely appreciate you taking the time to apply.</p>
+<p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#3a3a3a;">We want to be transparent with you. This particular evening is curated specifically for <strong>restaurant and hotel owners and senior operators</strong>. We do this to protect the depth and quality of conversation in the room. When the audience composition is right, the conversations are genuinely valuable for everyone present.</p>
+<p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#3a3a3a;">Based on your application, we feel this edition may not be the best use of your time, and we did not want to invite you to a room that was not built for your specific role.</p>
+<p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#3a3a3a;">That said, if your situation has changed or you feel we have misread the fit, please reply to this email. We would be glad to reconsider with additional context.</p>
+<p style="margin:0;font-size:16px;line-height:1.7;color:#3a3a3a;">Thank you for understanding.</p>
+</td></tr>
+<tr><td style="padding:24px 40px 40px 40px;border-top:1px solid #e8dcc4;padding-top:32px;">
+<p style="margin:0;font-family:'Fraunces',Georgia,serif;font-size:16px;font-style:italic;color:#0a0a0a;">With respect,</p>
+<p style="margin:16px 0 0 0;font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.1em;color:#8b6f3a;text-transform:uppercase;">Noman Peera<br><span style="color:#6b6b6b;">CEO · Horeca Store</span></p>
+</td></tr>
+
+-->
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- VARIANT 3: TRY THE NEXT EDITION                                      -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- Replace the BODY section above with this for variant 3:
+
+<tr><td style="padding:48px 40px 24px 40px;">
+<div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.24em;color:#8b6f3a;text-transform:uppercase;margin-bottom:16px;">See You at Vol. III</div>
+<h1 style="margin:0 0 24px 0;font-family:'Fraunces',Georgia,serif;font-size:32px;font-weight:400;line-height:1.2;color:#0a0a0a;">Hi <em style="font-style:italic;color:#8b6f3a;">{{first_name}}.</em></h1>
+<p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#3a3a3a;">Thank you for applying for {{event_city}} Vol. {{event_volume}}. We received your application and reviewed it carefully.</p>
+<p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#3a3a3a;">For this particular edition, we are unable to extend an invitation, but we would warmly welcome you to <strong>Vol. III on September 8, 2026</strong> at the Marriott Energy Corridor. Early reservations are now open.</p>
+<p style="margin:0;font-size:16px;line-height:1.7;color:#3a3a3a;">We will personally hold a seat for you. Just reply to this email and we will mark you down.</p>
+</td></tr>
+<tr><td style="padding:24px 40px 40px 40px;text-align:center;">
+<a href="https://events.thehorecastore.com#calendar" style="display:inline-block;background-color:#0a0a0a;color:#c9a55c;padding:14px 32px;text-decoration:none;font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;border:1px solid #c9a55c;">Reserve Seat for Vol. III</a>
+</td></tr>
+<tr><td style="padding:0 40px 40px 40px;border-top:1px solid #e8dcc4;padding-top:32px;">
+<p style="margin:0;font-family:'Fraunces',Georgia,serif;font-size:16px;font-style:italic;color:#0a0a0a;">Looking forward to having you at the table.</p>
+<p style="margin:16px 0 0 0;font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.1em;color:#8b6f3a;text-transform:uppercase;">Noman Peera<br><span style="color:#6b6b6b;">CEO · Horeca Store</span></p>
+</td></tr>
+
+-->

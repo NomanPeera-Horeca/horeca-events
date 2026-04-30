@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     REMINDER EMAILS · 4 VARIANTS WITH CANONICAL HEADER/FOOTER
+     ═══════════════════════════════════════════════════════════════════════
+     Store as 4 separate rows in email_templates with these slugs:
+       1. reminder-2weeks       (Subject: Two weeks until The Horeca Meetup)
+       2. reminder-1week        (Subject: One week until The Horeca Meetup)
+       3. reminder-day-before   (Subject: Tomorrow night at The Horeca Meetup)
+       4. reminder-day-of       (Subject: Tonight at The Horeca Meetup · Your QR is below)
+     
+     Header and footer are IDENTICAL across all variants.
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- VARIANT 1: TWO WEEKS OUT                                             -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Two weeks to go</title></head>
+<body style="margin:0;padding:0;background-color:#f5f1e8;font-family:Georgia,'Times New Roman',serif;">
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f1e8;padding:40px 20px;"><tr><td align="center">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:#ffffff;border:1px solid #e8dcc4;">
+
+<!-- ━━━ CANONICAL HEADER ━━━ -->
+<tr><td style="height:4px;background:linear-gradient(90deg,#8b6f3a,#c9a55c,#e0c186);font-size:0;line-height:0;">&nbsp;</td></tr>
+<tr><td style="background-color:#0a0a0a;padding:32px 40px;text-align:center;">
+<div style="font-family:'Fraunces',Georgia,serif;font-size:24px;font-weight:500;color:#ffffff;letter-spacing:-0.01em;">The Horeca <em style="font-style:italic;color:#c9a55c;">Meetup</em></div>
+<div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.24em;color:#c9a55c;text-transform:uppercase;margin-top:8px;">{{event_city}} · Volume {{event_volume}}</div>
+</td></tr>
+
+<!-- ━━━ BODY: 2 WEEKS OUT ━━━ -->
+<tr><td style="padding:48px 40px 24px 40px;">
+<div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.24em;color:#8b6f3a;text-transform:uppercase;margin-bottom:16px;">Mark Your Calendar</div>
+<h1 style="margin:0 0 24px 0;font-family:'Fraunces',Georgia,serif;font-size:36px;font-weight:400;line-height:1.1;color:#0a0a0a;letter-spacing:-0.02em;">Two weeks until<br>we <em style="font-style:italic;color:#8b6f3a;">gather.</em></h1>
+<p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#3a3a3a;">Hi {{first_name}}, this is your two-week heads up. The room is filling. The lineup is firming up. We will see you on <strong>{{event_date_long}}</strong>.</p>
+<p style="margin:0;font-size:16px;line-height:1.7;color:#3a3a3a;">A few things to put on your radar:</p>
+</td></tr>
+
+<tr><td style="padding:0 40px 32px 40px;">
+<div style="background-color:#fdfaf3;border:1px solid #e8dcc4;padding:28px;">
+<ul style="margin:0;padding:0 0 0 20px;font-family:'Fraunces',Georgia,serif;font-size:15px;line-height:1.9;color:#3a3a3a;">
+<li><strong>Doors at {{event_doors}}</strong>, program begins {{event_start}}</li>
+<li>Welcome reception · Working session · Operator panel · Buffet dinner</li>
+<li>Dress code: business / smart casual</li>
+<li>Bring a few business cards. The room is built for connection.</li>
+</ul>
+</div>
+</td></tr>
+
+<tr><td style="padding:0 40px 40px 40px;text-align:center;">
+<a href="https://events.thehorecastore.com" style="display:inline-block;background-color:#0a0a0a;color:#c9a55c;padding:14px 32px;text-decoration:none;font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;border:1px solid #c9a55c;">View Full Agenda</a>
+</td></tr>
+
+<tr><td style="padding:0 40px 40px 40px;border-top:1px solid #e8dcc4;padding-top:32px;">
+<p style="margin:0;font-family:'Fraunces',Georgia,serif;font-size:16px;font-style:italic;color:#0a0a0a;">Looking forward to having you at the table.</p>
+<p style="margin:24px 0 0 0;font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.1em;color:#8b6f3a;text-transform:uppercase;">Noman Peera<br><span style="color:#6b6b6b;">CEO · Horeca Store</span></p>
+</td></tr>
+
+<!-- ━━━ CANONICAL FOOTER ━━━ -->
+<tr><td style="background-color:#0a0a0a;padding:36px 40px;text-align:center;">
+<div style="font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:500;color:#ffffff;margin-bottom:8px;letter-spacing:-0.01em;">Horeca <em style="font-style:italic;color:#c9a55c;">Store</em></div>
+<div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.2em;color:#a8a8a8;text-transform:uppercase;margin-bottom:24px;">Global Hospitality Supply · 11 Countries · 3 Continents</div>
+<div style="font-family:'Fraunces',Georgia,serif;font-size:13px;font-style:italic;color:#a8a8a8;line-height:1.7;max-width:380px;margin:0 auto;">Trusted by 15,000+ hotels and restaurants across the Middle East, Asia, and the United States</div>
+<div style="margin-top:28px;padding-top:24px;border-top:1px solid #2a2a2a;">
+<a href="https://thehorecastore.com" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.18em;color:#c9a55c;text-decoration:none;text-transform:uppercase;">thehorecastore.com</a>
+<span style="color:#3a3a3a;margin:0 12px;">·</span>
+<a href="mailto:events@thehorecastore.com" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.18em;color:#c9a55c;text-decoration:none;text-transform:uppercase;">events@thehorecastore.com</a>
+</div>
+</td></tr>
+
+</table>
+</td></tr></table>
+</body></html>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- VARIANT 2: ONE WEEK OUT                                              -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- Use everything above, but replace the BODY block with:
+
+<tr><td style="padding:48px 40px 24px 40px;">
+<div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.24em;color:#8b6f3a;text-transform:uppercase;margin-bottom:16px;">Seven Days</div>
+<h1 style="margin:0 0 24px 0;font-family:'Fraunces',Georgia,serif;font-size:36px;font-weight:400;line-height:1.1;color:#0a0a0a;">One week from<br><em style="font-style:italic;color:#8b6f3a;">tonight.</em></h1>
+<p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#3a3a3a;">Hi {{first_name}}, one week from {{event_date_long}}.</p>
+<p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#3a3a3a;">The guest list this edition is something special. Restaurant owners running 1 to 50+ locations. Hotel GMs. F&B directors from groups you would recognize. The conversations will move fast.</p>
+<p style="margin:0;font-size:16px;line-height:1.7;color:#3a3a3a;">A small request: think about <strong>one specific question</strong> you want answered by the operators in the room. The best conversations at past editions started with someone simply asking "How are you handling X?"</p>
+</td></tr>
+
+-->
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- VARIANT 3: DAY BEFORE                                                -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- Use everything above, but replace the BODY block with:
+
+<tr><td style="padding:48px 40px 24px 40px;">
+<div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.24em;color:#8b6f3a;text-transform:uppercase;margin-bottom:16px;">Tomorrow Night</div>
+<h1 style="margin:0 0 24px 0;font-family:'Fraunces',Georgia,serif;font-size:36px;font-weight:400;line-height:1.1;color:#0a0a0a;">See you <em style="font-style:italic;color:#8b6f3a;">tomorrow,</em><br>{{first_name}}.</h1>
+<p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#3a3a3a;">Quick recap before tomorrow night:</p>
+</td></tr>
+
+<tr><td style="padding:0 40px 32px 40px;">
+<div style="background-color:#fdfaf3;border:1px solid #e8dcc4;padding:28px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:6px 0;font-family:'Courier New',monospace;font-size:11px;color:#8b6f3a;text-transform:uppercase;">When</td><td style="padding:6px 0;font-family:'Fraunces',Georgia,serif;font-size:15px;color:#0a0a0a;">{{event_date_long}}</td></tr>
+<tr><td style="padding:6px 0;font-family:'Courier New',monospace;font-size:11px;color:#8b6f3a;text-transform:uppercase;">Doors</td><td style="padding:6px 0;font-family:'Fraunces',Georgia,serif;font-size:15px;color:#0a0a0a;">{{event_doors}}</td></tr>
+<tr><td style="padding:6px 0;font-family:'Courier New',monospace;font-size:11px;color:#8b6f3a;text-transform:uppercase;">Where</td><td style="padding:6px 0;font-family:'Fraunces',Georgia,serif;font-size:15px;color:#0a0a0a;">{{venue_name}}<br>{{venue_address}}</td></tr>
+<tr><td style="padding:6px 0;font-family:'Courier New',monospace;font-size:11px;color:#8b6f3a;text-transform:uppercase;">Parking</td><td style="padding:6px 0;font-family:'Fraunces',Georgia,serif;font-size:15px;color:#0a0a0a;">Complimentary self-parking on-site</td></tr>
+</table>
+</div>
+</td></tr>
+
+<tr><td style="padding:0 40px 32px 40px;">
+<p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#3a3a3a;"><strong>Bring your QR code</strong> from your confirmation email. We will scan it at the door.</p>
+<p style="margin:0;font-size:16px;line-height:1.7;color:#3a3a3a;">Cant find it? <a href="mailto:events@thehorecastore.com" style="color:#8b6f3a;">Reply</a> and we will resend.</p>
+</td></tr>
+
+-->
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- VARIANT 4: DAY OF (with QR resend)                                   -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- Use everything above PLUS the QR block from approval.html. Replace BODY with:
+
+<tr><td style="padding:48px 40px 24px 40px;">
+<div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.24em;color:#8b6f3a;text-transform:uppercase;margin-bottom:16px;">Tonight</div>
+<h1 style="margin:0 0 24px 0;font-family:'Fraunces',Georgia,serif;font-size:36px;font-weight:400;line-height:1.1;color:#0a0a0a;">See you <em style="font-style:italic;color:#8b6f3a;">tonight,</em><br>{{first_name}}.</h1>
+<p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#3a3a3a;">Doors open at <strong>{{event_doors}}</strong> at {{venue_name}}. Your QR code is below for door scanning.</p>
+</td></tr>
+
+[INCLUDE QR CODE BLOCK FROM approval.html HERE]
+
+<tr><td style="padding:0 40px 32px 40px;">
+<p style="margin:0;font-size:16px;line-height:1.7;color:#3a3a3a;font-style:italic;">Drive safe. The room is ready.</p>
+</td></tr>
+
+-->

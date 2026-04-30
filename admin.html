@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Horeca Meetup · Admin</title>
+<meta name="robots" content="noindex,nofollow">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  --bg: #0a0a0a;
+  --bg-elev: #141414;
+  --bg-card: #1a1a1a;
+  --bg-row-hover: #1f1f1f;
+  --ink: #ededed;
+  --ink-soft: #a8a8a8;
+  --ink-mute: #6b6b6b;
+  --gold: #c9a55c;
+  --gold-light: #e0c186;
+  --gold-deep: #8b6f3a;
+  --green: #4a9b6e;
+  --red: #d4626a;
+  --orange: #d4a574;
+  --rule: rgba(255,255,255,0.08);
+  --rule-strong: rgba(255,255,255,0.16);
+  --serif: 'Fraunces', serif;
+  --sans: 'Inter Tight', -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.5; }
+a { color: var(--gold); text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+
+/* ━━━ LOGIN SCREEN ━━━ */
+.login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.login-card { background: var(--bg-card); border: 1px solid var(--rule); padding: 48px; max-width: 420px; width: 100%; position: relative; }
+.login-card::before { content: ''; position: absolute; top: -1px; left: -1px; right: -1px; height: 3px; background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light)); }
+.login-logo { font-family: var(--serif); font-size: 28px; font-weight: 500; margin-bottom: 8px; }
+.login-logo em { font-style: italic; color: var(--gold); }
+.login-sub { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; color: var(--ink-mute); text-transform: uppercase; margin-bottom: 36px; }
+.login-field { margin-bottom: 16px; }
+.login-field label { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
+.login-field input { width: 100%; background: var(--bg); border: 1px solid var(--rule); padding: 14px 16px; color: var(--ink); font-size: 14px; font-family: var(--sans); }
+.login-field input:focus { outline: none; border-color: var(--gold); }
+.login-btn { width: 100%; background: var(--gold); color: var(--bg); border: none; padding: 16px; font-weight: 600; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 16px; transition: background 0.3s; }
+.login-btn:hover { background: var(--gold-light); }
+.login-btn:disabled { opacity: 0.5; cursor: wait; }
+.login-error { background: rgba(212, 98, 106, 0.1); border: 1px solid var(--red); padding: 12px; color: var(--red); font-size: 13px; margin-top: 16px; }
+
+/* ━━━ DASHBOARD LAYOUT ━━━ */
+.dashboard { display: none; min-height: 100vh; }
+.dashboard.active { display: block; }
+
+header { background: var(--bg-card); border-bottom: 1px solid var(--rule); padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+.header-brand { display: flex; align-items: center; gap: 24px; }
+.brand-name { font-family: var(--serif); font-size: 18px; font-weight: 500; }
+.brand-name em { font-style: italic; color: var(--gold); }
+.brand-divider { width: 1px; height: 20px; background: var(--rule-strong); }
+.brand-section { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; color: var(--ink-soft); text-transform: uppercase; }
+
+.header-user { display: flex; align-items: center; gap: 16px; }
+.user-email { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+.logout-btn { background: transparent; border: 1px solid var(--rule); color: var(--ink-soft); padding: 8px 14px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; transition: all 0.3s; }
+.logout-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ━━━ EVENT SELECTOR + STATS ━━━ */
+.controls-bar { padding: 24px 32px; background: var(--bg); border-bottom: 1px solid var(--rule); }
+.event-selector { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+.event-selector label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute); }
+.event-selector select { background: var(--bg-card); border: 1px solid var(--rule); padding: 10px 14px; color: var(--ink); font-size: 14px; font-family: var(--sans); min-width: 320px; cursor: pointer; }
+.event-selector select:focus { outline: none; border-color: var(--gold); }
+
+.stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.stat-card { background: var(--bg-card); border: 1px solid var(--rule); padding: 18px; cursor: pointer; transition: all 0.3s; }
+.stat-card:hover { border-color: var(--rule-strong); }
+.stat-card.active { border-color: var(--gold); background: rgba(201, 165, 92, 0.05); }
+.stat-num { font-family: var(--serif); font-size: 32px; font-weight: 500; line-height: 1; margin-bottom: 6px; color: var(--ink); }
+.stat-card.active .stat-num { color: var(--gold); }
+.stat-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); }
+.stat-pending .stat-num { color: var(--orange); }
+.stat-approved .stat-num { color: var(--green); }
+.stat-rejected .stat-num { color: var(--red); }
+.stat-needs_info .stat-num { color: var(--gold); }
+
+/* ━━━ TABLE ━━━ */
+.table-controls { padding: 16px 32px; display: flex; gap: 16px; align-items: center; background: var(--bg); border-bottom: 1px solid var(--rule); }
+.search-box { flex: 1; max-width: 400px; }
+.search-box input { width: 100%; background: var(--bg-card); border: 1px solid var(--rule); padding: 10px 14px; color: var(--ink); font-size: 13px; }
+.search-box input:focus { outline: none; border-color: var(--gold); }
+
+.table-wrapper { padding: 0; }
+.registrations-table { width: 100%; border-collapse: collapse; }
+.registrations-table thead { background: var(--bg-elev); border-bottom: 1px solid var(--rule); position: sticky; top: 0; }
+.registrations-table th { padding: 14px 20px; text-align: left; font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-mute); font-weight: 500; }
+.registrations-table tbody tr { border-bottom: 1px solid var(--rule); transition: background 0.2s; }
+.registrations-table tbody tr:hover { background: var(--bg-row-hover); }
+.registrations-table td { padding: 18px 20px; font-size: 13px; vertical-align: top; }
+
+.cell-name { font-family: var(--serif); font-size: 16px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+.cell-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); display: flex; gap: 12px; flex-wrap: wrap; }
+.cell-business { font-size: 14px; color: var(--ink); margin-bottom: 4px; font-weight: 500; }
+.cell-role-locations { font-family: var(--mono); font-size: 11px; color: var(--ink-soft); }
+.cell-contact { font-family: var(--mono); font-size: 11px; color: var(--ink-soft); line-height: 1.6; }
+.cell-contact a { color: var(--gold); }
+.cell-plus-one { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; color: var(--gold); background: rgba(201,165,92,0.1); padding: 3px 8px; margin-top: 4px; }
+
+.status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; border: 1px solid var(--rule-strong); }
+.status-pill.pending { color: var(--orange); border-color: var(--orange); }
+.status-pill.approved { color: var(--green); border-color: var(--green); }
+.status-pill.rejected { color: var(--red); border-color: var(--red); opacity: 0.6; }
+.status-pill.needs_info { color: var(--gold); border-color: var(--gold); }
+
+.action-buttons { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.action-btn { background: transparent; border: 1px solid var(--rule-strong); padding: 8px 12px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); transition: all 0.3s; font-family: var(--sans); font-weight: 500; }
+.action-btn:hover { border-color: var(--gold); color: var(--gold); }
+.action-btn.approve { color: var(--green); border-color: var(--green); }
+.action-btn.approve:hover { background: var(--green); color: var(--bg); }
+.action-btn.reject { color: var(--red); border-color: var(--red); }
+.action-btn.reject:hover { background: var(--red); color: var(--ink); }
+.action-btn.question { color: var(--gold); border-color: var(--gold); }
+.action-btn.question:hover { background: var(--gold); color: var(--bg); }
+.action-btn.view { font-size: 10px; }
+
+.cell-time { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); white-space: nowrap; }
+
+.empty-state { padding: 80px 32px; text-align: center; }
+.empty-state h3 { font-family: var(--serif); font-size: 24px; font-weight: 400; margin-bottom: 8px; color: var(--ink-soft); }
+.empty-state p { font-size: 14px; color: var(--ink-mute); }
+
+/* ━━━ MODAL ━━━ */
+.modal-overlay { position: fixed; inset: 0; background: rgba(10,10,10,0.85); backdrop-filter: blur(20px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 24px; }
+.modal-overlay.active { display: flex; }
+.modal { background: var(--bg-card); border: 1px solid var(--rule-strong); padding: 40px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
+.modal::before { content: ''; position: absolute; top: -1px; left: -1px; right: -1px; height: 3px; background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light)); }
+.modal-close { position: absolute; top: 20px; right: 20px; background: transparent; border: 1px solid var(--rule); width: 32px; height: 32px; color: var(--ink-soft); font-size: 18px; transition: all 0.3s; }
+.modal-close:hover { border-color: var(--gold); color: var(--gold); transform: rotate(90deg); }
+
+.modal-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+.modal-title { font-family: var(--serif); font-size: 28px; font-weight: 500; margin-bottom: 24px; line-height: 1.1; }
+.modal-title em { font-style: italic; color: var(--gold); }
+.modal-body { margin-bottom: 24px; }
+.modal-detail { display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.modal-detail:last-child { border-bottom: none; }
+.modal-detail dt { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; color: var(--ink-mute); text-transform: uppercase; padding-top: 3px; }
+.modal-detail dd { color: var(--ink); font-size: 14px; }
+
+.template-selector { background: var(--bg); border: 1px solid var(--rule); padding: 16px; margin-bottom: 16px; }
+.template-selector label { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; color: var(--ink-mute); text-transform: uppercase; margin-bottom: 8px; }
+.template-selector select { width: 100%; background: var(--bg-card); border: 1px solid var(--rule); padding: 12px; color: var(--ink); font-size: 14px; font-family: var(--sans); }
+.template-selector select:focus { outline: none; border-color: var(--gold); }
+
+.template-preview { background: var(--bg); border: 1px solid var(--rule); padding: 16px; margin-bottom: 16px; max-height: 200px; overflow-y: auto; }
+.template-preview-subject { font-family: var(--mono); font-size: 11px; color: var(--gold); margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+.template-preview-body { font-size: 13px; color: var(--ink-soft); line-height: 1.6; white-space: pre-wrap; }
+
+.modal-actions { display: flex; gap: 12px; justify-content: flex-end; padding-top: 20px; border-top: 1px solid var(--rule); }
+.modal-actions .action-btn { padding: 12px 20px; font-size: 12px; }
+
+/* ━━━ TOAST ━━━ */
+.toast { position: fixed; bottom: 30px; right: 30px; background: var(--bg-card); border: 1px solid var(--rule-strong); padding: 16px 24px; transform: translateY(120%); transition: transform 0.4s; z-index: 2000; max-width: 380px; }
+.toast.show { transform: translateY(0); }
+.toast::before { content: ''; position: absolute; top: -1px; left: -1px; right: -1px; height: 2px; background: linear-gradient(90deg, var(--gold-deep), var(--gold)); }
+.toast-text { font-size: 13px; color: var(--ink); }
+.toast-text strong { color: var(--gold); }
+
+/* Spinner */
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--rule); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-screen { padding: 80px; text-align: center; color: var(--ink-soft); }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .registrations-table { font-size: 12px; }
+  .registrations-table th, .registrations-table td { padding: 12px; }
+}
+@media (max-width: 640px) {
+  header { padding: 16px 20px; flex-direction: column; gap: 12px; align-items: flex-start; }
+  .controls-bar { padding: 16px 20px; }
+  .table-controls { padding: 12px 20px; flex-direction: column; align-items: stretch; }
+  .stats-grid { grid-template-columns: 1fr; }
+  .registrations-table thead { display: none; }
+  .registrations-table tbody tr { display: block; padding: 16px; border-bottom: 1px solid var(--rule); }
+  .registrations-table td { display: block; padding: 6px 0; }
+  .action-buttons { justify-content: flex-start; margin-top: 12px; }
+  .modal { padding: 28px 24px; }
+  .modal-detail { grid-template-columns: 1fr; gap: 4px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LOGIN SCREEN ═══════════ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">The Horeca <em>Meetup</em></div>
+    <div class="login-sub">Admin Dashboard</div>
+    
+    <form id="loginForm">
+      <div class="login-field">
+        <label>Email</label>
+        <input type="email" id="loginEmail" required autocomplete="email">
+      </div>
+      <div class="login-field">
+        <label>Password</label>
+        <input type="password" id="loginPassword" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="login-btn" id="loginBtn">Sign In</button>
+      <div id="loginError" class="login-error" style="display:none;"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════ DASHBOARD ═══════════ -->
+<div class="dashboard" id="dashboard">
+  
+  <header>
+    <div class="header-brand">
+      <span class="brand-name">The Horeca <em>Meetup</em></span>
+      <span class="brand-divider"></span>
+      <span class="brand-section">Admin Dashboard</span>
+    </div>
+    <div class="header-user">
+      <span class="user-email" id="userEmail"></span>
+      <button class="logout-btn" id="logoutBtn">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="controls-bar">
+    <div class="event-selector">
+      <label>Event:</label>
+      <select id="eventSelect"></select>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card stat-pending active" data-status="pending">
+        <div class="stat-num" id="statPending">0</div>
+        <div class="stat-label">Pending Review</div>
+      </div>
+      <div class="stat-card stat-approved" data-status="approved">
+        <div class="stat-num" id="statApproved">0</div>
+        <div class="stat-label">Approved</div>
+      </div>
+      <div class="stat-card stat-needs_info" data-status="needs_info">
+        <div class="stat-num" id="statNeedsInfo">0</div>
+        <div class="stat-label">Needs Info</div>
+      </div>
+      <div class="stat-card stat-rejected" data-status="rejected">
+        <div class="stat-num" id="statRejected">0</div>
+        <div class="stat-label">Rejected</div>
+      </div>
+      <div class="stat-card" data-status="all">
+        <div class="stat-num" id="statTotal">0</div>
+        <div class="stat-label">Total Seats</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-controls">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search by name, email, or business...">
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="registrations-table">
+      <thead>
+        <tr>
+          <th style="width: 22%;">Attendee</th>
+          <th style="width: 22%;">Business</th>
+          <th style="width: 18%;">Contact</th>
+          <th style="width: 10%;">Status</th>
+          <th style="width: 10%;">Submitted</th>
+          <th style="width: 18%; text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="registrationsBody">
+        <tr><td colspan="6" class="empty-state"><div class="spinner"></div> Loading registrations...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════ DETAIL MODAL ═══════════ -->
+<div class="modal-overlay" id="detailModal" onclick="if(event.target===this) closeDetail()">
+  <div class="modal" id="detailModalContent">
+    <button class="modal-close" onclick="closeDetail()">×</button>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<!-- ═══════════ ACTION MODAL ═══════════ -->
+<div class="modal-overlay" id="actionModal" onclick="if(event.target===this) closeAction()">
+  <div class="modal" id="actionModalContent">
+    <button class="modal-close" onclick="closeAction()">×</button>
+    <div id="actionContent"></div>
+  </div>
+</div>
+
+<!-- ═══════════ TOAST ═══════════ -->
+<div class="toast" id="toast">
+  <div class="toast-text"></div>
+</div>
+
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://hgvfixbopldwptnfpxwc.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_MI0yJ7Lw1j3HCwDveLZWLg_vs9n3ojJ';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// State
+let currentUser = null;
+let allRegistrations = [];
+let currentFilter = 'pending';
+let currentEventId = null;
+let emailTemplates = [];
+let activeRegistration = null;
+
+
+// ═══════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════
+function normalizeAdminEmail(raw) {
+  return (raw || '').trim().toLowerCase();
+}
+
+/** After Supabase Auth succeeds, ensure this user exists in admin_users (and that we can read it under RLS). */
+async function verifyAdminRowForEmail(emailRaw) {
+  const email = normalizeAdminEmail(emailRaw);
+  const { data: adminRow, error } = await supabase
+    .from('admin_users')
+    .select('email, role')
+    .eq('email', email)
+    .maybeSingle();
+
+  if (error) {
+    return {
+      ok: false,
+      message:
+        error.message ||
+        'Could not verify admin access. Check Supabase RLS policies on admin_users (authenticated users must be allowed to read their row).',
+    };
+  }
+  if (!adminRow) {
+    return {
+      ok: false,
+      message:
+        'Not authorized: no matching row in admin_users for this email. In Supabase → Table Editor → admin_users, add your exact login email (lowercase).',
+    };
+  }
+  return { ok: true };
+}
+
+function showLoginScreen(prefillError) {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('dashboard').classList.remove('active');
+  if (prefillError) {
+    const errorBox = document.getElementById('loginError');
+    errorBox.textContent = prefillError;
+    errorBox.style.display = 'block';
+  }
+}
+
+async function init() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    const { ok, message } = await verifyAdminRowForEmail(session.user.email);
+    if (!ok) {
+      await supabase.auth.signOut();
+      showLoginScreen(message);
+      return;
+    }
+    await loadDashboard(session.user);
+  } else {
+    showLoginScreen();
+  }
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = normalizeAdminEmail(document.getElementById('loginEmail').value);
+  const password = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('loginBtn');
+  const errorBox = document.getElementById('loginError');
+  
+  btn.disabled = true;
+  btn.textContent = 'Signing in...';
+  errorBox.style.display = 'none';
+  
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+
+    const gate = await verifyAdminRowForEmail(email);
+    if (!gate.ok) {
+      await supabase.auth.signOut();
+      throw new Error(gate.message);
+    }
+
+    await loadDashboard(data.user);
+  } catch (err) {
+    errorBox.textContent = err && err.message ? err.message : String(err);
+    errorBox.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await supabase.auth.signOut();
+  window.location.reload();
+});
+
+
+// ═══════════════════════════════════════════════════════════════
+// LOAD DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+async function loadDashboard(user) {
+  currentUser = user;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dashboard').classList.add('active');
+  document.getElementById('userEmail').textContent = user.email;
+  
+  await loadEvents();
+  await loadEmailTemplates();
+  await loadRegistrations();
+  setupEventListeners();
+}
+
+async function loadEvents() {
+  const { data } = await supabase
+    .from('events')
+    .select('*')
+    .order('event_date', { ascending: false });
+  
+  const select = document.getElementById('eventSelect');
+  select.innerHTML = data.map(e => 
+    `<option value="${e.id}">${e.city} · Vol. ${e.volume_roman} · ${formatDate(e.event_date)}${e.status === 'open' ? ' (LIVE)' : ''}</option>`
+  ).join('');
+  
+  // Default to currently open event
+  const liveEvent = data.find(e => e.status === 'open') || data[0];
+  if (liveEvent) {
+    currentEventId = liveEvent.id;
+    select.value = liveEvent.id;
+  }
+}
+
+async function loadEmailTemplates() {
+  const { data } = await supabase
+    .from('email_templates')
+    .select('*')
+    .eq('is_active', true)
+    .order('category', { ascending: true });
+  emailTemplates = data || [];
+}
+
+async function loadRegistrations() {
+  if (!currentEventId) return;
+  
+  const tbody = document.getElementById('registrationsBody');
+  tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><div class="spinner"></div> Loading...</td></tr>';
+  
+  const { data, error } = await supabase
+    .from('registrations')
+    .select('*')
+    .eq('event_id', currentEventId)
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><h3>Error loading data</h3><p>${error.message}</p></td></tr>`;
+    return;
+  }
+  
+  allRegistrations = data || [];
+  updateStats();
+  renderTable();
+}
+
+function updateStats() {
+  const counts = { pending: 0, approved: 0, rejected: 0, needs_info: 0 };
+  let totalSeats = 0;
+  
+  allRegistrations.forEach(r => {
+    counts[r.status] = (counts[r.status] || 0) + 1;
+    if (r.status === 'approved') totalSeats += (r.attendee_count || 1);
+  });
+  
+  document.getElementById('statPending').textContent = counts.pending;
+  document.getElementById('statApproved').textContent = counts.approved;
+  document.getElementById('statRejected').textContent = counts.rejected;
+  document.getElementById('statNeedsInfo').textContent = counts.needs_info;
+  document.getElementById('statTotal').textContent = totalSeats;
+}
+
+function renderTable() {
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  const tbody = document.getElementById('registrationsBody');
+  
+  let filtered = allRegistrations;
+  if (currentFilter !== 'all') {
+    filtered = filtered.filter(r => r.status === currentFilter);
+  }
+  if (search) {
+    filtered = filtered.filter(r => 
+      `${r.first_name} ${r.last_name} ${r.email} ${r.business_name}`.toLowerCase().includes(search)
+    );
+  }
+  
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><h3>No registrations${currentFilter !== 'all' ? ` (${currentFilter})` : ''}</h3><p>${search ? 'Try a different search term' : 'Submissions will appear here as they come in.'}</p></td></tr>`;
+    return;
+  }
+  
+  tbody.innerHTML = filtered.map(r => `
+    <tr>
+      <td>
+        <div class="cell-name">${escape(r.first_name)} ${escape(r.last_name)}</div>
+        <div class="cell-meta">
+          <span>${escape(r.role || 'Role not specified')}</span>
+        </div>
+        ${r.has_plus_one ? `<div class="cell-plus-one">+1 ${escape(r.plus_one_first_name || '')} ${escape(r.plus_one_last_name || '')}</div>` : ''}
+      </td>
+      <td>
+        <div class="cell-business">${escape(r.business_name)}</div>
+        <div class="cell-role-locations">${escape(r.locations || 'Locations not specified')}</div>
+      </td>
+      <td>
+        <div class="cell-contact">
+          <a href="mailto:${escape(r.email)}">${escape(r.email)}</a><br>
+          <a href="tel:${escape(r.phone)}">${escape(r.phone)}</a>
+        </div>
+      </td>
+      <td><span class="status-pill ${r.status}">${r.status.replace('_', ' ')}</span></td>
+      <td><span class="cell-time">${timeAgo(r.created_at)}</span></td>
+      <td>
+        <div class="action-buttons">
+          <button class="action-btn view" onclick="viewDetail('${r.id}')">View</button>
+          ${r.status === 'pending' || r.status === 'needs_info' ? `
+            <button class="action-btn approve" onclick="openAction('${r.id}', 'approve')">✓ Approve</button>
+            <button class="action-btn question" onclick="openAction('${r.id}', 'question')">? Ask</button>
+            <button class="action-btn reject" onclick="openAction('${r.id}', 'reject')">✗ Reject</button>
+          ` : ''}
+          ${r.status === 'approved' ? `
+            <button class="action-btn" onclick="openAction('${r.id}', 'reminder')">📧 Send Reminder</button>
+          ` : ''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// EVENT LISTENERS
+// ═══════════════════════════════════════════════════════════════
+function setupEventListeners() {
+  document.getElementById('eventSelect').addEventListener('change', async (e) => {
+    currentEventId = e.target.value;
+    await loadRegistrations();
+  });
+  
+  document.querySelectorAll('.stat-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      currentFilter = card.dataset.status;
+      renderTable();
+    });
+  });
+  
+  let searchTimeout;
+  document.getElementById('searchInput').addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(renderTable, 200);
+  });
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// VIEW DETAIL
+// ═══════════════════════════════════════════════════════════════
+function viewDetail(id) {
+  const r = allRegistrations.find(x => x.id === id);
+  if (!r) return;
+  
+  const html = `
+    <div class="modal-eyebrow">Registration Details</div>
+    <h2 class="modal-title">${escape(r.first_name)} <em>${escape(r.last_name)}</em></h2>
+    <div class="modal-body">
+      <dl>
+        <div class="modal-detail"><dt>Status</dt><dd><span class="status-pill ${r.status}">${r.status}</span></dd></div>
+        <div class="modal-detail"><dt>Business</dt><dd>${escape(r.business_name)}</dd></div>
+        <div class="modal-detail"><dt>Role</dt><dd>${escape(r.role || '—')}</dd></div>
+        <div class="modal-detail"><dt>Locations</dt><dd>${escape(r.locations || '—')}</dd></div>
+        <div class="modal-detail"><dt>Email</dt><dd><a href="mailto:${escape(r.email)}">${escape(r.email)}</a></dd></div>
+        <div class="modal-detail"><dt>Phone</dt><dd><a href="tel:${escape(r.phone)}">${escape(r.phone)}</a></dd></div>
+        <div class="modal-detail"><dt>Source</dt><dd>${escape(r.source || '—')}</dd></div>
+        ${r.challenge ? `<div class="modal-detail"><dt>Challenge</dt><dd>${escape(r.challenge)}</dd></div>` : ''}
+        ${r.has_plus_one ? `
+          <div class="modal-detail"><dt>+1 Name</dt><dd>${escape(r.plus_one_first_name)} ${escape(r.plus_one_last_name)}</dd></div>
+          <div class="modal-detail"><dt>+1 Email</dt><dd>${escape(r.plus_one_email)}</dd></div>
+          <div class="modal-detail"><dt>+1 Phone</dt><dd>${escape(r.plus_one_phone)}</dd></div>
+          <div class="modal-detail"><dt>+1 Role</dt><dd>${escape(r.plus_one_role || '—')}</dd></div>
+        ` : ''}
+        <div class="modal-detail"><dt>Submitted</dt><dd>${formatDate(r.created_at, true)}</dd></div>
+        ${r.approved_at ? `<div class="modal-detail"><dt>Approved</dt><dd>${formatDate(r.approved_at, true)} by ${escape(r.approved_by || '—')}</dd></div>` : ''}
+        ${r.qr_code_url ? `<div class="modal-detail"><dt>QR Code</dt><dd><a href="${r.qr_code_url}" target="_blank">View QR</a></dd></div>` : ''}
+      </dl>
+    </div>
+  `;
+  document.getElementById('detailContent').innerHTML = html;
+  document.getElementById('detailModal').classList.add('active');
+}
+
+function closeDetail() {
+  document.getElementById('detailModal').classList.remove('active');
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// ACTIONS: Approve / Reject / Question / Reminder
+// ═══════════════════════════════════════════════════════════════
+function openAction(id, actionType) {
+  activeRegistration = allRegistrations.find(x => x.id === id);
+  if (!activeRegistration) return;
+  
+  const categoryMap = { approve: 'approval', reject: 'rejection', question: 'question', reminder: 'reminder' };
+  const category = categoryMap[actionType];
+  const templates = emailTemplates.filter(t => t.category === category);
+  
+  const titleMap = {
+    approve: 'Approve <em>& Send QR</em>',
+    reject: 'Politely <em>Reject</em>',
+    question: 'Ask a <em>Question</em>',
+    reminder: 'Send <em>Reminder</em>'
+  };
+  
+  const buttonText = {
+    approve: '✓ Approve & Send Email',
+    reject: '✗ Send Rejection',
+    question: '? Send Question',
+    reminder: '📧 Send Reminder'
+  };
+  
+  let html = `
+    <div class="modal-eyebrow">Action</div>
+    <h2 class="modal-title">${titleMap[actionType]}</h2>
+    <div class="modal-body">
+      <p style="color: var(--ink-soft); margin-bottom: 20px; font-size: 14px;">
+        For <strong style="color: var(--ink);">${escape(activeRegistration.first_name)} ${escape(activeRegistration.last_name)}</strong> · ${escape(activeRegistration.business_name)}
+      </p>
+      
+      <div class="template-selector">
+        <label>Choose Template</label>
+        <select id="templateSelect" onchange="renderTemplatePreview()">
+          ${templates.map(t => `<option value="${t.id}">${escape(t.name)}</option>`).join('')}
+        </select>
+      </div>
+      
+      <div class="template-preview" id="templatePreview"></div>
+      
+      ${actionType === 'question' ? `
+        <div class="template-selector">
+          <label>Custom Message (optional addition)</label>
+          <textarea id="customMessage" rows="3" style="width:100%; background:var(--bg-card); border:1px solid var(--rule); padding:12px; color:var(--ink); font-family:var(--sans); font-size:14px;" placeholder="Add a personal note..."></textarea>
+        </div>
+      ` : ''}
+    </div>
+    
+    <div class="modal-actions">
+      <button class="action-btn" onclick="closeAction()">Cancel</button>
+      <button class="action-btn ${actionType}" id="confirmActionBtn" onclick="confirmAction('${actionType}')">${buttonText[actionType]}</button>
+    </div>
+  `;
+  
+  document.getElementById('actionContent').innerHTML = html;
+  document.getElementById('actionModal').classList.add('active');
+  renderTemplatePreview();
+}
+
+function renderTemplatePreview() {
+  const templateId = document.getElementById('templateSelect').value;
+  const template = emailTemplates.find(t => t.id === templateId);
+  if (!template) return;
+  
+  const preview = template.body_html
+    .replace(/\{\{first_name\}\}/g, activeRegistration.first_name)
+    .replace(/\{\{last_name\}\}/g, activeRegistration.last_name)
+    .replace(/\{\{business_name\}\}/g, activeRegistration.business_name)
+    .replace(/<[^>]+>/g, ''); // Strip HTML for preview
+  
+  document.getElementById('templatePreview').innerHTML = `
+    <div class="template-preview-subject">Subject: ${escape(template.subject)}</div>
+    <div class="template-preview-body">${escape(preview.substring(0, 500))}${preview.length > 500 ? '...' : ''}</div>
+  `;
+}
+
+async function confirmAction(actionType) {
+  const btn = document.getElementById('confirmActionBtn');
+  const templateId = document.getElementById('templateSelect').value;
+  const customMessage = document.getElementById('customMessage')?.value || '';
+  
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Processing...';
+  
+  try {
+    // Status mapping
+    const statusMap = { approve: 'approved', reject: 'rejected', question: 'needs_info', reminder: 'approved' };
+    const newStatus = statusMap[actionType];
+    
+    // Build update payload
+    const updates = {
+      status: newStatus,
+      updated_at: new Date().toISOString()
+    };
+    
+    if (actionType === 'approve') {
+      updates.approved_at = new Date().toISOString();
+      updates.approved_by = currentUser.email;
+    } else if (actionType === 'reject') {
+      updates.rejected_at = new Date().toISOString();
+      updates.rejected_reason = emailTemplates.find(t => t.id === templateId)?.name || '';
+    } else if (actionType === 'question') {
+      updates.question_asked_at = new Date().toISOString();
+      updates.question_text = customMessage;
+    }
+    
+    // Update registration
+    const { error: updateErr } = await supabase
+      .from('registrations')
+      .update(updates)
+      .eq('id', activeRegistration.id);
+    
+    if (updateErr) throw updateErr;
+    
+    // Call Edge Function to send email + generate QR if approving
+    const { error: fnErr } = await supabase.functions.invoke('send-registration-email', {
+      body: {
+        registration_id: activeRegistration.id,
+        template_id: templateId,
+        action_type: actionType,
+        custom_message: customMessage,
+        admin_email: currentUser.email
+      }
+    });
+    
+    if (fnErr) console.warn('Email function error:', fnErr);
+    
+    // Log the action
+    await supabase.from('activity_log').insert({
+      registration_id: activeRegistration.id,
+      admin_email: currentUser.email,
+      action: actionType,
+      details: { template_id: templateId, custom_message: customMessage }
+    });
+    
+    closeAction();
+    showToast(`<strong>${actionType === 'approve' ? 'Approved' : actionType === 'reject' ? 'Rejected' : actionType === 'question' ? 'Question sent' : 'Reminder sent'}.</strong> Email sent to ${activeRegistration.email}.`);
+    
+    // Reload data
+    await loadRegistrations();
+    
+  } catch (err) {
+    alert('Error: ' + err.message);
+    btn.disabled = false;
+    btn.textContent = 'Try Again';
+  }
+}
+
+function closeAction() {
+  document.getElementById('actionModal').classList.remove('active');
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════
+function escape(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+
+function formatDate(d, withTime = false) {
+  const date = new Date(d);
+  const opts = withTime ? { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' } : { year: 'numeric', month: 'short', day: 'numeric' };
+  return date.toLocaleDateString('en-US', opts);
+}
+
+function timeAgo(d) {
+  const seconds = Math.floor((new Date() - new Date(d)) / 1000);
+  if (seconds < 60) return 'just now';
+  if (seconds < 3600) return Math.floor(seconds/60) + 'm ago';
+  if (seconds < 86400) return Math.floor(seconds/3600) + 'h ago';
+  if (seconds < 604800) return Math.floor(seconds/86400) + 'd ago';
+  return formatDate(d);
+}
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.querySelector('.toast-text').innerHTML = message;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 5000);
+}
+
+// Boot
+init();
+</script>
+
+</body>
+</html>
