@@ -341,6 +341,21 @@ section { position: relative; padding: 140px 40px; }
 .sponsor-brand-logo { display: block; width: auto; height: auto; object-fit: contain; object-position: left center; max-width: min(100%, 360px); max-height: 88px; }
 .sponsor-brand-logo--light { background: #f5f5f5; border-radius: 10px; padding: 14px 20px; max-height: 96px; }
 .sponsor-brand-logo--on-dark { max-height: 72px; max-width: min(100%, 320px); }
+.sponsor-brand-text {
+  font-family: var(--serif);
+  font-size: clamp(1.25rem, 2.5vw, 1.65rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  max-width: min(100%, 400px);
+  margin: 0;
+}
+.sponsor-brand-text--light {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 18px 22px;
+  color: #141414;
+}
 .sponsor-tagline { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; color: var(--ink-soft); text-transform: uppercase; font-weight: 400; line-height: 1.5; max-width: 420px; margin: 0; }
 
 /* SPONSOR APPLY CTA */
@@ -1208,7 +1223,7 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
           <div class="tier-name gold">Gold</div>
         </div>
         <div class="sponsor-brand-block">
-          <img class="sponsor-brand-logo sponsor-brand-logo--light" src="images/sponsors/rapid-hotel-supplies.png" alt="Rapid Hotel Supplies">
+          <p class="sponsor-brand-text sponsor-brand-text--light">Rapid Hotel Supplies International</p>
           <p class="sponsor-tagline">Hotel Operating Supplies &amp; Equipment</p>
         </div>
       </div>
@@ -1219,7 +1234,7 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
           <div class="tier-name silver">Silver</div>
         </div>
         <div class="sponsor-brand-block">
-          <img class="sponsor-brand-logo sponsor-brand-logo--light" src="images/sponsors/silverchef.png" alt="SilverChef">
+          <p class="sponsor-brand-text sponsor-brand-text--light">Silver Chef - Rent.Try.Buy</p>
           <p class="sponsor-tagline">Equipment Financing for Hospitality</p>
         </div>
       </div>
