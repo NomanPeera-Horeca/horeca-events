@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Horeca Meetup · A Private Series for Restaurant & Hotel Owners</title>
+<meta name="description" content="The exclusive quarterly dinner series for restaurant and hotel owners. Houston, Los Angeles, Dubai. By invitation only." />
+<meta property="og:title" content="The Horeca Meetup · A Private Series for Restaurant & Hotel Owners" />
+<meta property="og:description" content="An exclusive quarterly dinner series. Houston, Los Angeles, Dubai. By invitation only." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://events.thehorecastore.com" />
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230a0a0a'/%3E%3Ctext x='50' y='65' font-family='Georgia,serif' font-size='52' font-weight='700' fill='%23d4a574' text-anchor='middle'%3EH%3C/text%3E%3C/svg%3E" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0a0a0a;
+  --bg-elev: #141414;
+  --bg-card: #1a1a1a;
+  --ink: #ededed;
+  --ink-soft: #a8a8a8;
+  --ink-mute: #6b6b6b;
+  --gold: #c9a55c;
+  --gold-light: #e0c186;
+  --gold-deep: #8b6f3a;
+  --burgundy: #722f37;
+  --rule: rgba(255,255,255,0.08);
+  --rule-strong: rgba(255,255,255,0.16);
+  --serif: 'Fraunces', 'Times New Roman', serif;
+  --sans: 'Inter Tight', -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.6; overflow-x: hidden; }
+::selection { background: var(--gold); color: var(--bg); }
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+
+/* ANNOUNCE */
+.announce { background: var(--gold); color: var(--bg); text-align: center; padding: 11px 24px; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; position: relative; z-index: 100; }
+.announce a { text-decoration: underline; text-underline-offset: 3px; font-weight: 600; }
+.announce-dot { display: inline-block; width: 6px; height: 6px; background: var(--burgundy); border-radius: 50%; margin-right: 8px; animation: pulse 2s ease-in-out infinite; vertical-align: middle; }
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.3); } }
+
+/* NAV */
+nav { position: sticky; top: 0; z-index: 90; background: rgba(10,10,10,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--rule); }
+.nav-inner { max-width: 1400px; margin: 0 auto; padding: 22px 40px; display: flex; align-items: center; justify-content: space-between; }
+.logo { font-family: var(--serif); font-size: 22px; font-weight: 600; letter-spacing: -0.02em; display: flex; align-items: baseline; gap: 10px; }
+.logo-mark { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1.5px solid var(--gold); color: var(--gold); font-size: 16px; font-weight: 700; position: relative; top: 4px; }
+.nav-links { display: flex; gap: 38px; align-items: center; }
+.nav-links a { font-size: 13px; font-weight: 500; letter-spacing: 0.02em; color: var(--ink-soft); transition: color 0.3s ease; }
+.nav-links a:hover { color: var(--gold); }
+.nav-cta { background: var(--gold); color: var(--bg) !important; padding: 11px 20px; font-weight: 600 !important; font-size: 12px !important; letter-spacing: 0.08em !important; text-transform: uppercase; transition: all 0.3s ease; }
+.nav-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+/* HERO */
+.hero { position: relative; min-height: 95vh; display: flex; align-items: center; padding: 80px 40px 60px; overflow: hidden; }
+.hero-bg-image { 
+  position: absolute; 
+  inset: 0; 
+  z-index: 0;
+  background: 
+    radial-gradient(ellipse at 20% 30%, rgba(201, 165, 92, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(114, 47, 55, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(139, 111, 58, 0.12) 0%, transparent 60%),
+    linear-gradient(135deg, #0a0a0a 0%, #1a1410 50%, #0a0a0a 100%);
+}
+.hero-bg-image::after { 
+  content: ''; 
+  position: absolute; 
+  inset: 0; 
+  background: 
+    linear-gradient(180deg, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.6) 60%, rgba(10,10,10,0.85) 100%); 
+}
+.hero-bg-image::before { 
+  content: ''; 
+  position: absolute; 
+  inset: 0; 
+  background-image: 
+    radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0); 
+  background-size: 32px 32px; 
+  opacity: 0.4; 
+  z-index: 2; 
+}
+.hero-inner { max-width: 1400px; margin: 0 auto; width: 100%; position: relative; z-index: 5; display: grid; grid-template-columns: 1.4fr 1fr; gap: 80px; align-items: center; }
+.hero-eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); margin-bottom: 32px; display: flex; align-items: center; gap: 14px; animation: fadeUp 0.8s ease; }
+.hero-eyebrow::before { content: ''; flex: 0 0 32px; height: 1px; background: var(--gold); }
+.hero h1 { font-family: var(--serif); font-size: clamp(56px, 9vw, 132px); font-weight: 300; line-height: 0.92; letter-spacing: -0.035em; margin-bottom: 36px; animation: fadeUp 1s ease 0.1s backwards; }
+.hero h1 em { font-style: italic; font-weight: 400; color: var(--gold); }
+.hero-sub { font-family: var(--serif); font-size: clamp(18px, 1.6vw, 22px); font-weight: 300; line-height: 1.5; color: var(--ink-soft); max-width: 560px; margin-bottom: 48px; animation: fadeUp 1s ease 0.2s backwards; }
+.hero-sub em { color: var(--ink); font-style: italic; }
+.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; animation: fadeUp 1s ease 0.3s backwards; }
+.btn { display: inline-flex; align-items: center; gap: 12px; padding: 18px 32px; font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1.5px solid transparent; position: relative; overflow: hidden; }
+.btn-primary { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+.btn-primary:hover { background: var(--gold-light); border-color: var(--gold-light); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(201, 165, 92, 0.25); }
+.btn-ghost { background: rgba(20,20,20,0.6); color: var(--ink); border-color: var(--rule-strong); backdrop-filter: blur(10px); }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); background: rgba(20,20,20,0.8); }
+.btn-arrow { transition: transform 0.3s ease; }
+.btn:hover .btn-arrow { transform: translateX(4px); }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.hero-card { background: rgba(20,20,20,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--rule-strong); padding: 40px; position: relative; animation: fadeUp 1s ease 0.4s backwards; }
+.hero-card::before { content: ''; position: absolute; top: -1px; left: -1px; right: -1px; height: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold)); }
+.hero-card-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.live-dot { width: 8px; height: 8px; background: var(--burgundy); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+.hero-card-title { font-family: var(--serif); font-size: 32px; font-weight: 400; line-height: 1.1; margin-bottom: 24px; letter-spacing: -0.02em; }
+.hero-card-vol { color: var(--gold); font-style: italic; }
+.hero-card-meta { display: grid; grid-template-columns: auto 1fr; gap: 14px 20px; padding: 24px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); margin-bottom: 24px; }
+.hero-card-meta dt { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); padding-top: 3px; }
+.hero-card-meta dd { font-size: 14px; color: var(--ink); font-weight: 500; }
+.hero-card-progress { margin-bottom: 24px; }
+.progress-row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 10px; }
+.progress-row strong { color: var(--gold); font-weight: 600; }
+.progress-bar { height: 4px; background: var(--rule); position: relative; overflow: hidden; }
+.progress-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 73%; background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light)); }
+.hero-card-cta { display: block; width: 100%; text-align: center; background: var(--ink); color: var(--bg); padding: 16px; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; transition: background 0.3s ease; }
+.hero-card-cta:hover { background: var(--gold); }
+
+/* SECTIONS */
+section { position: relative; padding: 140px 40px; }
+.container { max-width: 1400px; margin: 0 auto; }
+.section-head { display: grid; grid-template-columns: auto 1fr; gap: 60px; align-items: end; margin-bottom: 80px; padding-bottom: 32px; border-bottom: 1px solid var(--rule); }
+.section-num { font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); padding-bottom: 8px; }
+.section-title { font-family: var(--serif); font-size: clamp(40px, 5.5vw, 84px); font-weight: 300; line-height: 0.96; letter-spacing: -0.03em; }
+.section-title em { font-style: italic; font-weight: 400; color: var(--gold); }
+
+/* WHY ATTEND - new section for the "reasons" */
+.why { border-top: 1px solid var(--rule); }
+.why-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+.why-card { background: var(--bg); padding: 56px 48px; position: relative; transition: background 0.4s ease; }
+.why-card:hover { background: var(--bg-card); }
+.why-card-num { font-family: var(--serif); font-size: 14px; font-style: italic; color: var(--gold); margin-bottom: 24px; font-weight: 400; letter-spacing: 0.08em; }
+.why-card h3 { font-family: var(--serif); font-size: clamp(26px, 2.8vw, 36px); font-weight: 400; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 20px; }
+.why-card h3 em { font-style: italic; color: var(--gold); }
+.why-card p { font-size: 16px; color: var(--ink-soft); line-height: 1.65; max-width: 480px; }
+.why-card p strong { color: var(--ink); font-weight: 500; }
+
+/* MANIFESTO */
+.manifesto { background: var(--bg-elev); }
+.manifesto-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 100px; }
+.manifesto-text p { font-family: var(--serif); font-size: clamp(22px, 2.2vw, 30px); font-weight: 300; line-height: 1.45; color: var(--ink-soft); margin-bottom: 28px; letter-spacing: -0.01em; }
+.manifesto-text p:last-child { color: var(--ink); }
+.manifesto-text em { font-style: italic; color: var(--gold); }
+.manifesto-aside { align-self: start; position: sticky; top: 120px; }
+.aside-block { border-left: 1px solid var(--gold); padding-left: 28px; margin-bottom: 40px; }
+.aside-num { font-family: var(--serif); font-size: 56px; font-weight: 300; color: var(--gold); line-height: 1; margin-bottom: 8px; font-style: italic; }
+.aside-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); }
+
+/* HOST / ABOUT HORECA STORE */
+.host { position: relative; overflow: hidden; }
+.host::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 20%, rgba(201, 165, 92, 0.05) 0%, transparent 60%); }
+.host-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; position: relative; }
+.host-visual { aspect-ratio: 5/6; position: relative; overflow: hidden; border: 1px solid var(--rule); }
+.host-visual-bg { position: absolute; inset: 0; background: 
+  radial-gradient(ellipse at 30% 20%, rgba(224, 193, 134, 0.2) 0%, transparent 50%),
+  radial-gradient(ellipse at 70% 80%, rgba(114, 47, 55, 0.15) 0%, transparent 55%),
+  radial-gradient(circle at 50% 50%, rgba(201, 165, 92, 0.08) 0%, transparent 70%),
+  linear-gradient(135deg, #1a1410 0%, #0a0a0a 100%);
+}
+.host-visual-bg::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0); background-size: 28px 28px; opacity: 0.6; }
+.host-visual::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,10,10,0.2) 0%, rgba(10,10,10,0.85) 100%); pointer-events: none; }
+.host-visual-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 44px; z-index: 2; gap: 20px; }
+.host-visual-tag { font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); }
+.host-visual-stamp { font-family: var(--serif); font-size: 60px; font-weight: 300; font-style: italic; line-height: 0.95; letter-spacing: -0.03em; color: var(--ink); }
+.host-visual-stamp span { color: var(--gold); }
+.host-content h3 { font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); margin-bottom: 24px; }
+.host-content h2 { font-family: var(--serif); font-size: clamp(40px, 5.5vw, 72px); font-weight: 300; line-height: 1; letter-spacing: -0.03em; margin-bottom: 32px; }
+.host-content h2 em { font-style: italic; color: var(--gold); }
+.host-content > p { font-family: var(--serif); font-size: clamp(18px, 1.6vw, 21px); font-weight: 300; line-height: 1.6; color: var(--ink-soft); margin-bottom: 24px; }
+.host-content > p strong { color: var(--ink); font-weight: 500; }
+.host-content > p em { color: var(--gold); font-style: italic; }
+.host-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin: 40px 0; }
+.host-stat { background: var(--bg); padding: 28px 24px; }
+.host-stat-num { font-family: var(--serif); font-size: clamp(36px, 4vw, 48px); font-weight: 300; line-height: 1; color: var(--gold); margin-bottom: 8px; font-style: italic; letter-spacing: -0.02em; }
+.host-stat-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); line-height: 1.4; }
+
+.host-trust { padding-top: 32px; border-top: 1px solid var(--rule); margin-bottom: 36px; }
+.host-trust-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 16px; }
+.host-trust-names { font-family: var(--serif); font-size: 18px; font-weight: 400; color: var(--ink); line-height: 1.7; letter-spacing: -0.01em; }
+.host-trust-names span { color: var(--gold); font-style: italic; }
+
+.host-countries { padding-top: 32px; border-top: 1px solid var(--rule); margin-bottom: 36px; }
+.countries-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.country-region { padding: 0; }
+.region-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--rule); }
+.country-list { display: flex; flex-direction: column; gap: 8px; }
+.country-list span { font-family: var(--serif); font-size: 16px; font-weight: 400; font-style: italic; color: var(--ink); letter-spacing: -0.01em; transition: color 0.3s ease; cursor: default; }
+.country-list span:hover { color: var(--gold); }
+
+.host-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+
+/* IMAGE STRIP - using CSS gradients for reliability */
+.image-strip { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 4px; height: 480px; padding: 0; background: var(--bg); }
+.strip-item { position: relative; overflow: hidden; background: var(--bg-elev); }
+.strip-bg { position: absolute; inset: 0; transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1); }
+.strip-item:hover .strip-bg { transform: scale(1.05); }
+.strip-bg-1 { background: 
+  radial-gradient(circle at 30% 40%, rgba(224, 193, 134, 0.3) 0%, transparent 40%),
+  radial-gradient(circle at 70% 60%, rgba(201, 165, 92, 0.2) 0%, transparent 50%),
+  radial-gradient(circle at 50% 80%, rgba(139, 111, 58, 0.15) 0%, transparent 60%),
+  linear-gradient(135deg, #1a1410 0%, #0a0a0a 100%);
+}
+.strip-bg-2 { background: 
+  radial-gradient(circle at 50% 30%, rgba(201, 165, 92, 0.25) 0%, transparent 45%),
+  radial-gradient(circle at 30% 70%, rgba(114, 47, 55, 0.2) 0%, transparent 50%),
+  linear-gradient(135deg, #0a0a0a 0%, #1a0e0d 100%);
+}
+.strip-bg-3 { background: 
+  radial-gradient(circle at 70% 30%, rgba(224, 193, 134, 0.18) 0%, transparent 50%),
+  radial-gradient(circle at 30% 70%, rgba(201, 165, 92, 0.15) 0%, transparent 55%),
+  linear-gradient(135deg, #0a0a0a 0%, #14110d 100%);
+}
+.strip-item::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgba(10,10,10,0.85) 100%); pointer-events: none; }
+.strip-time { 
+  position: absolute; 
+  top: 24px; 
+  right: 24px; 
+  font-family: var(--serif); 
+  font-size: clamp(60px, 9vw, 120px); 
+  font-weight: 200; 
+  font-style: italic; 
+  color: rgba(201, 165, 92, 0.25); 
+  line-height: 0.9; 
+  letter-spacing: -0.04em; 
+  z-index: 1;
+}
+.strip-caption { position: absolute; bottom: 24px; left: 24px; right: 24px; z-index: 2; font-family: var(--serif); font-size: 18px; font-style: italic; font-weight: 300; color: var(--ink); letter-spacing: -0.01em; }
+.strip-caption span { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; font-style: normal; }
+
+/* FEATURED EVENT */
+.featured-event { position: relative; overflow: hidden; }
+.featured-event::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 70% 30%, rgba(201, 165, 92, 0.06) 0%, transparent 50%); }
+.featured-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; position: relative; }
+.featured-visual { aspect-ratio: 4/5; position: relative; overflow: hidden; border: 1px solid var(--rule); }
+.featured-visual-bg { position: absolute; inset: 0; background:
+  radial-gradient(ellipse at 70% 30%, rgba(201, 165, 92, 0.18) 0%, transparent 50%),
+  radial-gradient(ellipse at 30% 80%, rgba(114, 47, 55, 0.2) 0%, transparent 55%),
+  linear-gradient(135deg, #1a0e0d 0%, #0a0a0a 100%);
+}
+.featured-visual-bg::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0); background-size: 28px 28px; opacity: 0.5; }
+.featured-visual::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.85) 100%); pointer-events: none; }
+.featured-visual-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 44px; z-index: 2; }
+.fv-top { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
+.fv-mid { font-family: var(--serif); font-style: italic; font-size: 28px; font-weight: 300; line-height: 1.3; color: var(--ink); }
+.fv-bottom { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); }
+.featured-content h3 { font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); margin-bottom: 24px; }
+.featured-content h2 { font-family: var(--serif); font-size: clamp(40px, 5vw, 64px); font-weight: 300; line-height: 1; letter-spacing: -0.03em; margin-bottom: 32px; }
+.featured-content h2 em { font-style: italic; color: var(--gold); }
+.featured-content > p { font-family: var(--serif); font-size: 19px; font-weight: 300; line-height: 1.6; color: var(--ink-soft); margin-bottom: 40px; max-width: 480px; }
+.featured-details { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin-bottom: 40px; }
+.featured-details > div { background: var(--bg); padding: 24px; }
+.detail-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 8px; }
+.detail-value { font-family: var(--serif); font-size: 20px; font-weight: 400; color: var(--ink); line-height: 1.3; }
+.detail-value em { font-style: italic; color: var(--gold); }
+.featured-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+
+/* AGENDA */
+.agenda { background: var(--bg-elev); }
+.agenda-list { max-width: 1000px; }
+.agenda-item { display: grid; grid-template-columns: 200px 1fr auto; gap: 60px; padding: 40px 0; border-bottom: 1px solid var(--rule); align-items: start; transition: padding 0.3s ease; position: relative; }
+.agenda-item:first-child { border-top: 1px solid var(--rule); }
+.agenda-item:hover { padding-left: 16px; }
+.agenda-item:hover::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 4px; height: 40%; background: var(--gold); }
+.agenda-time { font-family: var(--mono); font-size: 13px; letter-spacing: 0.1em; color: var(--gold); padding-top: 4px; }
+.agenda-content h4 { font-family: var(--serif); font-size: 28px; font-weight: 400; line-height: 1.2; margin-bottom: 8px; letter-spacing: -0.02em; }
+.agenda-content h4 em { font-style: italic; color: var(--gold); }
+.agenda-content p { font-size: 15px; color: var(--ink-soft); line-height: 1.6; max-width: 540px; }
+.agenda-meta { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); text-align: right; padding-top: 8px; }
+
+/* CALENDAR */
+.calendar { background: var(--bg-elev); }
+.events-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.event-card { background: var(--bg); border: 1px solid var(--rule); padding: 36px; position: relative; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; overflow: hidden; }
+.event-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0; transition: opacity 0.4s ease; }
+.event-card:hover { border-color: var(--rule-strong); transform: translateY(-4px); }
+.event-card:hover::before { opacity: 1; }
+.event-card.featured { background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg) 100%); border-color: var(--gold-deep); }
+.event-card.featured::before { background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light)); opacity: 1; height: 2px; }
+.event-status { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 32px; padding: 6px 12px; border: 1px solid var(--rule-strong); }
+.event-status.live { border-color: var(--burgundy); color: var(--gold-light); }
+.event-status.live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--burgundy); animation: pulse 2s ease-in-out infinite; }
+.event-status.open { border-color: var(--gold-deep); color: var(--gold); }
+.event-status.soon { color: var(--ink-mute); }
+.event-status.past { color: var(--ink-mute); opacity: 0.6; }
+.event-city { font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+.event-vol { font-family: var(--serif); font-size: 48px; font-weight: 300; line-height: 1; letter-spacing: -0.02em; margin-bottom: 4px; }
+.event-vol em { font-style: italic; color: var(--gold); }
+.event-date { font-family: var(--serif); font-size: 18px; font-style: italic; color: var(--ink-soft); margin-bottom: 32px; font-weight: 300; }
+.event-meta { font-size: 13px; color: var(--ink-soft); line-height: 1.7; margin-bottom: 28px; padding-top: 24px; border-top: 1px solid var(--rule); }
+.event-meta div { display: flex; justify-content: space-between; }
+.event-meta strong { color: var(--ink); font-weight: 500; }
+.event-link { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); padding-top: 8px; border-top: 1px solid var(--rule); width: 100%; }
+.event-link::after { content: '→'; margin-left: auto; transition: transform 0.3s ease; }
+.event-card:hover .event-link::after { transform: translateX(4px); }
+.event-card.past .event-link { color: var(--ink-soft); }
+
+/* TESTIMONIALS */
+.testimonials-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+.testimonial { background: var(--bg); padding: 56px 48px; position: relative; }
+.testimonial-quote { font-family: var(--serif); font-size: 22px; font-weight: 400; font-style: italic; line-height: 1.5; color: var(--ink); margin-bottom: 32px; letter-spacing: -0.01em; }
+.testimonial-quote::before { content: '"'; font-family: var(--serif); font-size: 80px; font-style: italic; color: var(--gold); line-height: 0.5; display: block; margin-bottom: 16px; opacity: 0.6; }
+.testimonial-author { display: flex; align-items: center; gap: 16px; padding-top: 24px; border-top: 1px solid var(--rule); }
+.author-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--gold-deep), var(--gold)); display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 20px; font-weight: 600; color: var(--bg); flex-shrink: 0; }
+.author-info-name { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+.author-info-meta { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); }
+.author-info-vol { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-mute); margin-top: 2px; }
+
+/* CRITERIA */
+.criteria { background: var(--bg-elev); }
+.criteria-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
+.criteria-block h3 { font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid var(--rule); }
+.criteria-yes h3 { color: var(--gold); }
+.criteria-no h3 { color: var(--ink-mute); }
+.criteria-list { list-style: none; }
+.criteria-list li { font-family: var(--serif); font-size: 22px; font-weight: 300; line-height: 1.5; padding: 16px 0; border-bottom: 1px solid var(--rule); display: flex; gap: 20px; align-items: baseline; }
+.criteria-yes li::before { content: '+'; color: var(--gold); font-size: 24px; flex-shrink: 0; font-weight: 400; }
+.criteria-no li { color: var(--ink-mute); }
+.criteria-no li::before { content: '×'; color: var(--ink-mute); font-size: 22px; flex-shrink: 0; }
+
+/* SPONSORS */
+.sponsors-tiers { display: grid; grid-template-columns: 1fr; gap: 24px; }
+.sponsor-tier { border: 1px solid var(--rule); padding: 40px 48px; display: grid; grid-template-columns: 220px 1fr; gap: 60px; align-items: center; transition: border-color 0.3s ease; }
+.sponsor-tier:hover { border-color: var(--rule-strong); }
+.sponsor-tier-label { display: flex; flex-direction: column; gap: 8px; }
+.tier-rank { font-family: var(--mono); font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--ink-mute); }
+.tier-name { font-family: var(--serif); font-size: 36px; font-weight: 300; letter-spacing: -0.02em; font-style: italic; }
+.tier-name.gold { color: var(--gold); }
+.tier-name.silver { color: #c0c0c0; }
+.tier-name.bronze { color: #cd7f32; }
+.tier-name.host { color: var(--ink); }
+.sponsor-name-large { font-family: var(--serif); font-size: 32px; font-weight: 400; letter-spacing: -0.02em; color: var(--ink); }
+.sponsor-name-large small { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; color: var(--ink-soft); text-transform: uppercase; margin-top: 8px; font-weight: 400; }
+
+/* SPONSOR APPLY CTA */
+.sponsor-apply { margin-top: 60px; background: linear-gradient(135deg, rgba(201,165,92,0.08), rgba(114,47,55,0.05)); border: 1px solid var(--gold-deep); padding: 56px 48px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 60px; align-items: center; position: relative; overflow: hidden; }
+.sponsor-apply::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light)); }
+.sponsor-apply-eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+.sponsor-apply h3 { font-family: var(--serif); font-size: clamp(28px, 3.5vw, 44px); font-weight: 300; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 20px; }
+.sponsor-apply h3 em { font-style: italic; color: var(--gold); }
+.sponsor-apply p { font-family: var(--serif); font-size: 17px; font-weight: 300; color: var(--ink-soft); line-height: 1.6; max-width: 480px; }
+.sponsor-apply-actions { display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
+
+/* FINAL CTA */
+.final-cta { text-align: center; padding: 180px 40px; position: relative; overflow: hidden; }
+.final-cta-bg { position: absolute; inset: 0; z-index: 0; background:
+  radial-gradient(ellipse at 30% 30%, rgba(201, 165, 92, 0.15) 0%, transparent 55%),
+  radial-gradient(ellipse at 70% 70%, rgba(114, 47, 55, 0.18) 0%, transparent 55%),
+  radial-gradient(ellipse at 50% 50%, rgba(139, 111, 58, 0.1) 0%, transparent 70%),
+  linear-gradient(135deg, #0a0a0a 0%, #1a1410 50%, #0a0a0a 100%);
+}
+.final-cta-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, rgba(10,10,10,0.4) 0%, rgba(10,10,10,0.95) 80%); }
+.final-cta > * { position: relative; z-index: 2; }
+.final-cta-eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 32px; }
+.final-cta h2 { font-family: var(--serif); font-size: clamp(48px, 7vw, 104px); font-weight: 300; line-height: 0.95; letter-spacing: -0.04em; margin-bottom: 32px; max-width: 1100px; margin-left: auto; margin-right: auto; }
+.final-cta h2 em { font-style: italic; color: var(--gold); }
+.final-cta p { font-family: var(--serif); font-size: 22px; font-weight: 300; color: var(--ink-soft); margin-bottom: 56px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.5; }
+
+/* FOOTER */
+footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
+.footer-grid { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; padding-bottom: 60px; border-bottom: 1px solid var(--rule); margin-bottom: 32px; }
+.footer-brand .logo { margin-bottom: 24px; }
+.footer-brand p { font-family: var(--serif); font-size: 16px; font-style: italic; color: var(--ink-soft); max-width: 360px; line-height: 1.6; }
+.footer-col h4 { font-family: var(--mono); font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 12px; }
+.footer-col a { font-size: 14px; color: var(--ink-soft); transition: color 0.3s ease; }
+.footer-col a:hover { color: var(--gold); }
+.footer-bottom { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: var(--ink-mute); text-transform: uppercase; }
+.footer-bottom span { display: flex; gap: 24px; }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(10,10,10,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 24px; animation: fadeIn 0.4s ease; }
+.modal-overlay.active { display: flex; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal { background: var(--bg-card); border: 1px solid var(--rule-strong); padding: 56px 48px; max-width: 580px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; animation: modalIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+@keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.modal::before { content: ''; position: absolute; top: -1px; left: -1px; right: -1px; height: 3px; background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light)); }
+.modal-close { position: absolute; top: 24px; right: 24px; width: 36px; height: 36px; border: 1px solid var(--rule); background: transparent; color: var(--ink-soft); cursor: pointer; font-size: 20px; transition: all 0.3s ease; }
+.modal-close:hover { border-color: var(--gold); color: var(--gold); transform: rotate(90deg); }
+.modal-eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+.modal-title { font-family: var(--serif); font-size: 36px; font-weight: 300; line-height: 1; letter-spacing: -0.02em; margin-bottom: 16px; }
+.modal-title em { font-style: italic; color: var(--gold); }
+.modal-sub { font-family: var(--serif); font-size: 16px; color: var(--ink-soft); margin-bottom: 32px; line-height: 1.5; font-style: italic; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.field-full { grid-column: 1 / -1; }
+.field label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft); }
+.field label .required { color: var(--gold); }
+.field input, .field select, .field textarea { background: var(--bg); border: 1px solid var(--rule); padding: 14px 16px; color: var(--ink); font-family: var(--sans); font-size: 14px; transition: border-color 0.3s ease; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--gold); }
+.field textarea { resize: vertical; min-height: 80px; }
+.modal-submit { width: 100%; background: var(--gold); color: var(--bg); border: none; padding: 18px; font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; margin-top: 16px; transition: all 0.3s ease; }
+.modal-submit:hover { background: var(--gold-light); transform: translateY(-2px); }
+.modal-fine { font-family: var(--serif); font-size: 13px; font-style: italic; color: var(--ink-mute); text-align: center; margin-top: 20px; line-height: 1.5; }
+.modal-success { text-align: center; padding: 40px 0; display: none; }
+.modal-success.active { display: block; }
+.success-mark { width: 64px; height: 64px; margin: 0 auto 24px; border: 1.5px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--gold); font-family: var(--serif); }
+
+/* PLUS ONE SECTION */
+.plus-one-section {
+  margin: 24px 0;
+  padding: 24px;
+  border: 1px solid var(--rule);
+  background: rgba(20,20,20,0.4);
+  position: relative;
+}
+.plus-one-section::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-deep), transparent);
+}
+.plus-one-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.plus-one-label { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.plus-one-eyebrow {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.plus-one-title {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--ink);
+  font-style: italic;
+}
+.plus-one-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  user-select: none;
+}
+.plus-one-toggle input { display: none; }
+.toggle-slider {
+  width: 38px;
+  height: 22px;
+  background: var(--rule-strong);
+  border-radius: 11px;
+  position: relative;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+}
+.toggle-slider::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: var(--ink-soft);
+  border-radius: 50%;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+.plus-one-toggle input:checked + .toggle-slider {
+  background: var(--gold);
+}
+.plus-one-toggle input:checked + .toggle-slider::after {
+  transform: translateX(16px);
+  background: var(--bg);
+}
+.plus-one-toggle input:checked ~ .toggle-text {
+  color: var(--gold);
+}
+.plus-one-fields {
+  display: none;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+}
+.plus-one-fields.active {
+  display: block;
+  animation: fadeIn 0.4s ease;
+}
+.plus-one-note {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-style: italic;
+  color: var(--ink-soft);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.field-hint {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--ink-mute);
+  margin-top: 4px;
+}
+.field-hint.error { color: #d4626a; }
+.field input.error,
+.field select.error {
+  border-color: #d4626a;
+}
+
+/* TOAST */
+.toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(120%); background: var(--bg-card); border: 1px solid var(--gold); border-left: 4px solid var(--gold); padding: 18px 28px; z-index: 2000; min-width: 320px; max-width: 90vw; box-shadow: 0 24px 60px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 16px; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast-icon { width: 28px; height: 28px; border: 1.5px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 14px; flex-shrink: 0; font-family: var(--serif); }
+.toast-text { font-size: 13px; color: var(--ink); line-height: 1.4; }
+.toast-text strong { color: var(--gold); font-weight: 600; }
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .hero-inner, .featured-grid, .manifesto-grid, .criteria-grid, .sponsor-apply, .why-grid, .host-grid { grid-template-columns: 1fr; gap: 60px; }
+  .why-grid { gap: 1px; }
+  .events-grid, .testimonials-grid { grid-template-columns: 1fr; }
+  .image-strip { grid-template-columns: 1fr; height: auto; }
+  .strip-item { aspect-ratio: 16/9; }
+  .nav-links { display: none; }
+  .nav-cta { display: inline-flex; }
+  .section-head { grid-template-columns: 1fr; gap: 24px; }
+  .agenda-item { grid-template-columns: 1fr; gap: 16px; }
+  .agenda-meta { text-align: left; }
+  .sponsor-tier { grid-template-columns: 1fr; gap: 24px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+  section { padding: 80px 24px; }
+  .hero { padding: 60px 24px; }
+  .manifesto-aside { position: static; }
+  .host-stats { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .nav-inner { padding: 18px 20px; }
+  .logo { font-size: 18px; }
+  .logo-mark { width: 28px; height: 28px; font-size: 14px; }
+  .hero { min-height: auto; padding: 50px 20px; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .btn { justify-content: center; }
+  .hero-card { padding: 28px; }
+  .hero-card-title { font-size: 24px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .modal { padding: 40px 28px; }
+  .modal-title { font-size: 28px; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+  .testimonial, .why-card { padding: 40px 28px; }
+  .sponsor-apply { padding: 40px 28px; }
+  section { padding: 60px 20px; }
+  .announce { font-size: 9px; padding: 9px 16px; }
+  .host-stat { padding: 20px 16px; }
+  .host-stat-num { font-size: 32px; }
+  .host-visual-stamp { font-size: 44px; }
+  .countries-grid { grid-template-columns: 1fr; gap: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ANNOUNCE -->
+<div class="announce">
+  <span class="announce-dot"></span>
+  Houston · Vol. II · May 5, 2026 · 73 of 100 seats reserved · 
+  <a href="#vol2" onclick="openModal(event,'vol2')">Reserve yours →</a>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo">
+      <span class="logo-mark">H</span>
+      <span>The Horeca Meetup</span>
+    </a>
+    <div class="nav-links">
+      <a href="#why">Why Attend</a>
+      <a href="#host">The Host</a>
+      <a href="#vol2">Vol. II</a>
+      <a href="#calendar">The Series</a>
+      <a href="#testimonials">Voices</a>
+      <a href="#sponsors">Patrons</a>
+      <a href="#vol2" class="nav-cta" onclick="openModal(event,'vol2')">Reserve Seat</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-image"></div>
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-eyebrow">An Invitation-Only Series · Est. 2026</div>
+      <h1>The room<br>where restaurant<br>owners <em>actually</em><br>get to talk.</h1>
+      <p class="hero-sub">A quarterly private dinner series for restaurant and hotel owners building real businesses. The conversations you cannot have at trade shows, with the operators worth listening to, <em>over an unhurried evening.</em></p>
+      <div class="hero-actions">
+        <a href="#vol2" class="btn btn-primary" onclick="openModal(event,'vol2')">
+          Reserve a Seat
+          <span class="btn-arrow">→</span>
+        </a>
+        <a href="#why" class="btn btn-ghost">Why Attend</a>
+      </div>
+    </div>
+    
+    <div class="hero-right">
+      <div class="hero-card">
+        <div class="hero-card-label">
+          <span class="live-dot"></span>
+          Next Edition · Approval Open
+        </div>
+        <div class="hero-card-title">
+          Houston <span class="hero-card-vol">Vol. II</span><br>
+          May 5, 2026
+        </div>
+        <dl class="hero-card-meta">
+          <dt>Venue</dt>
+          <dd>Marriott Energy Corridor</dd>
+          <dt>Time</dt>
+          <dd>6:30 PM · Doors 6:00 PM</dd>
+          <dt>Format</dt>
+          <dd>Buffet dinner · Welcome reception</dd>
+          <dt>Admission</dt>
+          <dd>Complimentary, by approval</dd>
+        </dl>
+        <div class="hero-card-progress">
+          <div class="progress-row">
+            <span>Seats Reserved</span>
+            <span><strong>73</strong> / 100</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill"></div>
+          </div>
+        </div>
+        <a href="#vol2" class="hero-card-cta" onclick="openModal(event,'vol2')">Apply for Approval →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY ATTEND - Reasons -->
+<section class="why" id="why">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num">01 · Why Attend</div>
+      <h2 class="section-title">Six reasons to give up <em>one Tuesday night.</em></h2>
+    </div>
+    
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-card-num">i.</div>
+        <h3>Find your <em>next franchise partner.</em></h3>
+        <p>The room is built for operators ready to scale. <strong>Half of last edition's attendees walked out with a serious franchise conversation already started.</strong> Multi-unit operators looking for territory partners. Single-unit owners hunting for proven concepts. The match-making happens over dinner.</p>
+      </div>
+      
+      <div class="why-card">
+        <div class="why-card-num">ii.</div>
+        <h3>Make your restaurant <em>more profitable.</em></h3>
+        <p>Honest conversations about real margins. What is working in 2026, what is not, and the unsexy decisions that quietly add 4 to 8 points to your bottom line. <strong>Operators sharing actual P&amp;L numbers under the Chatham House Rule.</strong> No theory. No consultants. Just the math that matters.</p>
+      </div>
+      
+      <div class="why-card">
+        <div class="why-card-num">iii.</div>
+        <h3>The network that <em>actually scales businesses.</em></h3>
+        <p>One hundred of Houston's most ambitious restaurant and hotel owners under one roof. <strong>This is the room where suppliers get found, partners get hired, leases get sublet, and operators help operators solve problems no LinkedIn post ever could.</strong> The relationships compound for years.</p>
+      </div>
+      
+      <div class="why-card">
+        <div class="why-card-num">iv.</div>
+        <h3>Grow your operation, <em>without growing chaos.</em></h3>
+        <p>Going from 1 to 3 locations is a different game than going from 3 to 10. <strong>The room is filled with operators who have crossed those bridges and survived.</strong> Hire systems, supplier relationships, financing playbooks, and the staffing strategies that keep multi-unit operators sane.</p>
+      </div>
+      
+      <div class="why-card">
+        <div class="why-card-num">v.</div>
+        <h3>A private dinner, <em>done right.</em></h3>
+        <p>Welcome reception at 6:00 PM. A generous buffet dinner served at 8:30 PM. Curated room flow arranged by operator profile, not by surname. <strong>The Marriott Energy Corridor handles hospitality the way operators expect it done.</strong> The dinner alone makes the night worth the drive.</p>
+      </div>
+      
+      <div class="why-card">
+        <div class="why-card-num">vi.</div>
+        <h3>You become <em>part of the series.</em></h3>
+        <p>Vol. II is the second Houston edition. Vol. III opens September. Vol. IV in January. Vol. V in May. <strong>Once you are in the room, you are in the room.</strong> The series compounds. The network multiplies. The earlier you join, the deeper the relationships build over time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMAGE STRIP -->
+<div class="image-strip">
+  <div class="strip-item">
+    <div class="strip-bg strip-bg-1"></div>
+    <div class="strip-time">VI</div>
+    <div class="strip-caption">
+      <span>06:00 PM</span>
+      Welcome reception. Quiet arrivals. The first conversations of the night.
+    </div>
+  </div>
+  <div class="strip-item">
+    <div class="strip-bg strip-bg-2"></div>
+    <div class="strip-time">VIII</div>
+    <div class="strip-caption">
+      <span>08:30 PM</span>
+      Buffet dinner. Curated flow. Three stations, one room.
+    </div>
+  </div>
+  <div class="strip-item">
+    <div class="strip-bg strip-bg-3"></div>
+    <div class="strip-time">IX</div>
+    <div class="strip-caption">
+      <span>09:00 PM</span>
+      The conversations that turn rooms into networks.
+    </div>
+  </div>
+</div>
+
+<!-- MANIFESTO -->
+<section class="manifesto" id="manifesto">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num">02 · Manifesto</div>
+      <h2 class="section-title">Why this room <em>exists.</em></h2>
+    </div>
+    
+    <div class="manifesto-grid">
+      <div class="manifesto-text">
+        <p>Running a restaurant in 2026 is harder than it has ever been. Margins are tighter. Staff is harder to keep. The noise from "restaurant gurus" online has never been louder, or less useful.</p>
+        
+        <p>So we built a different room.</p>
+        
+        <p>The Horeca Meetup is a quarterly private dinner for the operators who are actually doing the work. <em>Building, scaling, and surviving in this market.</em> Not the people selling them tools. Not the people selling them advice. The ones in the kitchen at 6am and the dining room at midnight.</p>
+      </div>
+      
+      <aside class="manifesto-aside">
+        <div class="aside-block">
+          <div class="aside-num">100</div>
+          <div class="aside-label">Seats per edition</div>
+        </div>
+        <div class="aside-block">
+          <div class="aside-num">04</div>
+          <div class="aside-label">Editions per year, per city</div>
+        </div>
+        <div class="aside-block">
+          <div class="aside-num">03</div>
+          <div class="aside-label">Cities · Dubai · LA · Houston</div>
+        </div>
+        <div class="aside-block">
+          <div class="aside-num">02</div>
+          <div class="aside-label">Hours that change a year</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- HOST / ABOUT HORECA STORE -->
+<section class="host" id="host">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num">03 · The Host</div>
+      <h2 class="section-title">Hosted by <em>Horeca Store.</em></h2>
+    </div>
+    
+    <div class="host-grid">
+      <div class="host-visual">
+        <div class="host-visual-bg"></div>
+        <div class="host-visual-content">
+          <div class="host-visual-tag">11 Countries · 3 Continents</div>
+          <div class="host-visual-stamp">Middle East ·<br>Asia ·<br><span>United States</span></div>
+        </div>
+      </div>
+      
+      <div class="host-content">
+        <h3>About the Host</h3>
+        <h2>The supply partner behind <em>real operators.</em></h2>
+        
+        <p><strong>Horeca Store</strong> is a global hospitality supply company powering hotels, restaurants, cafes, and franchise operators across the <em>Middle East, Asia, and the United States.</em> We supply the equipment, furniture, smallwares, and operating supplies that run <em>15,000+ hotels and restaurants worldwide.</em></p>
+        
+        <p>We started this dinner series in select cities for one reason: <strong>the operators we supply are the most ambitious people we know.</strong> They deserve a room where they can talk to each other without the noise. Houston tonight. Los Angeles next. Dubai after that.</p>
+        
+        <div class="host-stats">
+          <div class="host-stat">
+            <div class="host-stat-num">15K+</div>
+            <div class="host-stat-label">Hotels and restaurants<br>served globally</div>
+          </div>
+          <div class="host-stat">
+            <div class="host-stat-num">11</div>
+            <div class="host-stat-label">Countries across<br>3 continents</div>
+          </div>
+          <div class="host-stat">
+            <div class="host-stat-num">100K+</div>
+            <div class="host-stat-label">Products<br>in catalog</div>
+          </div>
+        </div>
+        
+        <div class="host-trust">
+          <div class="host-trust-label">Trusted By</div>
+          <div class="host-trust-names">
+            <span>Accor</span> · <span>Hilton</span> · <span>Staybridge Suites</span> · <span>Taj Hotels</span> · <span>Denny's</span> · <span>Smoothie King</span> · and 15,000+ hotels and restaurants worldwide
+          </div>
+        </div>
+        
+        <div class="host-countries">
+          <div class="host-trust-label">Operating Across</div>
+          <div class="countries-grid">
+            <div class="country-region">
+              <div class="region-label">Middle East</div>
+              <div class="country-list">
+                <span>UAE</span>
+                <span>Saudi Arabia</span>
+                <span>Qatar</span>
+                <span>Kuwait</span>
+                <span>Oman</span>
+              </div>
+            </div>
+            <div class="country-region">
+              <div class="region-label">Asia</div>
+              <div class="country-list">
+                <span>India</span>
+                <span>Pakistan</span>
+                <span>Singapore</span>
+                <span>Malaysia</span>
+                <span>Hong Kong</span>
+                <span>China</span>
+              </div>
+            </div>
+            <div class="country-region">
+              <div class="region-label">North America</div>
+              <div class="country-list">
+                <span>United States</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="host-actions">
+          <a href="https://thehorecastore.com" target="_blank" class="btn btn-primary">
+            Visit Horeca Store
+            <span class="btn-arrow">→</span>
+          </a>
+          <a href="https://thehorecastore.com/contact" target="_blank" class="btn btn-ghost">
+            Talk to Sales
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED EVENT VOL II -->
+<section class="featured-event" id="vol2">
+  <div class="container">
+    <div class="featured-grid">
+      <div class="featured-visual">
+        <div class="featured-visual-bg"></div>
+        <div class="featured-visual-content">
+          <div class="fv-top">Houston · Vol. II</div>
+          <div class="fv-mid">"The room<br>where Houston<br>actually gathers."</div>
+          <div class="fv-bottom">
+            <span>Tuesday</span>
+            <span>05·05·2026</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="featured-content">
+        <h3>The Featured Edition</h3>
+        <h2>Houston <em>Vol. II</em></h2>
+        <p>The second Houston edition gathers 100 of the city's most ambitious restaurant and hotel operators for one evening at the Marriott Energy Corridor. A working session on scaling profitably. Honest panel conversations on growth and franchise partnerships. A buffet dinner. And the kind of network you cannot fake.</p>
+        
+        <div class="featured-details">
+          <div>
+            <div class="detail-label">Date</div>
+            <div class="detail-value">Tuesday<br><em>May 5, 2026</em></div>
+          </div>
+          <div>
+            <div class="detail-label">Venue</div>
+            <div class="detail-value">Marriott<br><em>Energy Corridor</em></div>
+          </div>
+          <div>
+            <div class="detail-label">Time</div>
+            <div class="detail-value">6:30 PM<br><em>Doors 6:00 PM</em></div>
+          </div>
+          <div>
+            <div class="detail-label">Capacity</div>
+            <div class="detail-value">100 Seats<br><em>By approval</em></div>
+          </div>
+        </div>
+        
+        <div class="featured-actions">
+          <a href="#" class="btn btn-primary" onclick="openModal(event,'vol2')">
+            Apply for Approval
+            <span class="btn-arrow">→</span>
+          </a>
+          <a href="#agenda" class="btn btn-ghost">View Evening</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AGENDA -->
+<section class="agenda" id="agenda">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num">04 · The Evening</div>
+      <h2 class="section-title">A two-hour<br>conversation, <em>structured.</em></h2>
+    </div>
+    
+    <div class="agenda-list">
+      <div class="agenda-item">
+        <div class="agenda-time">6:00 PM</div>
+        <div class="agenda-content">
+          <h4>Doors &amp; <em>Welcome Reception</em></h4>
+          <p>Quiet arrivals. Welcome refreshments. The first conversations of the night happen here, before anyone takes a seat.</p>
+        </div>
+        <div class="agenda-meta">30 min</div>
+      </div>
+      
+      <div class="agenda-item">
+        <div class="agenda-time">6:30 PM</div>
+        <div class="agenda-content">
+          <h4>Opening <em>Remarks</em></h4>
+          <p>A short welcome from the host. Why we built this room, who is in it tonight, and what we are here to talk about.</p>
+        </div>
+        <div class="agenda-meta">15 min</div>
+      </div>
+      
+      <div class="agenda-item">
+        <div class="agenda-time">6:45 PM</div>
+        <div class="agenda-content">
+          <h4>How to <em>Scale &amp; Stay Profitable</em></h4>
+          <p>A working session on the systems that grow restaurants without burning operators out. The supplier playbooks, financing structures, and operational tools that quietly add points to the bottom line. Real frameworks pulled from operators running multi-million dollar businesses.</p>
+        </div>
+        <div class="agenda-meta">45 min</div>
+      </div>
+      
+      <div class="agenda-item">
+        <div class="agenda-time">7:30 PM</div>
+        <div class="agenda-content">
+          <h4>The <em>Operator Panel</em></h4>
+          <p>An honest conversation between Houston operators about scaling, franchising, and the real numbers behind growth. Staffing, margins, expansion, and the franchise partnerships that quietly turn single-unit operators into regional groups.</p>
+        </div>
+        <div class="agenda-meta">60 min</div>
+      </div>
+      
+      <div class="agenda-item">
+        <div class="agenda-time">8:30 PM</div>
+        <div class="agenda-content">
+          <h4>Buffet Dinner &amp; <em>Open Networking</em></h4>
+          <p>The reason most attendees say they came back. Curated stations, generous service, and the conversations that turn rooms into networks.</p>
+        </div>
+        <div class="agenda-meta">60 min</div>
+      </div>
+      
+      <div class="agenda-item">
+        <div class="agenda-time">9:30 PM</div>
+        <div class="agenda-content">
+          <h4>Closing &amp; <em>Vol. III Save the Date</em></h4>
+          <p>A toast. A reservation card for September. The night ends, the network does not.</p>
+        </div>
+        <div class="agenda-meta">15 min</div>
+      </div>
+      
+      <div class="agenda-item">
+        <div class="agenda-time">8:30 PM</div>
+        <div class="agenda-content">
+          <h4>Buffet Dinner &amp; <em>Open Networking</em></h4>
+          <p>The reason most attendees say they came back. Curated stations, generous service, and the conversations that turn rooms into networks.</p>
+        </div>
+        <div class="agenda-meta">60 min</div>
+      </div>
+      
+      <div class="agenda-item">
+        <div class="agenda-time">9:30 PM</div>
+        <div class="agenda-content">
+          <h4>Closing &amp; <em>Vol. III Save the Date</em></h4>
+          <p>A toast. A reservation card for September. The night ends, the network does not.</p>
+        </div>
+        <div class="agenda-meta">15 min</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CALENDAR / SERIES -->
+<section class="calendar" id="calendar">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num">05 · The Series</div>
+      <h2 class="section-title">The story <em>so far.</em></h2>
+    </div>
+    
+    <div class="events-grid">
+      <div class="event-card past">
+        <div class="event-status past">◯ Concluded</div>
+        <div class="event-city">Houston</div>
+        <div class="event-vol">Vol. <em>I</em></div>
+        <div class="event-date">January 27, 2026</div>
+        <div class="event-meta">
+          <div><span>Attendance</span><strong>84 / 100</strong></div>
+          <div><span>Venue</span><strong>Lantern Banquet Houston</strong></div>
+        </div>
+        <a href="#" class="event-link">View Recap</a>
+      </div>
+      
+      <div class="event-card featured">
+        <div class="event-status live">Live · Approval Open</div>
+        <div class="event-city">Houston</div>
+        <div class="event-vol">Vol. <em>II</em></div>
+        <div class="event-date">May 5, 2026</div>
+        <div class="event-meta">
+          <div><span>Reserved</span><strong>73 / 100</strong></div>
+          <div><span>Venue</span><strong>Marriott Energy Corridor</strong></div>
+        </div>
+        <a href="#" class="event-link" onclick="openModal(event,'vol2')">Apply for Approval</a>
+      </div>
+      
+      <div class="event-card">
+        <div class="event-status open">○ Early RSVP Open</div>
+        <div class="event-city">Houston</div>
+        <div class="event-vol">Vol. <em>III</em></div>
+        <div class="event-date">September 8, 2026</div>
+        <div class="event-meta">
+          <div><span>Reserved</span><strong>0 / 100</strong></div>
+          <div><span>Venue</span><strong>Marriott Energy Corridor</strong></div>
+        </div>
+        <a href="#" class="event-link" onclick="openModal(event,'vol3')">Reserve Early</a>
+      </div>
+      
+      <div class="event-card">
+        <div class="event-status soon">○ Save the Date</div>
+        <div class="event-city">Los Angeles</div>
+        <div class="event-vol">Vol. <em>II</em></div>
+        <div class="event-date">June 2, 2026</div>
+        <div class="event-meta">
+          <div><span>Status</span><strong>Coming Soon</strong></div>
+          <div><span>Venue</span><strong>TBA</strong></div>
+        </div>
+        <a href="#" class="event-link" onclick="openModal(event,'la2')">Notify Me</a>
+      </div>
+      
+      <div class="event-card">
+        <div class="event-status soon">○ Save the Date</div>
+        <div class="event-city">Houston</div>
+        <div class="event-vol">Vol. <em>IV</em></div>
+        <div class="event-date">January 12, 2027</div>
+        <div class="event-meta">
+          <div><span>Status</span><strong>Calendar Hold</strong></div>
+          <div><span>Venue</span><strong>Marriott Energy Corridor</strong></div>
+        </div>
+        <a href="#" class="event-link" onclick="openModal(event,'vol4')">Notify Me</a>
+      </div>
+      
+      <div class="event-card">
+        <div class="event-status soon">○ Save the Date</div>
+        <div class="event-city">Dubai · UAE</div>
+        <div class="event-vol">Vol. <em>VIII</em></div>
+        <div class="event-date">November 10, 2026</div>
+        <div class="event-meta">
+          <div><span>Status</span><strong>UAE Flagship Chapter</strong></div>
+          <div><span>Venue</span><strong>Courtyard by Marriott Business Bay</strong></div>
+        </div>
+        <a href="#" class="event-link" onclick="openModal(event,'dubai8')">Notify Me</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num">06 · Voices</div>
+      <h2 class="section-title">What operators <em>say after.</em></h2>
+    </div>
+    
+    <div class="testimonials-grid">
+      <div class="testimonial">
+        <div class="testimonial-quote">Walked in for dinner. Walked out with two operators interested in our franchise. Best ROI on a Tuesday night I have ever had.</div>
+        <div class="testimonial-author">
+          <div class="author-avatar">RP</div>
+          <div>
+            <div class="author-info-name">Ramesh Patel</div>
+            <div class="author-info-meta">Owner · 7 Locations · Houston</div>
+            <div class="author-info-vol">Houston · Vol. I</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="testimonial">
+        <div class="testimonial-quote">The seating was curated. I sat next to operators running the same scale I am. Three of them are now in my WhatsApp group.</div>
+        <div class="testimonial-author">
+          <div class="author-avatar">SK</div>
+          <div>
+            <div class="author-info-name">Sarah Kim</div>
+            <div class="author-info-meta">Founder · Bento Bar Cafe</div>
+            <div class="author-info-vol">Houston · Vol. I</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="testimonial">
+        <div class="testimonial-quote">First room I have been in where nobody was selling me something. Just operators talking about real numbers. Refreshing.</div>
+        <div class="testimonial-author">
+          <div class="author-avatar">DC</div>
+          <div>
+            <div class="author-info-name">Daniel Chen</div>
+            <div class="author-info-meta">Multi-Unit Operator · 12 Stores</div>
+            <div class="author-info-vol">Houston · Vol. I</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="testimonial">
+        <div class="testimonial-quote">Found my next franchise partner over dinner. Closed the deal six weeks later. The room is the value.</div>
+        <div class="testimonial-author">
+          <div class="author-avatar">AR</div>
+          <div>
+            <div class="author-info-name">Ana Rodriguez</div>
+            <div class="author-info-meta">Founder · Mesa Hospitality Group</div>
+            <div class="author-info-vol">Houston · Vol. I</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="testimonial">
+        <div class="testimonial-quote">I was skeptical about another networking dinner. By the end of the night I was already asking when the next one is.</div>
+        <div class="testimonial-author">
+          <div class="author-avatar">JP</div>
+          <div>
+            <div class="author-info-name">James Patel</div>
+            <div class="author-info-meta">F&amp;B Director · Boutique Hotel Group</div>
+            <div class="author-info-vol">Houston · Vol. I</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="testimonial">
+        <div class="testimonial-quote">The conversations were honest. Real margins, real staffing problems, real solutions. The kind of room you cannot find on LinkedIn.</div>
+        <div class="testimonial-author">
+          <div class="author-avatar">LV</div>
+          <div>
+            <div class="author-info-name">Lina Vasquez</div>
+            <div class="author-info-meta">Owner · 3 Coffee Concepts</div>
+            <div class="author-info-vol">Houston · Vol. I</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CRITERIA -->
+<section class="criteria">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num">07 · The Room</div>
+      <h2 class="section-title">Who belongs <em>at this table.</em></h2>
+    </div>
+    
+    <div class="criteria-grid">
+      <div class="criteria-block criteria-yes">
+        <h3>This room is for</h3>
+        <ul class="criteria-list">
+          <li>Restaurant owners with 1 to 10 locations</li>
+          <li>Multi-unit operators and franchisees</li>
+          <li>Hotel F&amp;B Directors and General Managers</li>
+          <li>Cafe and coffee shop founders ready to scale</li>
+          <li>Catering and hospitality entrepreneurs running real revenue</li>
+        </ul>
+      </div>
+      
+      <div class="criteria-block criteria-no">
+        <h3>This room is not for</h3>
+        <ul class="criteria-list">
+          <li>Aspiring owners who have not opened yet</li>
+          <li>Generic networkers looking for free food</li>
+          <li>Influencers without operating credentials</li>
+          <li>Press or media without prior arrangement</li>
+          <li>Job seekers or service providers without a host invitation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPONSORS -->
+<section id="sponsors">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num">08 · Patrons</div>
+      <h2 class="section-title">Proudly <em>supported by.</em></h2>
+    </div>
+    
+    <div class="sponsors-tiers">
+      <div class="sponsor-tier">
+        <div class="sponsor-tier-label">
+          <div class="tier-rank">Presented By</div>
+          <div class="tier-name host">Horeca Store</div>
+        </div>
+        <div class="sponsor-name-large">
+          Horeca Store
+          <small>Global Hospitality Supply · 11 Countries</small>
+        </div>
+      </div>
+      
+      <div class="sponsor-tier">
+        <div class="sponsor-tier-label">
+          <div class="tier-rank">Tier I · Patron</div>
+          <div class="tier-name gold">Gold</div>
+        </div>
+        <div class="sponsor-name-large">
+          Frankit
+          <small>Restaurant Equipment &amp; Solutions</small>
+        </div>
+      </div>
+      
+      <div class="sponsor-tier">
+        <div class="sponsor-tier-label">
+          <div class="tier-rank">Tier II · Patron</div>
+          <div class="tier-name silver">Silver</div>
+        </div>
+        <div class="sponsor-name-large">
+          SilverChef
+          <small>Equipment Financing for Hospitality</small>
+        </div>
+      </div>
+      
+      <div class="sponsor-tier">
+        <div class="sponsor-tier-label">
+          <div class="tier-rank">Tier III · Patron</div>
+          <div class="tier-name bronze">Bronze</div>
+        </div>
+        <div class="sponsor-name-large">
+          Rapid Hotel Supply
+          <small>Hotel Operating Supplies &amp; Equipment</small>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sponsor Apply CTA -->
+    <div class="sponsor-apply">
+      <div>
+        <div class="sponsor-apply-eyebrow">Limited Patronage Available</div>
+        <h3>Reach 100 of Houston's most ambitious operators <em>in one room.</em></h3>
+        <p>Tier patronage includes stage time, branded materials, dinner table presence, and inclusion across the series. We curate sponsors as carefully as we curate attendees. Limited slots available for Vol. III and beyond.</p>
+      </div>
+      <div class="sponsor-apply-actions">
+        <a href="#" class="btn btn-primary" onclick="openModal(event,'sponsor')">
+          Apply for Sponsorship
+          <span class="btn-arrow">→</span>
+        </a>
+        <a href="mailto:events@thehorecastore.com?subject=Sponsorship%20Deck%20Request" class="btn btn-ghost">Request Deck</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="final-cta-bg"></div>
+  <div class="final-cta-eyebrow">An Invitation</div>
+  <h2>We would be honoured <em>to have you</em><br>at our table.</h2>
+  <p>An evening built for operators, by operators. Reserved seating. The next edition is filling.</p>
+  <a href="#" class="btn btn-primary" onclick="openModal(event,'vol2')">
+    Reserve Your Seat
+    <span class="btn-arrow">→</span>
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo">
+        <span class="logo-mark">H</span>
+        <span>The Horeca Meetup</span>
+      </div>
+      <p>A private quarterly dinner series for restaurant and hotel owners. Hosted in select cities across the world. <strong style="color:var(--gold);font-style:normal;">Hosted by <a href="https://thehorecastore.com" target="_blank" style="color:var(--gold);text-decoration:underline;text-underline-offset:3px;">Horeca Store</a></strong>, the global hospitality supply partner trusted by 15,000+ hotels and restaurants across 11 countries in the Middle East, Asia, and the United States.</p>
+    </div>
+    
+    <div class="footer-col">
+      <h4>The Series</h4>
+      <ul>
+        <li><a href="#vol2">Houston Vol. II</a></li>
+        <li><a href="#calendar">Houston Vol. III</a></li>
+        <li><a href="#calendar">Los Angeles Vol. II</a></li>
+        <li><a href="#calendar">Dubai Vol. VIII</a></li>
+      </ul>
+    </div>
+    
+    <div class="footer-col">
+      <h4>About</h4>
+      <ul>
+        <li><a href="#why">Why Attend</a></li>
+        <li><a href="#host">The Host · Horeca Store</a></li>
+        <li><a href="#manifesto">Manifesto</a></li>
+        <li><a href="#testimonials">Voices</a></li>
+        <li><a href="#sponsors">Patrons</a></li>
+        <li><a href="https://thehorecastore.com" target="_blank">thehorecastore.com</a></li>
+      </ul>
+    </div>
+    
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:events@thehorecastore.com">events@thehorecastore.com</a></li>
+        <li><a href="tel:8664467322">+1 866 446 7322</a></li>
+        <li><a href="#" onclick="openModal(event,'sponsor')">Apply for Sponsorship</a></li>
+        <li><a href="#" onclick="openModal(event,'press')">Press Inquiries</a></li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="footer-bottom">
+    <span>© 2026 Horeca Store USA · The Horeca Meetup Series</span>
+    <span>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Code of Conduct</a>
+    </span>
+  </div>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-icon">✓</div>
+  <div class="toast-text"><strong>Application sent.</strong> Check your email for our review response.</div>
+</div>
+
+<!-- RSVP MODAL -->
+<div class="modal-overlay" id="rsvpModal" onclick="closeModalIfBg(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    
+    <div class="modal-content" id="modalContent">
+      <div class="modal-eyebrow" id="modalEyebrow">Apply for Approval</div>
+      <h2 class="modal-title" id="modalTitle">Houston <em>Vol. II</em></h2>
+      <p class="modal-sub" id="modalSub">Every seat is reviewed. We will respond within 24 hours.</p>
+      
+      <form id="rsvpForm" onsubmit="submitRSVP(event)">
+        <input type="hidden" id="eventName" name="event" value="Houston Vol. II - May 5, 2026">
+        <input type="hidden" id="formType" name="formType" value="rsvp">
+        
+        <div class="form-grid">
+          <div class="field">
+            <label>First Name <span class="required">*</span></label>
+            <input type="text" name="firstName" required>
+          </div>
+          <div class="field">
+            <label>Last Name <span class="required">*</span></label>
+            <input type="text" name="lastName" required>
+          </div>
+        </div>
+        
+        <div class="field field-full">
+          <label>Email <span class="required">*</span></label>
+          <input type="email" name="email" required>
+        </div>
+        
+        <div class="field field-full">
+          <label>Mobile / WhatsApp <span class="required">*</span></label>
+          <input type="tel" name="phone" required>
+        </div>
+        
+        <div class="field field-full" id="businessField">
+          <label>Restaurant or Business Name <span class="required">*</span></label>
+          <input type="text" name="business" required>
+        </div>
+        
+        <div class="form-grid" id="rsvpExtra">
+          <div class="field">
+            <label>Your Role <span class="required">*</span></label>
+            <select name="role" required>
+              <option value="">Select...</option>
+              <option>Owner / Founder</option>
+              <option>General Manager</option>
+              <option>F&amp;B Director</option>
+              <option>Operations Manager</option>
+              <option>Multi-Unit Operator</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Locations <span class="required">*</span></label>
+            <select name="locations" required>
+              <option value="">Select...</option>
+              <option>1 location</option>
+              <option>2-5 locations</option>
+              <option>6-10 locations</option>
+              <option>10+ locations</option>
+              <option>Pre-opening</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="field field-full" id="challengeField">
+          <label>Biggest challenge in your business right now?</label>
+          <textarea name="challenge" rows="3" placeholder="Optional, but helps us curate the room"></textarea>
+        </div>
+        
+        <!-- PLUS ONE SECTION -->
+        <div class="plus-one-section" id="plusOneSection">
+          <div class="plus-one-header">
+            <div class="plus-one-label">
+              <span class="plus-one-eyebrow">Optional</span>
+              <span class="plus-one-title">Bringing someone with you?</span>
+            </div>
+            <label class="plus-one-toggle">
+              <input type="checkbox" id="plusOneToggle" name="hasPlusOne" value="yes">
+              <span class="toggle-slider"></span>
+              <span class="toggle-text">Add a guest</span>
+            </label>
+          </div>
+          
+          <div class="plus-one-fields" id="plusOneFields">
+            <p class="plus-one-note">Please share your guest's details. We will reserve their seat alongside yours.</p>
+            
+            <div class="form-grid">
+              <div class="field">
+                <label>Guest First Name <span class="required">*</span></label>
+                <input type="text" name="plusOneFirstName" id="plusOneFirstName">
+              </div>
+              <div class="field">
+                <label>Guest Last Name <span class="required">*</span></label>
+                <input type="text" name="plusOneLastName" id="plusOneLastName">
+              </div>
+            </div>
+            
+            <div class="field field-full">
+              <label>Guest Email <span class="required">*</span></label>
+              <input type="email" name="plusOneEmail" id="plusOneEmail">
+              <small class="field-hint" id="plusOneEmailHint">Must be different from your email above</small>
+            </div>
+            
+            <div class="field field-full">
+              <label>Guest Mobile / WhatsApp <span class="required">*</span></label>
+              <input type="tel" name="plusOnePhone" id="plusOnePhone">
+              <small class="field-hint" id="plusOnePhoneHint">Must be different from your phone above</small>
+            </div>
+            
+            <div class="field field-full">
+              <label>Guest Role at Their Business</label>
+              <select name="plusOneRole" id="plusOneRole">
+                <option value="">Select...</option>
+                <option>Owner / Founder</option>
+                <option>Co-Founder / Partner</option>
+                <option>General Manager</option>
+                <option>F&amp;B Director</option>
+                <option>Operations Manager</option>
+                <option>Spouse / Family</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <div class="field field-full" id="sourceField">
+          <label>How did you hear about this dinner?</label>
+          <select name="source">
+            <option value="">Select...</option>
+            <option>WhatsApp invitation</option>
+            <option>LinkedIn</option>
+            <option>Instagram</option>
+            <option>Email from Horeca Store</option>
+            <option>Word of mouth · Referral</option>
+            <option>Eventbrite</option>
+            <option>Other</option>
+          </select>
+        </div>
+        
+        <button type="submit" class="modal-submit" id="modalSubmitBtn">Submit for Approval →</button>
+        
+        <p class="modal-fine">By submitting, you understand every seat is reviewed to protect the quality of the room. You will receive confirmation within 24 hours.</p>
+      </form>
+    </div>
+    
+    <div class="modal-success" id="modalSuccess">
+      <div class="success-mark">✓</div>
+      <h2 class="modal-title">Thank you for <em>your interest.</em></h2>
+      <p class="modal-sub" style="margin-top: 24px;">Your application is now being reviewed by our curation team. We protect the quality of every room, so each seat is approved individually.</p>
+      <p class="modal-sub" style="margin-top: 16px;">If approved, you will receive an official confirmation from <strong style="color:var(--gold);">events@thehorecastore.com</strong> before the event. Please check your inbox, including spam folder.</p>
+      <button class="modal-submit" onclick="closeModal()" style="margin-top:32px;">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const events = {
+  vol2: { title: 'Houston <em>Vol. II</em>', eyebrow: 'May 5, 2026 · Approval Open', sub: 'Every seat is reviewed. We will respond within 24 hours.', eventName: 'Houston Vol. II - May 5, 2026', type: 'rsvp', businessLabel: 'Restaurant or Business Name' },
+  vol3: { title: 'Houston <em>Vol. III</em>', eyebrow: 'September 8, 2026 · Early Reserve', sub: 'You are reserving early. We will confirm your seat 60 days before the event.', eventName: 'Houston Vol. III - September 8, 2026', type: 'rsvp', businessLabel: 'Restaurant or Business Name' },
+  vol4: { title: 'Houston <em>Vol. IV</em>', eyebrow: 'January 12, 2027 · Calendar Hold', sub: 'You will be notified 90 days before the event opens for approval.', eventName: 'Houston Vol. IV - January 12, 2027', type: 'rsvp', businessLabel: 'Restaurant or Business Name' },
+  la2: { title: 'Los Angeles <em>Vol. II</em>', eyebrow: 'June 2, 2026 · Save the Date', sub: 'You will be notified when applications open for the LA chapter.', eventName: 'Los Angeles Vol. II - June 2, 2026', type: 'rsvp', businessLabel: 'Restaurant or Business Name' },
+  dubai8: { title: 'Dubai <em>Vol. VIII</em>', eyebrow: 'November 10, 2026 · UAE Flagship Chapter', sub: 'The 8th edition in our home market. You will be notified when applications open.', eventName: 'Dubai Vol. VIII - November 10, 2026', type: 'rsvp', businessLabel: 'Restaurant or Business Name' },
+  press: { title: 'Press <em>Inquiry</em>', eyebrow: 'Media · Approved Coverage', sub: 'Media access is by approval only. Please share your outlet and angle.', eventName: 'Press Inquiry', type: 'press', businessLabel: 'Publication / Outlet' },
+  sponsor: { title: 'Apply for <em>Sponsorship</em>', eyebrow: 'Patronage · Limited Tier Availability', sub: 'Tell us about your company and which edition you would like to sponsor. We curate patrons as carefully as we curate the room.', eventName: 'Sponsorship Application', type: 'sponsor', businessLabel: 'Company Name' }
+};
+
+function openModal(e, key) {
+  if (e) e.preventDefault();
+  const data = events[key] || events.vol2;
+  document.getElementById('modalTitle').innerHTML = data.title;
+  document.getElementById('modalEyebrow').textContent = data.eyebrow;
+  document.getElementById('modalSub').textContent = data.sub;
+  document.getElementById('eventName').value = data.eventName;
+  document.getElementById('formType').value = data.type;
+  document.querySelector('#businessField label').firstChild.textContent = data.businessLabel + ' ';
+  
+  // Show/hide fields based on type
+  const isRSVP = data.type === 'rsvp';
+  document.getElementById('rsvpExtra').style.display = isRSVP ? 'grid' : 'none';
+  document.getElementById('challengeField').style.display = isRSVP ? 'flex' : 'none';
+  document.getElementById('sourceField').style.display = isRSVP ? 'flex' : 'none';
+  
+  // Update button text by type
+  const btnText = data.type === 'sponsor' ? 'Submit Sponsorship Inquiry →' : data.type === 'press' ? 'Submit Press Inquiry →' : 'Submit for Approval →';
+  document.getElementById('modalSubmitBtn').textContent = btnText;
+  
+  // Toggle required attributes for hidden RSVP fields
+  document.querySelectorAll('#rsvpExtra select').forEach(s => { s.required = isRSVP; });
+  
+  document.getElementById('modalContent').style.display = 'block';
+  document.getElementById('modalSuccess').classList.remove('active');
+  document.getElementById('rsvpModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('rsvpModal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function closeModalIfBg(e) {
+  if (e.target.id === 'rsvpModal') closeModal();
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// SUPABASE BACKEND CONFIG
+// Replace these with your actual values from Supabase dashboard
+// (Settings → API → Project URL and Project anon key)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const SUPABASE_URL = 'https://hgvfixbopldwptnfpxwc.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_MI0yJ7Lw1j3HCwDveLZWLg_vs9n3ojJ';
+
+// Map the event names in the form to the slugs in your Supabase events table
+const EVENT_SLUG_MAP = {
+  'Houston Vol. II - May 5, 2026': 'houston-vol-2-may-2026',
+  'Houston Vol. III - September 8, 2026': 'houston-vol-3-sep-2026',
+  'Houston Vol. IV - January 12, 2027': 'houston-vol-4-jan-2027',
+  'Los Angeles Vol. II - June 2, 2026': 'la-vol-2-jun-2026',
+  'Dubai Vol. VIII - November 10, 2026': 'dubai-vol-8-nov-2026',
+  'Sponsorship Application': 'houston-vol-2-may-2026',
+  'Press Inquiry': 'houston-vol-2-may-2026'
+};
+
+// Initialize Supabase client (loads from CDN script in <head>)
+let supabaseClient = null;
+if (typeof window !== 'undefined' && window.supabase) {
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+async function submitRSVP(e) {
+  e.preventDefault();
+  const form = e.target;
+  const submitBtn = document.getElementById('modalSubmitBtn');
+  const originalBtnText = submitBtn.textContent;
+  
+  // ━━━ VALIDATION: PLUS ONE FIELDS ━━━
+  const plusOneToggle = document.getElementById('plusOneToggle');
+  const hasPlusOne = plusOneToggle && plusOneToggle.checked;
+  
+  if (hasPlusOne) {
+    const mainEmail = form.querySelector('[name="email"]').value.trim().toLowerCase();
+    const mainPhone = form.querySelector('[name="phone"]').value.replace(/\s|-|\(|\)/g, '');
+    const guestEmail = document.getElementById('plusOneEmail').value.trim().toLowerCase();
+    const guestPhone = document.getElementById('plusOnePhone').value.replace(/\s|-|\(|\)/g, '');
+    const guestFirstName = document.getElementById('plusOneFirstName').value.trim();
+    const guestLastName = document.getElementById('plusOneLastName').value.trim();
+    
+    document.querySelectorAll('.plus-one-fields .error').forEach(el => el.classList.remove('error'));
+    document.getElementById('plusOneEmailHint').textContent = 'Must be different from your email above';
+    document.getElementById('plusOnePhoneHint').textContent = 'Must be different from your phone above';
+    
+    if (!guestFirstName || !guestLastName || !guestEmail || !guestPhone) {
+      alert('Please fill in your guest\u2019s first name, last name, email, and phone number.');
+      return;
+    }
+    
+    if (guestEmail === mainEmail) {
+      const emailField = document.getElementById('plusOneEmail');
+      const emailHint = document.getElementById('plusOneEmailHint');
+      emailField.classList.add('error');
+      emailHint.classList.add('error');
+      emailHint.textContent = 'Guest email cannot be the same as yours';
+      emailField.focus();
+      return;
+    }
+    
+    if (guestPhone === mainPhone) {
+      const phoneField = document.getElementById('plusOnePhone');
+      const phoneHint = document.getElementById('plusOnePhoneHint');
+      phoneField.classList.add('error');
+      phoneHint.classList.add('error');
+      phoneHint.textContent = 'Guest phone cannot be the same as yours';
+      phoneField.focus();
+      return;
+    }
+  }
+  
+  // ━━━ COLLECT FORM DATA ━━━
+  const formData = new FormData(form);
+  const raw = Object.fromEntries(formData);
+  
+  // Disable button during submission
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting...';
+  submitBtn.style.opacity = '0.6';
+  
+  // ━━━ SUBMIT TO SUPABASE ━━━
+  const isConfigured = supabaseClient && !SUPABASE_URL.includes('YOUR_PROJECT_ID');
+  
+  if (isConfigured) {
+    try {
+      // 1. Look up event by slug
+      const eventSlug = EVENT_SLUG_MAP[raw.event];
+      if (!eventSlug) throw new Error('Unknown event: ' + raw.event);
+      
+      const { data: eventData, error: eventError } = await supabaseClient
+        .from('events')
+        .select('id')
+        .eq('slug', eventSlug)
+        .single();
+      
+      if (eventError || !eventData) throw new Error('Event lookup failed');
+      
+      // 2. Build registration record
+      const registration = {
+        event_id: eventData.id,
+        form_type: raw.formType || 'rsvp',
+        status: 'pending',
+        first_name: raw.firstName,
+        last_name: raw.lastName,
+        email: raw.email.toLowerCase().trim(),
+        phone: raw.phone.trim(),
+        business_name: raw.business,
+        role: raw.role || null,
+        locations: raw.locations || null,
+        challenge: raw.challenge || null,
+        source: raw.source || null,
+        has_plus_one: hasPlusOne,
+        plus_one_first_name: hasPlusOne ? raw.plusOneFirstName : null,
+        plus_one_last_name: hasPlusOne ? raw.plusOneLastName : null,
+        plus_one_email: hasPlusOne ? raw.plusOneEmail.toLowerCase().trim() : null,
+        plus_one_phone: hasPlusOne ? raw.plusOnePhone.trim() : null,
+        plus_one_role: hasPlusOne ? raw.plusOneRole : null,
+        attendee_count: hasPlusOne ? 2 : 1,
+        user_agent: navigator.userAgent,
+        utm_source: new URLSearchParams(window.location.search).get('utm_source'),
+        utm_medium: new URLSearchParams(window.location.search).get('utm_medium'),
+        utm_campaign: new URLSearchParams(window.location.search).get('utm_campaign')
+      };
+      
+      // 3. Insert into Supabase
+      const { error: insertError } = await supabaseClient
+        .from('registrations')
+        .insert([registration]);
+      
+      if (insertError) throw insertError;
+      
+      console.log('✅ Registration submitted to Supabase');
+    } catch (err) {
+      console.error('Submission failed:', err);
+      alert('Sorry, something went wrong. Please email events@thehorecastore.com directly.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+      submitBtn.style.opacity = '1';
+      return;
+    }
+  } else {
+    console.warn('⚠️ SUPABASE NOT CONFIGURED. See /horeca-backend/docs/SETUP-GUIDE.md');
+    console.log('📋 Would have submitted:', raw);
+  }
+  
+  // Show success state
+  document.getElementById('modalContent').style.display = 'none';
+  document.getElementById('modalSuccess').classList.add('active');
+  
+  // Show toast notification
+  showToast(raw.formType, hasPlusOne);
+  
+  // Reset form for next use
+  form.reset();
+  if (plusOneToggle) {
+    plusOneToggle.checked = false;
+    document.getElementById('plusOneFields').classList.remove('active');
+  }
+  submitBtn.disabled = false;
+  submitBtn.textContent = originalBtnText;
+  submitBtn.style.opacity = '1';
+}
+
+function showToast(formType, hasPlusOne) {
+  const toast = document.getElementById('toast');
+  const toastText = toast.querySelector('.toast-text');
+  
+  let message = '<strong>Application sent.</strong> Our team will review and respond before the event.';
+  if (hasPlusOne) {
+    message = '<strong>Application sent for you and your guest.</strong> Our team will review and respond before the event.';
+  }
+  if (formType === 'sponsor') {
+    message = '<strong>Inquiry received.</strong> Our partnerships team will be in touch within 48 hours.';
+  } else if (formType === 'press') {
+    message = '<strong>Press request received.</strong> We will respond within 48 hours.';
+  }
+  
+  toastText.innerHTML = message;
+  toast.classList.add('show');
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 6000);
+}
+
+// ━━━ PLUS ONE TOGGLE LOGIC ━━━
+document.addEventListener('DOMContentLoaded', () => {
+  const plusOneToggle = document.getElementById('plusOneToggle');
+  const plusOneFields = document.getElementById('plusOneFields');
+  
+  if (plusOneToggle && plusOneFields) {
+    plusOneToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        plusOneFields.classList.add('active');
+        // Make plus one fields required
+        document.getElementById('plusOneFirstName').required = true;
+        document.getElementById('plusOneLastName').required = true;
+        document.getElementById('plusOneEmail').required = true;
+        document.getElementById('plusOnePhone').required = true;
+      } else {
+        plusOneFields.classList.remove('active');
+        // Remove required
+        document.getElementById('plusOneFirstName').required = false;
+        document.getElementById('plusOneLastName').required = false;
+        document.getElementById('plusOneEmail').required = false;
+        document.getElementById('plusOnePhone').required = false;
+        // Clear errors
+        document.querySelectorAll('.plus-one-fields .error').forEach(el => el.classList.remove('error'));
+      }
+    });
+  }
+  
+  // ━━━ REAL-TIME VALIDATION ━━━
+  // Check if guest email matches main email as user types
+  const mainEmailField = document.querySelector('[name="email"]');
+  const guestEmailField = document.getElementById('plusOneEmail');
+  const guestEmailHint = document.getElementById('plusOneEmailHint');
+  
+  if (mainEmailField && guestEmailField && guestEmailHint) {
+    guestEmailField.addEventListener('input', () => {
+      const main = mainEmailField.value.trim().toLowerCase();
+      const guest = guestEmailField.value.trim().toLowerCase();
+      if (main && guest && main === guest) {
+        guestEmailField.classList.add('error');
+        guestEmailHint.classList.add('error');
+        guestEmailHint.textContent = 'Guest email cannot be the same as yours';
+      } else {
+        guestEmailField.classList.remove('error');
+        guestEmailHint.classList.remove('error');
+        guestEmailHint.textContent = 'Must be different from your email above';
+      }
+    });
+  }
+  
+  // Check if guest phone matches main phone as user types
+  const mainPhoneField = document.querySelector('[name="phone"]');
+  const guestPhoneField = document.getElementById('plusOnePhone');
+  const guestPhoneHint = document.getElementById('plusOnePhoneHint');
+  
+  if (mainPhoneField && guestPhoneField && guestPhoneHint) {
+    guestPhoneField.addEventListener('input', () => {
+      const main = mainPhoneField.value.replace(/\s|-|\(|\)/g, '');
+      const guest = guestPhoneField.value.replace(/\s|-|\(|\)/g, '');
+      if (main && guest && main === guest) {
+        guestPhoneField.classList.add('error');
+        guestPhoneHint.classList.add('error');
+        guestPhoneHint.textContent = 'Guest phone cannot be the same as yours';
+      } else {
+        guestPhoneField.classList.remove('error');
+        guestPhoneHint.classList.remove('error');
+        guestPhoneHint.textContent = 'Must be different from your phone above';
+      }
+    });
+  }
+});
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.event-card, .testimonial, .agenda-item, .sponsor-tier, .why-card, .host-stat').forEach((el) => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(30px)';
+  el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+  observer.observe(el);
+});
+</script>
+
+</body>
+</html>
