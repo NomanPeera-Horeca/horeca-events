@@ -1551,8 +1551,6 @@ document.addEventListener('keydown', (e) => {
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // SUPABASE BACKEND CONFIG
-// Replace these with your actual values from Supabase dashboard
-// (Settings → API → Project URL and Project anon key)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const SUPABASE_URL = 'https://hgvfixbopldwptnfpxwc.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_MI0yJ7Lw1j3HCwDveLZWLg_vs9n3ojJ';
@@ -1568,11 +1566,12 @@ const EVENT_SLUG_MAP = {
   'Press Inquiry': 'houston-vol-2-may-2026'
 };
 
-// Initialize Supabase client (loads from CDN script in <head>)
-let supabaseClient = null;
-if (typeof window !== 'undefined' && window.supabase) {
-  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-}
+// Initialize Supabase client (loads from CDN script in <head>). Use supabaseClient — not
+// const supabase — to avoid clashing with the global the CDN attaches to window.
+const supabaseClient =
+  typeof window !== 'undefined' && window.supabase
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
 
 async function submitRSVP(e) {
   e.preventDefault();
@@ -1632,7 +1631,10 @@ async function submitRSVP(e) {
   submitBtn.style.opacity = '0.6';
   
   // ━━━ SUBMIT TO SUPABASE ━━━
-  const isConfigured = supabaseClient && !SUPABASE_URL.includes('YOUR_PROJECT_ID');
+  const isConfigured =
+    supabaseClient &&
+    !SUPABASE_URL.includes('YOUR_PROJECT_ID') &&
+    !SUPABASE_ANON_KEY.includes('YOUR_PUBLIC_ANON_KEY_HERE');
   
   if (isConfigured) {
     try {
