@@ -578,7 +578,7 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
 <!-- ANNOUNCE -->
 <div class="announce">
   <span class="announce-dot"></span>
-  Houston · Vol. II · May 5, 2026 · <span id="vol2AnnounceSeats">73</span> of 100 seats reserved · 
+  Houston · Vol. II · May 5, 2026 · <span id="vol2AnnounceSeats">73</span> of <span id="vol2AnnounceMax">108</span> seats reserved · 
   <a href="#vol2" onclick="openModal(event,'vol2')">Reserve yours →</a>
 </div>
 
@@ -641,13 +641,13 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
         <div class="hero-card-progress">
           <div class="progress-row">
             <span>Seats Reserved</span>
-            <span><strong id="vol2HeroSeats">73</strong> / 100</span>
+            <span><strong id="vol2HeroSeats">73</strong> / <span id="vol2HeroMax">108</span></span>
           </div>
           <div class="progress-bar">
-            <div class="progress-fill" id="vol2HeroProgress" style="width:73%"></div>
+            <div class="progress-fill" id="vol2HeroProgress" style="width:67.6%"></div>
           </div>
         </div>
-        <a href="#vol2" class="hero-card-cta" onclick="openModal(event,'vol2')">Apply for Approval →</a>
+        <a href="#vol2" class="hero-card-cta" onclick="openModal(event,'vol2')">Reserve Now</a>
       </div>
     </div>
   </div>
@@ -1007,7 +1007,7 @@ footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
         <div class="event-vol">Vol. <em>II</em></div>
         <div class="event-date">May 5, 2026</div>
         <div class="event-meta">
-          <div><span>Reserved</span><strong><span id="vol2CalendarSeats">73</span> / 100</strong></div>
+          <div><span>Reserved</span><strong><span id="vol2CalendarSeats">73</span> / <span id="vol2CalendarMax">108</span></strong></div>
           <div><span>Venue</span><strong>Marriott Energy Corridor</strong></div>
         </div>
         <a href="#" class="event-link" onclick="openModal(event,'vol2')">Apply for Approval</a>
@@ -1562,57 +1562,103 @@ const supabaseClient =
 
 // ── Houston Vol. II live seat counter (marketing floor + real registrations) ──
 const VOL2_SEAT_SLUG = 'houston-vol-2-may-2026';
-const VOL2_SEAT_CAPACITY = 100;
+/** Display capacity (seats cap) — must match hero + calendar markup. */
+let vol2SeatCapacity = 108;
 const VOL2_SEAT_BASE = 73;
-const VOL2_SEAT_REFRESH_MS = 75_000;
+const VOL2_SEAT_REFRESH_MS = 60_000;
+
+async function resolveVol2EventId() {
+  if (!supabaseClient) return null;
+  const { data: bySlug, error: slugErr } = await supabaseClient
+    .from('events')
+    .select('id')
+    .eq('slug', VOL2_SEAT_SLUG)
+    .maybeSingle();
+  if (!slugErr && bySlug?.id) return bySlug.id;
+
+  const { data: openList } = await supabaseClient
+    .from('events')
+    .select('id, city, slug')
+    .eq('status', 'open');
+  if (openList?.length) {
+    const houston =
+      openList.find((r) => (r.city || '').toLowerCase().includes('houston')) || openList[0];
+    return houston?.id || null;
+  }
+  return null;
+}
 
 async function fetchVol2ReservedSeatCount() {
   if (!supabaseClient) return VOL2_SEAT_BASE;
   try {
-    const { data: ev, error: evErr } = await supabaseClient
-      .from('events')
-      .select('id')
-      .eq('slug', VOL2_SEAT_SLUG)
-      .maybeSingle();
-    if (evErr || !ev) return VOL2_SEAT_BASE;
+    const eventId = await resolveVol2EventId();
+    if (!eventId) {
+      console.warn('Vol. II seat counter: no event id (check slug', VOL2_SEAT_SLUG, 'or an open event).');
+      return VOL2_SEAT_BASE;
+    }
 
-    const { data: rows, error: regErr } = await supabaseClient
-      .from('registrations')
-      .select('attendee_count')
-      .eq('event_id', ev.id)
-      .neq('status', 'rejected');
+    let sumSeats = 0;
+    const { data: rpcCount, error: rpcErr } = await supabaseClient.rpc('horeca_reserved_seat_count', {
+      p_event_id: eventId,
+    });
 
-    if (regErr || !rows) return VOL2_SEAT_BASE;
+    if (!rpcErr && rpcCount != null && rpcCount !== '') {
+      sumSeats = Number(rpcCount);
+    } else {
+      const { data: rows, error: regErr } = await supabaseClient
+        .from('registrations')
+        .select('attendee_count')
+        .eq('event_id', eventId)
+        .neq('status', 'rejected');
 
-    const sumSeats = rows.reduce((acc, r) => {
-      const n = Number(r.attendee_count);
-      return acc + (n > 0 ? n : 1);
-    }, 0);
-    return Math.max(VOL2_SEAT_BASE, Math.min(sumSeats, VOL2_SEAT_CAPACITY));
-  } catch {
+      if (regErr || !rows) {
+        if (rpcErr) {
+          console.warn(
+            'Seat counter: RPC failed (run database/horeca_reserved_seat_count.sql in Supabase SQL Editor):',
+            rpcErr
+          );
+        }
+        console.warn('Seat counter: could not read registrations;', regErr || 'no rows');
+        return VOL2_SEAT_BASE;
+      }
+      sumSeats = rows.reduce((acc, r) => {
+        const n = Number(r.attendee_count);
+        return acc + (n > 0 ? n : 1);
+      }, 0);
+    }
+
+    return Math.max(VOL2_SEAT_BASE, Math.min(sumSeats, vol2SeatCapacity));
+  } catch (e) {
+    console.warn('fetchVol2ReservedSeatCount', e);
     return VOL2_SEAT_BASE;
   }
 }
 
 function applyVol2SeatUI(n) {
-  const safe = Math.max(VOL2_SEAT_BASE, Math.min(Math.round(n), VOL2_SEAT_CAPACITY));
+  const cap = vol2SeatCapacity;
+  const safe = Math.max(VOL2_SEAT_BASE, Math.min(Math.round(n), cap));
   ['vol2AnnounceSeats', 'vol2HeroSeats', 'vol2CalendarSeats'].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.textContent = String(safe);
   });
+  ['vol2AnnounceMax', 'vol2HeroMax', 'vol2CalendarMax'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = String(cap);
+  });
   const progressEl = document.getElementById('vol2HeroProgress');
-  if (progressEl) progressEl.style.width = `${(safe / VOL2_SEAT_CAPACITY) * 100}%`;
+  if (progressEl) progressEl.style.width = `${(safe / cap) * 100}%`;
   return safe;
 }
 
 function animateVol2SeatsTo(target) {
+  const cap = vol2SeatCapacity;
   const els = [
     document.getElementById('vol2AnnounceSeats'),
     document.getElementById('vol2HeroSeats'),
     document.getElementById('vol2CalendarSeats'),
   ].filter(Boolean);
   const progressEl = document.getElementById('vol2HeroProgress');
-  const dest = Math.max(VOL2_SEAT_BASE, Math.min(Math.round(target), VOL2_SEAT_CAPACITY));
+  const dest = Math.max(VOL2_SEAT_BASE, Math.min(Math.round(target), cap));
   const startRaw = els.length ? parseInt(els[0].textContent, 10) : VOL2_SEAT_BASE;
   const start = Number.isFinite(startRaw) ? startRaw : VOL2_SEAT_BASE;
   if (start === dest) {
@@ -1628,7 +1674,7 @@ function animateVol2SeatsTo(target) {
     els.forEach((el) => {
       el.textContent = String(val);
     });
-    if (progressEl) progressEl.style.width = `${(val / VOL2_SEAT_CAPACITY) * 100}%`;
+    if (progressEl) progressEl.style.width = `${(val / cap) * 100}%`;
     if (t < 1) requestAnimationFrame(frame);
     else applyVol2SeatUI(dest);
   }
@@ -1758,6 +1804,7 @@ async function submitRSVP(e) {
       if (insertError) throw insertError;
       
       console.log('✅ Registration submitted to Supabase');
+      if (typeof refreshVol2SeatCount === 'function') void refreshVol2SeatCount();
     } catch (err) {
       console.error('Submission failed:', err);
       alert('Sorry, something went wrong. Please email events@thehorecastore.com directly.');
