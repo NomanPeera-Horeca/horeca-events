@@ -25,9 +25,6 @@ type Body = {
   admin_email?: string;
 };
 
-const CID_MAIN = "horeca_qr_main";
-const CID_PLUS = "horeca_qr_plus";
-
 function corsJson(obj: unknown, status = 200) {
   return new Response(JSON.stringify(obj), {
     status,
@@ -57,6 +54,11 @@ function interpolate(
     out = out.split(`{{${k}}}`).join(val);
   }
   return out;
+}
+
+/** Remove only simple {{variable}} tokens left unmatched (not {{#if}} / {{/if}}). */
+function stripUnresolvedSimpleTags(html: string) {
+  return html.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, "");
 }
 
 function uint8ToBase64(bytes: Uint8Array): string {
@@ -342,6 +344,8 @@ Deno.serve(async (req) => {
       : "";
 
     const hasPlus = Boolean(reg.has_plus_one);
+    const plusOneFull = `${reg.plus_one_first_name ?? ""} ${reg.plus_one_last_name ?? ""}`
+      .trim();
     const vars: Record<string, string> = {
       first_name: reg.first_name ?? "",
       last_name: reg.last_name ?? "",
@@ -356,10 +360,18 @@ Deno.serve(async (req) => {
       venue_name: "Marriott Energy Corridor",
       venue_address: "16011 Katy Freeway, Houston, TX",
       qr_code_url: qrUrl || "",
-      plus_one_name: hasPlus
-        ? `${reg.plus_one_first_name ?? ""} ${reg.plus_one_last_name ?? ""}`
-          .trim()
-        : "",
+      plus_one_name: hasPlus ? plusOneFull : "",
+      plus_one_first_name: hasPlus
+        ? (reg.plus_one_first_name ?? "")
+        : (reg.first_name ?? ""),
+      plus_one_full_name: hasPlus ? plusOneFull : (
+        `${reg.first_name ?? ""} ${reg.last_name ?? ""}`.trim()
+      ),
+      host_first_name: reg.first_name ?? "",
+      host_last_name: reg.last_name ?? "",
+      host_full_name:
+        `${reg.first_name ?? ""} ${reg.last_name ?? ""}`.trim(),
+      host_business: reg.business_name ?? "",
       plus_one_email: reg.plus_one_email ?? "",
       reservation_id: String(reg.id).slice(0, 8).toUpperCase(),
       custom_message: custom_message || "",
@@ -384,12 +396,18 @@ Deno.serve(async (req) => {
     }
 
     if (action_type === "approve" && pngMainBytes) {
-      const emailVars = {
+      // Inline PNG as data-URL so Outlook shows the QR without CID / external fetch.
+      const mainDataUrl =
+        `data:image/png;base64,${uint8ToBase64(pngMainBytes)}`;
+      const emailVars: Record<string, string> = {
         ...vars,
-        qr_code_url: `cid:${CID_MAIN}`,
+        qr_code_url: mainDataUrl,
+        // If approval template row mistakenly uses +1 img variable, still show the guest QR.
+        plus_one_qr_code_url: mainDataUrl,
       };
       let emailHtml = applyIfBlocks(String(rawHtml), { has_plus_one: hasPlus });
       emailHtml = interpolate(emailHtml, emailVars);
+      emailHtml = stripUnresolvedSimpleTags(emailHtml);
       try {
         await sendResend({
           apiKey: resendKey,
@@ -398,12 +416,6 @@ Deno.serve(async (req) => {
           to: [reg.email as string],
           subject,
           html: emailHtml,
-          attachments: [{
-            filename: "horeca-admission-qr.png",
-            content: uint8ToBase64(pngMainBytes),
-            content_id: CID_MAIN,
-            content_type: "image/png",
-          }],
         });
       } catch (e) {
         console.error(e);
@@ -426,9 +438,8 @@ Deno.serve(async (req) => {
 
         if (plusTpl?.body_html && String(plusTpl.body_html).trim()) {
           const poEmail = String(reg.plus_one_email).trim().toLowerCase();
-          const plusOneFull =
-            `${reg.plus_one_first_name ?? ""} ${reg.plus_one_last_name ?? ""}`
-              .trim();
+          const plusDataUrl =
+            `data:image/png;base64,${uint8ToBase64(pngPlusBytes)}`;
           const plusVars: Record<string, string> = {
             ...vars,
             plus_one_first_name: reg.plus_one_first_name ?? "",
@@ -437,12 +448,14 @@ Deno.serve(async (req) => {
             host_last_name: reg.last_name ?? "",
             host_full_name: vars.full_name,
             host_business: reg.business_name ?? "",
-            plus_one_qr_code_url: `cid:${CID_PLUS}`,
+            plus_one_qr_code_url: plusDataUrl,
+            qr_code_url: plusDataUrl,
           };
           let pHtml = applyIfBlocks(String(plusTpl.body_html), {
             has_plus_one: true,
           });
           pHtml = interpolate(pHtml, plusVars);
+          pHtml = stripUnresolvedSimpleTags(pHtml);
           const pSub = interpolate(String(plusTpl.subject ?? ""), plusVars);
           try {
             await sendResend({
@@ -452,12 +465,6 @@ Deno.serve(async (req) => {
               to: [poEmail],
               subject: pSub,
               html: pHtml,
-              attachments: [{
-                filename: "horeca-plusone-qr.png",
-                content: uint8ToBase64(pngPlusBytes),
-                content_id: CID_PLUS,
-                content_type: "image/png",
-              }],
             });
           } catch (e) {
             console.error("plus-one resend", e);
