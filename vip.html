@@ -25,7 +25,6 @@
   --gold: #c9a55c;
   --gold-light: #e0c186;
   --gold-deep: #8b6f3a;
-  --burgundy: #722f37;
   --rule: rgba(255,255,255,0.08);
   --serif: 'Fraunces', Georgia, serif;
   --sans: 'Inter Tight', -apple-system, sans-serif;
@@ -147,6 +146,14 @@ nav {
 }
 .hero-lead strong { color: var(--ink); font-weight: 500; }
 .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.hero-hint {
+  max-width: 520px;
+  margin: 20px auto 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-mute);
+}
+.hero-hint a { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
 .btn {
   display: inline-flex;
   align-items: center;
@@ -222,6 +229,7 @@ section.alt .benefit { background: var(--bg-card); }
   letter-spacing: -0.02em;
 }
 .benefit p { color: var(--ink-soft); font-size: 15px; line-height: 1.65; }
+.benefit a { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
 
 .callout {
   margin-top: 48px;
@@ -237,10 +245,7 @@ section.alt .benefit { background: var(--bg-card); }
   color: var(--ink);
 }
 .callout p em { color: var(--gold); font-style: italic; }
-
-.steps { margin-top: 28px; padding-left: 22px; color: var(--ink-soft); }
-.steps li { margin-bottom: 12px; }
-.steps a { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+.callout-cta { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: flex-start; }
 
 footer {
   padding: 48px 28px 64px;
@@ -270,9 +275,8 @@ footer .footer-links { margin-top: 16px; display: flex; gap: 20px; justify-conte
     </a>
     <div class="nav-links">
       <a href="/">Home</a>
-      <a href="/#vol2">Reserve a seat</a>
-      <a href="mailto:events@thehorecastore.com?subject=VIP%20consideration%3A%20Horeca%20Meetup">Request VIP</a>
-      <a href="/#vol2" class="nav-cta">Apply</a>
+      <a href="#benefits">What you receive</a>
+      <a href="/index.html?apply=vol2" class="nav-cta">Apply</a>
     </div>
   </div>
 </nav>
@@ -283,13 +287,14 @@ footer .footer-links { margin-top: 16px; display: flex; gap: 20px; justify-conte
     <h1>A seat reserved for the people we want<br>at the <em>center</em> of the room.</h1>
     <p class="hero-lead">The Horeca Meetup is built around serious owners and operators. <strong>VIP</strong> is not an upsell. It is how we mark guests who should get unmistakable hospitality, a clear welcome at the door, a host shoutout, plated dinner, and zero ambiguity that their evening matters to us.</p>
     <div class="hero-actions">
-      <a class="btn btn-primary" href="mailto:events@thehorecastore.com?subject=VIP%20consideration%3A%20Horeca%20Meetup&body=Please%20share%20your%20name%2C%20business%2C%20city%2C%20and%20why%20you%20would%20like%20VIP%20consideration%20for%20the%20next%20edition.%0A">Email for VIP consideration</a>
-      <a class="btn btn-ghost" href="/#vol2">Apply for an edition</a>
+      <a class="btn btn-primary" href="/index.html?apply=vol2">Apply for the next edition</a>
+      <a class="btn btn-ghost" href="mailto:noman.peera@thehorecastore.com?subject=Horeca%20Meetup%20VIP%20special%20request&amp;body=Name%20and%20business%3A%0A%0AWhich%20edition%3A%0A%0AHow%20can%20we%20help%3F%0A">Special request? Email our CEO</a>
     </div>
+    <p class="hero-hint">Start with the application so we have your details. In the form, mention that you are requesting <strong>VIP consideration</strong> or who referred you. If something sensitive does not fit the form, you can reach <a href="mailto:noman.peera@thehorecastore.com">Noman Peera</a> directly.</p>
   </div>
 </header>
 
-<section>
+<section id="benefits">
   <div class="container">
     <p class="section-label">Why we call someone VIP</p>
     <h2>So the right hosts <em>feel it</em> before they walk in.</h2>
@@ -307,7 +312,7 @@ footer .footer-links { margin-top: 16px; display: flex; gap: 20px; justify-conte
         <div class="benefit-num">02</div>
         <div>
           <h3>VIP confirmation email &amp; digital entry pass</h3>
-          <p>Approved VIPs get a separate email from standard guests: distinct design, “VIP Host” framing, and the same practical tools (calendar links and personal QR) so nothing is lost in logistics.</p>
+          <p>Approved VIPs get a separate email from standard guests: distinct design, VIP Host framing, and the same practical tools (calendar links and personal QR) so logistics stay simple.</p>
         </div>
       </div>
       <div class="benefit">
@@ -328,14 +333,14 @@ footer .footer-links { margin-top: 16px; display: flex; gap: 20px; justify-conte
         <div class="benefit-num">05</div>
         <div>
           <h3>Room placement &amp; hospitality notes</h3>
-          <p>We hold space with intent: closer to the conversation, not the fringe. If they share dietary needs, accessibility, or a quiet word with our team before doors open, we route it to the people who can act on it.</p>
+          <p>We hold space with intent: closer to the conversation, not the fringe. If you share dietary needs, accessibility needs, or timing constraints before doors open, we route them to the team that can act on them.</p>
         </div>
       </div>
       <div class="benefit">
         <div class="benefit-num">06</div>
         <div>
-          <h3>Direct line to the events team</h3>
-          <p>VIPs can reply to their confirmation or write <a href="mailto:events@thehorecastore.com" style="color:var(--gold);text-decoration:underline;text-underline-offset:3px">events@thehorecastore.com</a>. That thread is the fastest path for real questions, not a form buried on a website.</p>
+          <h3>Direct line for questions &amp; special requests</h3>
+          <p>For anything that needs a decision, not a ticket: reach our CEO, <a href="mailto:noman.peera@thehorecastore.com">noman.peera@thehorecastore.com</a>. That includes unusual scheduling, accessibility, dietary restrictions we should coordinate in advance, or a referral you want handled personally. General RSVP and event logistics can also go to <a href="mailto:events@thehorecastore.com">events@thehorecastore.com</a>.</p>
         </div>
       </div>
       <div class="benefit">
@@ -348,32 +353,23 @@ footer .footer-links { margin-top: 16px; display: flex; gap: 20px; justify-conte
     </div>
 
     <div class="callout">
-      <p><em>VIP is extended by invitation or by approval.</em> If you believe you should be in this tier for an upcoming edition, say so and we will consider it. We cap the room intentionally so every VIP seat still means something.</p>
+      <p><em>VIP is extended by invitation or by approval.</em> We cap the room intentionally so every VIP seat still means something. Tell us you are interested through the application, or write the CEO if your situation needs a conversation first.</p>
+      <div class="callout-cta">
+        <a class="btn btn-primary" href="/index.html?apply=vol2">Start application</a>
+        <a class="btn btn-ghost" href="mailto:noman.peera@thehorecastore.com?subject=Horeca%20Meetup%20VIP%20question">Email Noman Peera</a>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="alt">
   <div class="container">
-    <p class="section-label">For your ops team</p>
-    <h2>How VIP ties to <em>email &amp; check-in</em></h2>
-    <p class="prose">In production, VIP is a flag on the guest record. When you approve someone marked VIP, the system sends the <strong>VIP approval template</strong> (not the standard confirmation). At the door, VIP appears on the roster so staff greet them correctly.</p>
-    <ol class="steps">
-      <li><strong>Source files (repo):</strong> <code style="font-family:var(--mono);font-size:12px;color:var(--gold)">emails/approval-vip.html</code>, also mirrored at project root as <code style="font-family:var(--mono);font-size:12px;color:var(--gold)">approval-vip.html</code>.</li>
-      <li><strong>Database:</strong> template slug <code style="font-family:var(--mono);font-size:12px;color:var(--gold)">approval-vip</code> (category <code style="font-family:var(--mono);font-size:12px;color:var(--gold)">approval</code>), applied via <code style="font-family:var(--mono);font-size:12px;color:var(--gold)">database/upsert_email_template_approval_vip.sql</code> if you have not run it yet.</li>
-      <li><strong>Admin:</strong> mark the guest as VIP before (or after) approval; the approve flow pre-selects the VIP template when the flag is on.</li>
-    </ol>
-  </div>
-</section>
-
-<section>
-  <div class="container">
-    <p class="section-label">Walk-ins &amp; referrals</p>
-    <h2>Calling VIPs <em>in</em></h2>
-    <p class="prose">Use this page when you are on the phone with an owner: send them <strong>https://events.thehorecastore.com/vip.html</strong> along with the regular application link. It answers “what do I get?” in one place, without overpromising perks we do not operationalize.</p>
-    <div class="hero-actions" style="justify-content:flex-start;margin-top:28px">
-      <a class="btn btn-primary" href="/#vol2">Open reservation flow</a>
-      <a class="btn btn-ghost" href="mailto:events@thehorecastore.com?subject=VIP%20referral">Refer a VIP</a>
+    <p class="section-label">Next step</p>
+    <h2>Apply in <em>one place</em></h2>
+    <p class="prose">This page explains the experience. The RSVP form on our main events site is how you officially request a seat. Use it for every edition so your details land in the right roster.</p>
+    <div class="hero-actions" style="justify-content:flex-start;margin-top:8px">
+      <a class="btn btn-primary" href="/index.html?apply=vol2">Open application</a>
+      <a class="btn btn-ghost" href="/">Back to main events site</a>
     </div>
   </div>
 </section>
@@ -382,8 +378,10 @@ footer .footer-links { margin-top: 16px; display: flex; gap: 20px; justify-conte
   <p>The Horeca Meetup · Horeca Store</p>
   <p class="footer-links">
     <a href="/">Home</a>
-    <a href="https://thehorecastore.com" target="_blank" rel="noopener">thehorecastore.com</a>
+    <a href="/index.html?apply=vol2">Apply</a>
+    <a href="mailto:noman.peera@thehorecastore.com">noman.peera@thehorecastore.com</a>
     <a href="mailto:events@thehorecastore.com">events@thehorecastore.com</a>
+    <a href="https://thehorecastore.com" target="_blank" rel="noopener noreferrer">thehorecastore.com</a>
   </p>
 </footer>
 

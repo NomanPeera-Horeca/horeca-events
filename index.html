@@ -1932,6 +1932,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  const apply = new URLSearchParams(window.location.search).get('apply');
+  if (apply === 'vol2') {
+    queueMicrotask(() => openModal({ preventDefault() {} }, 'vol2'));
+  }
+});
+
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
