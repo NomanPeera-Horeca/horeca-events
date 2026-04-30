@@ -720,6 +720,14 @@ function renderTemplatePreview() {
   document.getElementById('templatePreview').innerHTML = `
     <div class="template-preview-subject">Subject: ${escape(template.subject)}</div>
     <div class="template-preview-body">${escape(preview.substring(0, 500))}${preview.length > 500 ? '...' : ''}</div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:10px;letter-spacing:0.06em;color:var(--ink-mute);line-height:1.6;">
+      <strong style="color:var(--ink-soft);">Loaded from Supabase:</strong> ${String(raw).length} chars in <code style="color:var(--gold);">body_html</code>
+      ${template.slug ? ` · slug: ${escape(template.slug)}` : ''}
+      · template id: <span style="word-break:break-all;">${escape(template.id)}</span><br>
+      If this count is <strong>large</strong> but mail still has an <strong>empty body</strong>, the problem is almost always the <strong>Edge Function</strong>:
+      it must read the column <code style="color:var(--gold);">body_html</code> (not <code style="color:var(--gold);">body</code>) and pass it to Resend as <code style="color:var(--gold);">html</code>.
+      Or the template renderer is failing and returning an empty string — check Function logs.
+    </div>
   `;
 }
 
