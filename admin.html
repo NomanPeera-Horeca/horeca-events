@@ -694,11 +694,24 @@ function openAction(id, actionType) {
 }
 
 function renderTemplatePreview() {
-  const templateId = document.getElementById('templateSelect').value;
+  const templateId = document.getElementById('templateSelect')?.value;
   const template = emailTemplates.find(t => t.id === templateId);
   if (!template) return;
-  
-  const preview = template.body_html
+
+  const raw = template.body_html;
+  const empty = raw == null || !String(raw).trim();
+  if (empty) {
+    document.getElementById('templatePreview').innerHTML = `
+      <div class="template-preview-subject">Subject: ${escape(template.subject || '')}</div>
+      <div style="color: var(--red); font-size: 13px; line-height: 1.5; padding: 14px; border: 1px solid var(--red); background: rgba(212, 98, 106, 0.08); margin-top: 12px;">
+        <strong>No email body in Supabase.</strong> The <code style="font-family:var(--mono);font-size:11px;">body_html</code> column for this row is empty, so Resend sends <em>subject only</em> (blank body in Outlook).<br><br>
+        Fix: Supabase → Table Editor → <code style="font-family:var(--mono);font-size:11px;">email_templates</code> → open this template → paste the full HTML from the repo file (e.g. <code style="font-family:var(--mono);font-size:11px;">approval.html</code>) into <code style="font-family:var(--mono);font-size:11px;">body_html</code> → Save → try again.
+      </div>
+    `;
+    return;
+  }
+
+  const preview = String(raw)
     .replace(/\{\{first_name\}\}/g, activeRegistration.first_name)
     .replace(/\{\{last_name\}\}/g, activeRegistration.last_name)
     .replace(/\{\{business_name\}\}/g, activeRegistration.business_name)
@@ -715,6 +728,22 @@ async function confirmAction(actionType) {
   const templateId = document.getElementById('templateSelect').value;
   const customMessage = document.getElementById('customMessage')?.value || '';
   
+  const btnLabels = {
+    approve: '✓ Approve & Send Email',
+    reject: '✗ Send Rejection',
+    question: '? Send Question',
+    reminder: '📧 Send Reminder'
+  };
+
+  const tpl = emailTemplates.find(t => t.id === templateId);
+  if (!tpl || !String(tpl.body_html || '').trim()) {
+    alert(
+      'This template has no body_html in Supabase. Emails will be blank.\n\n' +
+        'Open Table Editor → email_templates → paste HTML from approval.html (or the matching file in your repo) into body_html, then save.'
+    );
+    return;
+  }
+
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Processing...';
   
@@ -807,7 +836,7 @@ async function confirmAction(actionType) {
   } catch (err) {
     alert('Error: ' + err.message);
     btn.disabled = false;
-    btn.textContent = 'Try Again';
+    btn.textContent = btnLabels[actionType] || 'Try Again';
   }
 }
 
