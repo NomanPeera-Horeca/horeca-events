@@ -673,7 +673,7 @@ function renderTable() {
   tbody.innerHTML = filtered.map(r => `
     <tr>
       <td>
-        <div class="cell-name">${escape(r.first_name)} ${escape(r.last_name)}</div>
+        <div class="cell-name">${escape(r.first_name)} ${escape(r.last_name)}${r.is_vip ? ' <span class="status-pill" style="border-color:var(--gold);color:var(--gold);font-size:10px;padding:2px 8px;text-transform:uppercase;letter-spacing:0.06em">VIP</span>' : ''}</div>
         <div class="cell-meta">
           <span>${escape(r.role || 'Role not specified')}</span>
         </div>
@@ -882,7 +882,7 @@ function openDoorGuest(id) {
 
   document.getElementById('doorModalContent').innerHTML = `
     <div class="modal-eyebrow">Door check-in</div>
-    <h2 class="modal-title">${host}</h2>
+    <h2 class="modal-title">${host}${r.is_vip ? ' <span class="status-pill" style="border-color:var(--gold);color:var(--gold);font-size:11px;vertical-align:middle">VIP</span>' : ''}</h2>
     <div class="modal-body">
       <dl>
         <div class="modal-detail"><dt>Business</dt><dd>${escape(r.business_name)}</dd></div>
@@ -1007,6 +1007,19 @@ function setupEventListeners() {
 // ═══════════════════════════════════════════════════════════════
 // VIEW DETAIL
 // ═══════════════════════════════════════════════════════════════
+async function toggleVipFromDetail(regId, makeVip) {
+  const { error } = await supabaseClient
+    .from('registrations')
+    .update({ is_vip: !!makeVip, updated_at: new Date().toISOString() })
+    .eq('id', regId);
+  if (error) {
+    alert(error.message);
+    return;
+  }
+  await loadRegistrations();
+  viewDetail(regId);
+}
+
 function viewDetail(id) {
   const r = allRegistrations.find(x => x.id === id);
   if (!r) return;
@@ -1017,6 +1030,10 @@ function viewDetail(id) {
     <div class="modal-body">
       <dl>
         <div class="modal-detail"><dt>Status</dt><dd><span class="status-pill ${r.status}">${r.status}</span></dd></div>
+        <div class="modal-detail"><dt>VIP</dt><dd style="display:flex;align-items:center;flex-wrap:wrap;gap:10px">
+          ${r.is_vip ? '<span class="status-pill" style="border-color:var(--gold);color:var(--gold)">VIP</span>' : '<span style="color:var(--ink-mute)">Standard</span>'}
+          <button type="button" class="action-btn approve" style="padding:6px 12px;font-size:12px" onclick="toggleVipFromDetail('${r.id}', ${r.is_vip ? 'false' : 'true'})">${r.is_vip ? 'Remove VIP' : 'Mark as VIP'}</button>
+        </dd></div>
         <div class="modal-detail"><dt>Business</dt><dd>${escape(r.business_name)}</dd></div>
         <div class="modal-detail"><dt>Role</dt><dd>${escape(r.role || '—')}</dd></div>
         <div class="modal-detail"><dt>Locations</dt><dd>${escape(r.locations || '—')}</dd></div>
@@ -1055,7 +1072,25 @@ function openAction(id, actionType) {
   const categoryMap = { approve: 'approval', reject: 'rejection', question: 'question', reminder: 'reminder' };
   const category = categoryMap[actionType];
   const templates = emailTemplates.filter(t => t.category === category);
-  
+
+  let orderedTemplates = templates;
+  let defaultTplId = templates[0]?.id;
+  if (actionType === 'approve' && templates.length) {
+    const tplRank = (t) => {
+      if (t.slug === 'approval-vip') return 0;
+      if (t.slug === 'approval') return 1;
+      return 2;
+    };
+    orderedTemplates = [...templates].sort((a, b) => tplRank(a) - tplRank(b));
+    if (activeRegistration.is_vip) {
+      const vip = orderedTemplates.find((t) => t.slug === 'approval-vip');
+      defaultTplId = vip ? vip.id : orderedTemplates[0].id;
+    } else {
+      const std = orderedTemplates.find((t) => t.slug === 'approval');
+      defaultTplId = std ? std.id : orderedTemplates[0].id;
+    }
+  }
+
   const titleMap = {
     approve: 'Approve <em>& Send QR</em>',
     reject: 'Politely <em>Reject</em>',
@@ -1077,11 +1112,16 @@ function openAction(id, actionType) {
       <p style="color: var(--ink-soft); margin-bottom: 20px; font-size: 14px;">
         For <strong style="color: var(--ink);">${escape(activeRegistration.first_name)} ${escape(activeRegistration.last_name)}</strong> · ${escape(activeRegistration.business_name)}
       </p>
-      
+      ${actionType === 'approve' && activeRegistration.is_vip ? `
+      <p style="color: var(--gold); margin: -8px 0 16px 0; font-size: 13px; line-height: 1.5; padding: 12px 14px; border: 1px solid rgba(201,165,92,0.35); background: rgba(201,165,92,0.08); border-radius: 2px;">
+        This guest is marked <strong style="color: var(--ink);">VIP</strong>. The VIP approval template is selected by default — you can switch to the standard approval if needed.
+      </p>
+      ` : ''}
+
       <div class="template-selector">
         <label>Choose Template</label>
         <select id="templateSelect" onchange="renderTemplatePreview()">
-          ${templates.map(t => `<option value="${t.id}">${escape(t.name)}</option>`).join('')}
+          ${orderedTemplates.map(t => `<option value="${t.id}" ${t.id === defaultTplId ? 'selected' : ''}>${escape(t.name)}</option>`).join('')}
         </select>
       </div>
       
