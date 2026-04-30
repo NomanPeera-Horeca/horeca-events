@@ -1953,10 +1953,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const apply = p.get('apply');
   const vip = p.get('vip');
   if (apply === 'vol2' && (vip === '1' || vip === 'true')) {
-    p.delete('apply');
-    p.delete('vip');
-    const tail = p.toString();
-    window.location.replace('/vip.html' + (tail ? '?' + tail : '') + '#apply');
+    window.location.replace('/vip-apply.html' + qs);
     return;
   }
   if (apply === 'vol2') {
