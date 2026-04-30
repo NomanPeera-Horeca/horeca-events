@@ -61,6 +61,68 @@ function stripUnresolvedSimpleTags(html: string) {
   return html.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, "");
 }
 
+/** Google Calendar template dates: YYYYMMDDTHHmmssZ */
+function formatGCalUtc(d: Date): string {
+  return d.toISOString().replace(/\.\d{3}Z$/, "Z").replace(/[-:]/g, "");
+}
+
+/** Evening window from DB date-only (YYYY-MM-DD); ~6:30 PM US Central as 23:30 UTC + 4h. */
+function eventWindowFromDateOnly(
+  eventDateStr: string,
+): { start: Date; end: Date } | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(eventDateStr).trim());
+  if (!m) return null;
+  const y = Number(m[1]);
+  const mo = Number(m[2]);
+  const d = Number(m[3]);
+  const start = new Date(Date.UTC(y, mo - 1, d, 23, 30, 0));
+  const end = new Date(start.getTime() + 4 * 60 * 60 * 1000);
+  return { start, end };
+}
+
+function buildGoogleCalendarUrl(opts: {
+  title: string;
+  details: string;
+  location: string;
+  start: Date;
+  end: Date;
+}): string {
+  const dates = `${formatGCalUtc(opts.start)}/${formatGCalUtc(opts.end)}`;
+  const u = new URL("https://calendar.google.com/calendar/render");
+  u.searchParams.set("action", "TEMPLATE");
+  u.searchParams.set("text", opts.title);
+  u.searchParams.set("dates", dates);
+  u.searchParams.set("details", opts.details);
+  u.searchParams.set("location", opts.location);
+  return u.toString();
+}
+
+function buildCalendarPageUrl(
+  origin: string,
+  opts: {
+    title: string;
+    details: string;
+    location: string;
+    start: Date;
+    end: Date;
+    uid: string;
+  },
+): string {
+  const q = new URLSearchParams();
+  q.set("t", opts.title);
+  q.set("s", opts.start.toISOString());
+  q.set("e", opts.end.toISOString());
+  q.set("l", opts.location);
+  q.set("d", opts.details);
+  q.set("u", opts.uid);
+  return `${origin}/calendar.html?${q.toString()}`;
+}
+
+/** Encode & for HTML href attributes (email-safe). */
+function ampersandForHtmlAttr(url: string): string {
+  return url.replace(/&/g, "&amp;");
+}
+
 function uint8ToBase64(bytes: Uint8Array): string {
   let binary = "";
   const chunk = 0x8000;
@@ -346,13 +408,48 @@ Deno.serve(async (req) => {
     const hasPlus = Boolean(reg.has_plus_one);
     const plusOneFull = `${reg.plus_one_first_name ?? ""} ${reg.plus_one_last_name ?? ""}`
       .trim();
+    const resId = String(reg.id).slice(0, 8).toUpperCase();
+    const eventCity = (ev?.city as string) ?? "Houston";
+    const eventVolume = String((ev?.volume_roman as string) ?? "");
+    const meetupTitle = `The Horeca Meetup ${eventCity} Vol. ${eventVolume}`;
+    const venueLine =
+      "Marriott Energy Corridor, 16011 Katy Freeway, Houston, TX";
+    const win = ev?.event_date
+      ? eventWindowFromDateOnly(String(ev.event_date))
+      : null;
+    let calendarGoogleUrl = `${eventsOrigin}/calendar.html`;
+    let calendarIcsUrl = `${eventsOrigin}/calendar.html`;
+    if (win) {
+      const descBody =
+        `Doors 6:00 PM · Program 6:30 PM · Reservation #${resId}. Check-in: ${eventsOrigin}/checkin.html`;
+      calendarGoogleUrl = ampersandForHtmlAttr(
+        buildGoogleCalendarUrl({
+          title: meetupTitle,
+          details: descBody,
+          location: venueLine,
+          start: win.start,
+          end: win.end,
+        }),
+      );
+      calendarIcsUrl = ampersandForHtmlAttr(
+        buildCalendarPageUrl(eventsOrigin, {
+          title: meetupTitle,
+          details: descBody,
+          location: venueLine,
+          start: win.start,
+          end: win.end,
+          uid: resId,
+        }),
+      );
+    }
+
     const vars: Record<string, string> = {
       first_name: reg.first_name ?? "",
       last_name: reg.last_name ?? "",
       full_name: `${reg.first_name ?? ""} ${reg.last_name ?? ""}`.trim(),
       business_name: reg.business_name ?? "",
-      event_city: (ev?.city as string) ?? "Houston",
-      event_volume: String((ev?.volume_roman as string) ?? ""),
+      event_city: eventCity,
+      event_volume: eventVolume,
       event_date_long: eventDateLong,
       event_date_short: eventDateShort,
       event_doors: "6:00 PM",
@@ -373,7 +470,9 @@ Deno.serve(async (req) => {
         `${reg.first_name ?? ""} ${reg.last_name ?? ""}`.trim(),
       host_business: reg.business_name ?? "",
       plus_one_email: reg.plus_one_email ?? "",
-      reservation_id: String(reg.id).slice(0, 8).toUpperCase(),
+      reservation_id: resId,
+      calendar_google_url: calendarGoogleUrl,
+      calendar_ics_url: calendarIcsUrl,
       custom_message: custom_message || "",
     };
 

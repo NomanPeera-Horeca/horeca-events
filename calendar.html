@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add to calendar · The Horeca Meetup</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --black: #0a0a0a;
+      --gold: #c9a55c;
+      --cream: #f5f1e8;
+      --ink: #3a3a3a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: Georgia, serif;
+      padding: 32px 20px 48px;
+      text-align: center;
+    }
+    .strip {
+      height: 4px;
+      background: linear-gradient(90deg, #8b6f3a, var(--gold), #e0c186);
+      margin: -32px -20px 28px;
+    }
+    h1 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 26px;
+      font-weight: 400;
+      margin-bottom: 12px;
+      color: var(--black);
+    }
+    h1 em { font-style: italic; color: #8b6f3a; }
+    p { font-size: 16px; line-height: 1.6; max-width: 420px; margin: 0 auto 20px; }
+    .btn {
+      display: inline-block;
+      background: var(--black);
+      color: var(--gold);
+      padding: 16px 28px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1px solid var(--gold);
+      margin: 8px 6px;
+      cursor: pointer;
+    }
+    .btn:hover { opacity: 0.92; }
+    .err { color: #a34; margin-top: 16px; font-size: 14px; }
+    .meta { font-size: 13px; color: #6b6b6b; margin-top: 24px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="strip"></div>
+  <h1>The Horeca <em>Meetup</em></h1>
+  <p id="lead">Preparing your calendar file…</p>
+  <div id="actions" style="display:none;margin-top:8px;">
+    <button type="button" class="btn" id="dlBtn">Download .ics file</button>
+    <a class="btn" id="gLink" href="#" style="display:none;">Open in Google Calendar</a>
+  </div>
+  <p id="err" class="err" style="display:none;"></p>
+  <p class="meta" id="detail"></p>
+
+  <script>
+(function () {
+  function icsEscape(s) {
+    return String(s || '')
+      .replace(/\\/g, '\\\\')
+      .replace(/\n/g, '\\n')
+      .replace(/;/g, '\\;')
+      .replace(/,/g, '\\,');
+  }
+
+  function formatIcsUtc(d) {
+    return new Date(d).toISOString().replace(/\.\d{3}Z$/, 'Z').replace(/[-:]/g, '');
+  }
+
+  function buildIcs(opts) {
+    const stamp = formatIcsUtc(new Date());
+    const lines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//The Horeca Meetup//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      'UID:' + opts.uid + '@thehorecastore.com',
+      'DTSTAMP:' + stamp,
+      'DTSTART:' + formatIcsUtc(opts.start),
+      'DTEND:' + formatIcsUtc(opts.end),
+      'SUMMARY:' + icsEscape(opts.title),
+      'DESCRIPTION:' + icsEscape(opts.description),
+      'LOCATION:' + icsEscape(opts.location),
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ];
+    return lines.join('\r\n');
+  }
+
+  const q = new URLSearchParams(window.location.search);
+  const sRaw = q.get('s');
+  const eRaw = q.get('e');
+  const title = q.get('t') || 'The Horeca Meetup';
+  const loc = q.get('l') || '';
+  const desc = q.get('d') || '';
+  const uid = (q.get('u') || 'meetup').replace(/[^a-zA-Z0-9-]/g, '');
+
+  const lead = document.getElementById('lead');
+  const err = document.getElementById('err');
+  const actions = document.getElementById('actions');
+  const dlBtn = document.getElementById('dlBtn');
+  const gLink = document.getElementById('gLink');
+  const detail = document.getElementById('detail');
+
+  if (!sRaw || !eRaw) {
+    lead.textContent = 'Missing event times.';
+    err.style.display = 'block';
+    err.innerHTML =
+      'This page is opened from your confirmation email. If you see this by mistake, add the event manually or visit ' +
+      '<a href="https://events.thehorecastore.com">events.thehorecastore.com</a>.';
+    return;
+  }
+
+  const start = new Date(sRaw);
+  const end = new Date(eRaw);
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    lead.textContent = 'Invalid event times.';
+    err.style.display = 'block';
+    err.textContent = 'Please use the Add to Calendar link from the latest confirmation email.';
+    return;
+  }
+
+  const ics = buildIcs({
+    uid: uid || 'event',
+    start,
+    end,
+    title,
+    description: desc,
+    location: loc,
+  });
+
+  detail.textContent = title + (loc ? '\n' + loc : '');
+
+  function triggerDownload() {
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'the-horeca-meetup.ics';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    lead.textContent = 'Calendar file downloaded.';
+  }
+
+  dlBtn.addEventListener('click', triggerDownload);
+
+  function googleCalUrl() {
+    const fmt = (d) => formatIcsUtc(d);
+    const dates = fmt(start) + '/' + fmt(end);
+    const u = new URL('https://calendar.google.com/calendar/render');
+    u.searchParams.set('action', 'TEMPLATE');
+    u.searchParams.set('text', title);
+    u.searchParams.set('dates', dates);
+    u.searchParams.set('details', desc || title);
+    u.searchParams.set('location', loc);
+    return u.toString();
+  }
+
+  gLink.href = googleCalUrl();
+  gLink.style.display = 'inline-block';
+
+  actions.style.display = 'block';
+  lead.textContent = 'Choose how to add this dinner to your calendar:';
+
+  var triedAuto = false;
+  window.addEventListener('load', function () {
+    if (triedAuto) return;
+    triedAuto = true;
+    try {
+      triggerDownload();
+    } catch (e) {
+      lead.textContent = 'Tap the button below to download the calendar file.';
+    }
+  });
+})();
+  </script>
+</body>
+</html>

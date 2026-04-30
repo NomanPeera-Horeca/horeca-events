@@ -74,7 +74,14 @@
 <!-- ADD TO CALENDAR -->
 <tr><td style="padding:0 40px 32px 40px;text-align:center;">
 <div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.24em;color:#8b6f3a;text-transform:uppercase;margin-bottom:16px;">Don't Miss It</div>
-<a href="https://events.thehorecastore.com/calendar/{{reservation_id}}.ics" style="display:inline-block;background-color:#0a0a0a;color:#c9a55c;padding:14px 32px;text-decoration:none;font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;border:1px solid #c9a55c;">Add to Calendar</a>
+<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;"><tr>
+<td style="padding:6px;vertical-align:middle;">
+<a href="{{calendar_google_url}}" style="display:inline-block;background-color:#0a0a0a;color:#c9a55c;padding:14px 22px;text-decoration:none;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;border:1px solid #c9a55c;">Add to Google Calendar</a>
+</td>
+<td style="padding:6px;vertical-align:middle;">
+<a href="{{calendar_ics_url}}" style="display:inline-block;background-color:#fdfaf3;color:#0a0a0a;padding:14px 22px;text-decoration:none;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;border:1px solid #c9a55c;">Apple / Outlook (.ics)</a>
+</td>
+</tr></table>
 </td></tr>
 
 <!-- CLOSING -->
