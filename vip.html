@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VIP Experience · The Horeca Meetup · events.thehorecastore.com</title>
+<meta name="description" content="Why we host VIP guests at The Horeca Meetup — priority welcome, dedicated confirmation, and a room built around serious operators. Request VIP consideration." />
+<meta property="og:title" content="VIP Experience · The Horeca Meetup" />
+<meta property="og:description" content="Reserved hospitality for owners and leaders we want at the center of the room." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://events.thehorecastore.com/vip.html" />
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230a0a0a'/%3E%3Ctext x='50' y='65' font-family='Georgia,serif' font-size='52' font-weight='700' fill='%23d4a574' text-anchor='middle'%3EH%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0a0a0a;
+  --bg-card: #141414;
+  --ink: #ededed;
+  --ink-soft: #a8a8a8;
+  --ink-mute: #6b6b6b;
+  --gold: #c9a55c;
+  --gold-light: #e0c186;
+  --gold-deep: #8b6f3a;
+  --burgundy: #722f37;
+  --rule: rgba(255,255,255,0.08);
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'Inter Tight', -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 17px; line-height: 1.65; }
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--gold); color: var(--bg); }
+
+.vip-strip {
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light));
+  color: var(--bg);
+  text-align: center;
+  padding: 10px 20px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(10,10,10,0.9);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--rule);
+}
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.logo {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 600;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.logo-mark {
+  width: 28px; height: 28px;
+  border: 1.5px solid var(--gold);
+  color: var(--gold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+.nav-links { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+.nav-links a { font-size: 13px; font-weight: 500; color: var(--ink-soft); }
+.nav-links a:hover { color: var(--gold); }
+.nav-cta {
+  background: var(--gold);
+  color: var(--bg) !important;
+  padding: 10px 18px;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.nav-cta:hover { filter: brightness(1.08); }
+
+.hero {
+  position: relative;
+  padding: 72px 28px 56px;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(201, 165, 92, 0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 80% 60%, rgba(114, 47, 55, 0.12) 0%, transparent 50%),
+    linear-gradient(180deg, #0a0a0a 0%, #12100c 100%);
+  z-index: 0;
+}
+.hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; text-align: center; }
+
+.badge-vip {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--gold);
+  padding: 8px 18px;
+  margin-bottom: 28px;
+  border: 1px solid var(--gold-light);
+}
+.hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(36px, 7vw, 58px);
+  font-weight: 300;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin-bottom: 24px;
+}
+.hero h1 em { font-style: italic; font-weight: 400; color: var(--gold); }
+.hero-lead {
+  font-family: var(--serif);
+  font-size: clamp(18px, 2.2vw, 22px);
+  font-weight: 300;
+  color: var(--ink-soft);
+  max-width: 640px;
+  margin: 0 auto 36px;
+}
+.hero-lead strong { color: var(--ink); font-weight: 500; }
+.hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 28px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-primary { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(201, 165, 92, 0.2); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+section { padding: 88px 28px; }
+section.alt { background: var(--bg-card); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.container { max-width: 960px; margin: 0 auto; }
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+h2 {
+  font-family: var(--serif);
+  font-size: clamp(30px, 4.5vw, 44px);
+  font-weight: 300;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+}
+h2 em { font-style: italic; color: var(--gold); }
+
+.prose { color: var(--ink-soft); font-size: 17px; margin-bottom: 40px; max-width: 720px; }
+.prose strong { color: var(--ink); }
+
+.benefits {
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin-top: 36px;
+}
+.benefit {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 24px 28px;
+  padding: 32px 28px;
+  background: var(--bg);
+  align-items: start;
+}
+section.alt .benefit { background: var(--bg-card); }
+.benefit-num {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-style: italic;
+  color: var(--gold);
+  line-height: 1;
+}
+.benefit h3 {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 400;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+.benefit p { color: var(--ink-soft); font-size: 15px; line-height: 1.65; }
+
+.callout {
+  margin-top: 48px;
+  padding: 28px 32px;
+  border: 1px solid rgba(201, 165, 92, 0.35);
+  background: rgba(201, 165, 92, 0.06);
+}
+.callout p {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.callout p em { color: var(--gold); font-style: italic; }
+
+.steps { margin-top: 28px; padding-left: 22px; color: var(--ink-soft); }
+.steps li { margin-bottom: 12px; }
+.steps a { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+
+footer {
+  padding: 48px 28px 64px;
+  text-align: center;
+  border-top: 1px solid var(--rule);
+  font-size: 13px;
+  color: var(--ink-mute);
+}
+footer a { color: var(--gold); }
+footer .footer-links { margin-top: 16px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+
+@media (max-width: 640px) {
+  .benefit { grid-template-columns: 1fr; gap: 12px; }
+  .nav-links { width: 100%; justify-content: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<div class="vip-strip">VIP host experience · The Horeca Meetup · events.thehorecastore.com</div>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo">
+      <span class="logo-mark">H</span>
+      <span>The Horeca Meetup</span>
+    </a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/#vol2">Reserve a seat</a>
+      <a href="mailto:events@thehorecastore.com?subject=VIP%20consideration%20%E2%80%94%20Horeca%20Meetup">Request VIP</a>
+      <a href="/#vol2" class="nav-cta">Apply</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="badge-vip">Invitation tier</div>
+    <h1>A seat reserved for the people we want<br>at the <em>center</em> of the room.</h1>
+    <p class="hero-lead">The Horeca Meetup is built around serious owners and operators. <strong>VIP</strong> is not a upsell — it is how we mark guests who should get unmistakable hospitality, a clear welcome at the door, and zero ambiguity that their evening matters to us.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="mailto:events@thehorecastore.com?subject=VIP%20consideration%20%E2%80%94%20Horeca%20Meetup&body=Please%20share%20your%20name%2C%20business%2C%20city%2C%20and%20why%20you%E2%80%99d%20like%20VIP%20consideration%20for%20the%20next%20edition.%0A">Email for VIP consideration</a>
+      <a class="btn btn-ghost" href="/#vol2">Apply for an edition</a>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="container">
+    <p class="section-label">Why we call someone VIP</p>
+    <h2>So the right hosts <em>feel it</em> before they walk in.</h2>
+    <p class="prose">We use VIP for owners, multi-unit leaders, and voices we want amplified in the room — people we may invite personally or approve with intent. The goal is simple: when they arrive, everything should signal <strong>we expected you</strong>, not <strong>you are one more name on a list</strong>.</p>
+
+    <div class="benefits">
+      <div class="benefit">
+        <div class="benefit-num">01</div>
+        <div>
+          <h3>Priority welcome &amp; check-in</h3>
+          <p>VIPs receive a dedicated confirmation and pass treatment at entry — staff know to expect them. No hunting for a name; the evening starts with respect.</p>
+        </div>
+      </div>
+      <div class="benefit">
+        <div class="benefit-num">02</div>
+        <div>
+          <h3>VIP confirmation email &amp; digital entry pass</h3>
+          <p>Approved VIPs get a separate email from standard guests: distinct design, “VIP Host” framing, and the same practical tools (calendar links and personal QR) so nothing is lost in logistics.</p>
+        </div>
+      </div>
+      <div class="benefit">
+        <div class="benefit-num">03</div>
+        <div>
+          <h3>Room placement &amp; hospitality notes</h3>
+          <p>We hold space with intent — closer to the conversation, not the fringe. If they share dietary needs, accessibility, or a quiet word with our team before doors open, we route it to the people who can act on it.</p>
+        </div>
+      </div>
+      <div class="benefit">
+        <div class="benefit-num">04</div>
+        <div>
+          <h3>Direct line to the events team</h3>
+          <p>VIPs can reply to their confirmation or write <a href="mailto:events@thehorecastore.com" style="color:var(--gold);text-decoration:underline;text-underline-offset:3px">events@thehorecastore.com</a>. That thread is the fastest path for real questions — not a form buried on a website.</p>
+        </div>
+      </div>
+      <div class="benefit">
+        <div class="benefit-num">05</div>
+        <div>
+          <h3>Recognition among peers (without theater)</h3>
+          <p>We do not run a red carpet. We do run a room where the right people know they were chosen for a reason. That social proof matters when you are trying to pull serious operators into one conversation.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p><em>VIP is extended by invitation or by approval.</em> If you believe you should be in this tier for an upcoming edition, say so and we will consider it — we cap the room intentionally so every VIP seat still means something.</p>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="container">
+    <p class="section-label">For your ops team</p>
+    <h2>How VIP ties to <em>email &amp; check-in</em></h2>
+    <p class="prose">In production, VIP is a flag on the guest record. When you approve someone marked VIP, the system sends the <strong>VIP approval template</strong> (not the standard confirmation). At the door, VIP appears on the roster so staff greet them correctly.</p>
+    <ol class="steps">
+      <li><strong>Source files (repo):</strong> <code style="font-family:var(--mono);font-size:12px;color:var(--gold)">emails/approval-vip.html</code> — also mirrored at project root as <code style="font-family:var(--mono);font-size:12px;color:var(--gold)">approval-vip.html</code>.</li>
+      <li><strong>Database:</strong> template slug <code style="font-family:var(--mono);font-size:12px;color:var(--gold)">approval-vip</code> (category <code style="font-family:var(--mono);font-size:12px;color:var(--gold)">approval</code>), applied via <code style="font-family:var(--mono);font-size:12px;color:var(--gold)">database/upsert_email_template_approval_vip.sql</code> if you have not run it yet.</li>
+      <li><strong>Admin:</strong> mark the guest as VIP before (or after) approval; the approve flow pre-selects the VIP template when the flag is on.</li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <p class="section-label">Walk-ins &amp; referrals</p>
+    <h2>Calling VIPs <em>in</em></h2>
+    <p class="prose">Use this page when you are on the phone with an owner: send them <strong>https://events.thehorecastore.com/vip.html</strong> along with the regular application link. It answers “what do I get?” in one place, without overpromising perks we do not operationalize.</p>
+    <div class="hero-actions" style="justify-content:flex-start;margin-top:28px">
+      <a class="btn btn-primary" href="/#vol2">Open reservation flow</a>
+      <a class="btn btn-ghost" href="mailto:events@thehorecastore.com?subject=VIP%20referral">Refer a VIP</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>The Horeca Meetup · Horeca Store</p>
+  <p class="footer-links">
+    <a href="/">Home</a>
+    <a href="https://thehorecastore.com" target="_blank" rel="noopener">thehorecastore.com</a>
+    <a href="mailto:events@thehorecastore.com">events@thehorecastore.com</a>
+  </p>
+</footer>
+
+</body>
+</html>
