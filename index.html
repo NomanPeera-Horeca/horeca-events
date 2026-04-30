@@ -1505,7 +1505,7 @@ function openModal(e, key) {
   if (vipField) vipField.value = vipFromUrl && data.type === 'rsvp' ? '1' : '';
   let subText = data.sub;
   if (vipFromUrl && data.type === 'rsvp') {
-    subText += ' This is a VIP application: our team will see the VIP flag on your registration.';
+    subText += ' You are applying from our VIP page, so we will read this as VIP consideration.';
   }
   subEl.textContent = subText;
   document.getElementById('eventName').value = data.eventName;

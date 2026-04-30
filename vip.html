@@ -168,6 +168,8 @@ nav {
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+.btn-arrow { transition: transform 0.2s ease; display: inline-block; }
+.btn:hover .btn-arrow { transform: translateX(4px); }
 .btn-primary { background: var(--gold); color: var(--bg); border-color: var(--gold); }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(201, 165, 92, 0.2); }
 .btn-ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
@@ -247,19 +249,72 @@ section.alt .benefit { background: var(--bg-card); }
 .callout p em { color: var(--gold); font-style: italic; }
 .callout-cta { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: flex-start; }
 
-footer {
-  padding: 48px 28px 64px;
+.final-cta {
   text-align: center;
+  padding: 100px 28px 96px;
+  position: relative;
+  overflow: hidden;
   border-top: 1px solid var(--rule);
-  font-size: 13px;
-  color: var(--ink-mute);
 }
-footer a { color: var(--gold); }
-footer .footer-links { margin-top: 16px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+.final-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 30% 30%, rgba(201, 165, 92, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 70% 70%, rgba(114, 47, 55, 0.12) 0%, transparent 55%),
+    linear-gradient(135deg, #0a0a0a 0%, #1a1410 50%, #0a0a0a 100%);
+}
+.final-cta-inner { position: relative; z-index: 1; max-width: 820px; margin: 0 auto; }
+.final-cta .section-label { margin-bottom: 14px; }
+.final-cta h2 {
+  font-family: var(--serif);
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 300;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin-bottom: 20px;
+}
+.final-cta h2 em { font-style: italic; color: var(--gold); }
+.final-cta-lead {
+  font-family: var(--serif);
+  font-size: clamp(17px, 2vw, 20px);
+  font-weight: 300;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  margin-bottom: 32px;
+}
+.final-cta-actions { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; align-items: center; }
 
+footer {
+  border-top: 1px solid var(--rule);
+  padding: 80px 40px 40px;
+}
+.footer-grid { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; padding-bottom: 60px; border-bottom: 1px solid var(--rule); margin-bottom: 32px; }
+.footer-brand .logo { margin-bottom: 24px; font-family: var(--serif); font-size: 22px; font-weight: 600; letter-spacing: -0.02em; display: flex; align-items: baseline; gap: 10px; }
+.footer-brand .logo-mark { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1.5px solid var(--gold); color: var(--gold); font-size: 16px; font-weight: 700; }
+.footer-brand p { font-family: var(--serif); font-size: 16px; font-style: italic; color: var(--ink-soft); max-width: 360px; line-height: 1.6; }
+.footer-col h4 { font-family: var(--mono); font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 12px; }
+.footer-col a { font-size: 14px; color: var(--ink-soft); transition: color 0.3s ease; text-decoration: none; }
+.footer-col a:hover { color: var(--gold); }
+.footer-brand a { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+.footer-bottom { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: var(--ink-mute); text-transform: uppercase; }
+.footer-bottom span { display: flex; gap: 24px; flex-wrap: wrap; }
+.footer-bottom a { color: var(--ink-mute); text-decoration: none; transition: color 0.3s ease; }
+.footer-bottom a:hover { color: var(--gold); }
+
+@media (max-width: 1024px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+}
 @media (max-width: 640px) {
   .benefit { grid-template-columns: 1fr; gap: 12px; }
   .nav-links { width: 100%; justify-content: flex-start; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; gap: 16px; text-align: center; justify-content: center; }
+  footer { padding: 60px 24px 32px; }
 }
 </style>
 </head>
@@ -277,7 +332,7 @@ footer .footer-links { margin-top: 16px; display: flex; gap: 20px; justify-conte
       <a href="/">Home</a>
       <a href="#about">Why we're here</a>
       <a href="#benefits">What you receive</a>
-      <a href="/index.html?apply=vol2&amp;vip=1" class="nav-cta">Apply</a>
+      <a href="/index.html?apply=vol2&amp;vip=1" class="nav-cta">Apply for Vol. II</a>
     </div>
   </div>
 </nav>
@@ -288,10 +343,10 @@ footer .footer-links { margin-top: 16px; display: flex; gap: 20px; justify-conte
     <h1>A seat reserved for the people we want<br>at the <em>center</em> of the room.</h1>
     <p class="hero-lead">This evening is hosted by <strong>Horeca Store</strong> for restaurant and hotel owners we want in one real conversation. <strong>VIP</strong> is not an upsell. It is how we mark guests who should get unmistakable hospitality: a clear welcome, a host shoutout, plated dinner, and no doubt their seat was meant for them.</p>
     <div class="hero-actions">
-      <a class="btn btn-primary" href="/index.html?apply=vol2&amp;vip=1">Apply for the next edition</a>
-      <a class="btn btn-ghost" href="#benefits">What VIP includes</a>
+      <a class="btn btn-primary" href="/index.html?apply=vol2&amp;vip=1">Submit application for Vol. II <span class="btn-arrow">→</span></a>
+      <a class="btn btn-ghost" href="#benefits">See VIP hospitality</a>
     </div>
-    <p class="hero-hint">You will use the <strong>same RSVP form</strong> as every other guest. Our system tags your registration as <strong>VIP</strong> so the team sees it in admin. General event questions: <a href="mailto:events@thehorecastore.com">events@thehorecastore.com</a>. For a decision on something sensitive, see <a href="#benefits">direct line</a> under item 06.</p>
+    <p class="hero-hint">Every seat is reviewed before the event. You complete the <strong>same application</strong> as on our home page; when you start from here, we read it as <strong>VIP consideration</strong> for Houston Vol. II. Event questions: <a href="mailto:events@thehorecastore.com">events@thehorecastore.com</a>. For something sensitive, use the <a href="#benefits">direct line</a> in item 06.</p>
   </div>
 </header>
 
@@ -301,7 +356,7 @@ footer .footer-links { margin-top: 16px; display: flex; gap: 20px; justify-conte
     <h2>Who <em>Horeca Store</em> is, and why we run this room.</h2>
     <p class="prose"><strong>Horeca Store</strong> is the global hospitality supply company behind this series. We equip hotels, restaurants, cafes, and franchise operations with furniture, equipment, smallwares, and operating supplies across the <strong>Middle East, Asia, and the United States</strong>. The properties and brands that rely on us number <strong>15,000+</strong> worldwide. The meetup is not a catalogue pitch. It is our way of gathering serious operators in one place. <a href="https://thehorecastore.com" target="_blank" rel="noopener noreferrer">Learn more at thehorecastore.com</a></p>
     <p class="prose"><strong>Why we organize The Horeca Meetup:</strong> We host a private, quarterly dinner for <strong>owners and leaders</strong> in markets where we work and where our guests work. The room is curated and invitation-led so the conversation stays high-trust: peers talking shop with peers, not a noisy expo hall. We cap attendance on purpose. If you are in the room, it is because we believe you belong in that circle.</p>
-    <p class="prose"><strong>Why VIP exists:</strong> Most approved guests receive a strong standard experience. <strong>VIP</strong> is the tier we use when someone should feel unmistakably <em>expected</em>: a multi-unit leader, a voice we want amplified in the program, a personal invite, or a referral we intend to honor. If that sounds like you, use <strong>Apply</strong> on this page: it opens the same form as the main site, with your row flagged <strong>VIP</strong> for our team. The numbered list below is what we deliver when we mark someone VIP.</p>
+    <p class="prose"><strong>Why VIP exists:</strong> Most approved guests receive a strong standard experience. <strong>VIP</strong> is the tier we use when someone should feel unmistakably <em>expected</em>: a multi-unit leader, a voice we want amplified in the program, a personal invite, or a referral we intend to honor. If that sounds like you, submit the application from this page for Houston Vol. II so we can treat it as VIP consideration. The numbered list below is what we deliver when we mark someone VIP.</p>
   </div>
 </section>
 
@@ -364,34 +419,76 @@ footer .footer-links { margin-top: 16px; display: flex; gap: 20px; justify-conte
     </div>
 
     <div class="callout">
-      <p><em>VIP is extended by invitation or by approval.</em> We cap the room intentionally so every VIP seat still means something. Use the application link: your registration arrives with the VIP flag for our team. If your situation needs a personal thread first, use the <a href="#benefits">direct line</a> in item 06.</p>
+      <p><em>VIP is extended by invitation or by approval.</em> We cap the room on purpose. When you are ready, submit your application below. If you need a conversation before you apply, use the <a href="#benefits">direct line</a> in item 06.</p>
       <div class="callout-cta">
-        <a class="btn btn-primary" href="/index.html?apply=vol2&amp;vip=1">Start application</a>
+        <a class="btn btn-primary" href="/index.html?apply=vol2&amp;vip=1">Submit application for Vol. II <span class="btn-arrow">→</span></a>
       </div>
     </div>
   </div>
 </section>
 
-<section class="alt">
-  <div class="container">
-    <p class="section-label">Next step</p>
-    <h2>Apply in <em>one place</em></h2>
-    <p class="prose">This page explains the experience. The button below opens the <strong>same RSVP form</strong> as the home page, with your application <strong>flagged VIP</strong> in our system so we know you came from here.</p>
-    <div class="hero-actions" style="justify-content:flex-start;margin-top:8px">
-      <a class="btn btn-primary" href="/index.html?apply=vol2&amp;vip=1">Open application</a>
-      <a class="btn btn-ghost" href="/">Back to main events site</a>
+<section class="final-cta" id="apply">
+  <div class="final-cta-inner">
+    <p class="section-label">Application · Houston Vol. II</p>
+    <h2>Submit your application <em>for the room.</em></h2>
+    <p class="final-cta-lead">One form, the same review process as every guest. Starting here tells us you are requesting <strong>VIP consideration</strong> for May 5, 2026. We respond before the event.</p>
+    <div class="final-cta-actions">
+      <a class="btn btn-primary" href="/index.html?apply=vol2&amp;vip=1">Submit application <span class="btn-arrow">→</span></a>
+      <a class="btn btn-ghost" href="/">Return to home</a>
     </div>
   </div>
 </section>
 
 <footer>
-  <p>The Horeca Meetup · Horeca Store</p>
-  <p class="footer-links">
-    <a href="/">Home</a>
-    <a href="/index.html?apply=vol2&amp;vip=1">Apply (VIP)</a>
-    <a href="mailto:events@thehorecastore.com">events@thehorecastore.com</a>
-    <a href="https://thehorecastore.com" target="_blank" rel="noopener noreferrer">thehorecastore.com</a>
-  </p>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="/" class="logo">
+        <span class="logo-mark">H</span>
+        <span>The Horeca Meetup</span>
+      </a>
+      <p>A private quarterly dinner series for restaurant and hotel owners. Hosted in select cities across the world. <strong style="color:var(--gold);font-style:normal;">Hosted by <a href="https://thehorecastore.com" target="_blank" rel="noopener noreferrer">Horeca Store</a></strong>, the global hospitality supply partner trusted by 15,000+ hotels and restaurants across 11 countries in the Middle East, Asia, and the United States.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>The Series</h4>
+      <ul>
+        <li><a href="/index.html#vol2">Houston Vol. II</a></li>
+        <li><a href="/index.html#calendar">Houston Vol. III</a></li>
+        <li><a href="/index.html#calendar">Los Angeles Vol. II</a></li>
+        <li><a href="/index.html#calendar">Dubai Vol. VIII</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>About</h4>
+      <ul>
+        <li><a href="/index.html#host">The Host · Horeca Store</a></li>
+        <li><a href="/index.html#manifesto">Manifesto</a></li>
+        <li><a href="/index.html#testimonials">Voices</a></li>
+        <li><a href="/index.html#sponsors">Patrons</a></li>
+        <li><a href="https://thehorecastore.com" target="_blank" rel="noopener noreferrer">thehorecastore.com</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:events@thehorecastore.com">events@thehorecastore.com</a></li>
+        <li><a href="tel:8664467322">+1 866 446 7322</a></li>
+        <li><a href="/index.html#sponsors">Apply for Sponsorship</a></li>
+        <li><a href="mailto:events@thehorecastore.com?subject=Press%20Inquiry">Press Inquiries</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2026 Horeca Store USA · The Horeca Meetup Series</span>
+    <span>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Code of Conduct</a>
+    </span>
+  </div>
 </footer>
 
 </body>
