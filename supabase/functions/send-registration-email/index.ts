@@ -2,8 +2,8 @@
  * send-registration-email
  *
  * - On approve: unique qr_token (+ plus_one_qr_token), PNGs of check-in URLs, Storage upload,
- *   Resend with inline CID images (Outlook-friendly), optional +1 email from template slug
- *   approval-plus-one
+ *   Resend HTML with QR embedded as data:image/png (reliable in Outlook vs CID/external),
+ *   optional +1 email from template slug approval-plus-one
  * - Deploy: supabase functions deploy send-registration-email --no-verify-jwt
  * - Secret (optional): PUBLIC_EVENTS_ORIGIN (default https://events.thehorecastore.com)
  */
