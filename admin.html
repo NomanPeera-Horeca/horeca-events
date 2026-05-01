@@ -377,16 +377,17 @@ header { flex-wrap: wrap; row-gap: 12px; }
     <table class="registrations-table">
       <thead>
         <tr>
-          <th style="width: 22%;">Attendee</th>
-          <th style="width: 22%;">Business</th>
-          <th style="width: 18%;">Contact</th>
-          <th style="width: 10%;">Status</th>
-          <th style="width: 10%;">Submitted</th>
-          <th style="width: 18%; text-align: right;">Actions</th>
+          <th style="width: 20%;">Attendee</th>
+          <th style="width: 20%;">Business</th>
+          <th style="width: 17%;">Contact</th>
+          <th style="width: 9%;">Status</th>
+          <th style="width: 9%;">VIP</th>
+          <th style="width: 9%;">Submitted</th>
+          <th style="width: 16%; text-align: right;">Actions</th>
         </tr>
       </thead>
       <tbody id="registrationsBody">
-        <tr><td colspan="6" class="empty-state"><div class="spinner"></div> Loading registrations...</td></tr>
+        <tr><td colspan="7" class="empty-state"><div class="spinner"></div> Loading registrations...</td></tr>
       </tbody>
     </table>
   </div>
@@ -643,7 +644,7 @@ async function loadRegistrations() {
   if (!currentEventId) return;
   
   const tbody = document.getElementById('registrationsBody');
-  tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><div class="spinner"></div> Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><div class="spinner"></div> Loading...</td></tr>';
   
   const { data, error } = await supabaseClient
     .from('registrations')
@@ -652,7 +653,7 @@ async function loadRegistrations() {
     .order('created_at', { ascending: false });
   
   if (error) {
-    tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><h3>Error loading data</h3><p>${error.message}</p></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><h3>Error loading data</h3><p>${error.message}</p></td></tr>`;
     return;
   }
   
@@ -681,6 +682,30 @@ function updateStats() {
   document.getElementById('statTotal').textContent = totalSeats;
 }
 
+/** VIP column body for registrations grid */
+function vipIndicatorForRegistrationsColumn(r) {
+  if (r.is_vip) {
+    return '<span class="status-pill" style="border-color:var(--gold);color:var(--gold);font-size:10px;padding:4px 10px;text-transform:uppercase;letter-spacing:0.06em">VIP</span>';
+  }
+  const ch = r.challenge && String(r.challenge);
+  if (ch && /\[VIP apply/i.test(ch)) {
+    return '<span class="status-pill" style="border-color:rgba(212,165,116,0.45);color:var(--gold);font-size:10px;padding:4px 10px;text-transform:uppercase;letter-spacing:0.05em;opacity:0.95" title="Submitted via VIP form but is_vip is off in the database — open View → Mark as VIP.">Apply</span>';
+  }
+  return '<span style="color:var(--ink-mute);font-size:13px">—</span>';
+}
+
+/** Small VIP marker next to name on Door tab */
+function vipIndicatorForDoorName(r) {
+  if (r.is_vip) {
+    return ' <span class="status-pill" style="border-color:var(--gold);color:var(--gold);font-size:9px;padding:2px 7px;text-transform:uppercase;letter-spacing:0.05em">VIP</span>';
+  }
+  const ch = r.challenge && String(r.challenge);
+  if (ch && /\[VIP apply/i.test(ch)) {
+    return ' <span class="status-pill" style="border-color:rgba(212,165,116,0.45);color:var(--gold);font-size:9px;padding:2px 7px;text-transform:uppercase" title="VIP apply — open guest and Mark as VIP">Apply</span>';
+  }
+  return '';
+}
+
 function renderTable() {
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
   const tbody = document.getElementById('registrationsBody');
@@ -696,14 +721,14 @@ function renderTable() {
   }
   
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><h3>No registrations${currentFilter !== 'all' ? ` (${currentFilter})` : ''}</h3><p>${search ? 'Try a different search term' : 'Submissions will appear here as they come in.'}</p></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><h3>No registrations${currentFilter !== 'all' ? ` (${currentFilter})` : ''}</h3><p>${search ? 'Try a different search term' : 'Submissions will appear here as they come in.'}</p></td></tr>`;
     return;
   }
   
   tbody.innerHTML = filtered.map(r => `
     <tr>
       <td>
-        <div class="cell-name">${escape(r.first_name)} ${escape(r.last_name)}${r.is_vip ? ' <span class="status-pill" style="border-color:var(--gold);color:var(--gold);font-size:10px;padding:2px 8px;text-transform:uppercase;letter-spacing:0.06em">VIP</span>' : ''}</div>
+        <div class="cell-name">${escape(r.first_name)} ${escape(r.last_name)}</div>
         <div class="cell-meta">
           <span>${escape(r.role || 'Role not specified')}</span>
         </div>
@@ -720,6 +745,7 @@ function renderTable() {
         </div>
       </td>
       <td><span class="status-pill ${r.status}">${r.status.replace('_', ' ')}</span></td>
+      <td>${vipIndicatorForRegistrationsColumn(r)}</td>
       <td><span class="cell-time">${timeAgo(r.created_at)}</span></td>
       <td>
         <div class="action-buttons">
@@ -811,7 +837,7 @@ function renderDoorTable() {
         : '';
       return `
     <tr onclick="openDoorGuest('${r.id}')">
-      <td><div class="cell-name">${escape(r.first_name)} ${escape(r.last_name)}</div>
+      <td><div class="cell-name">${escape(r.first_name)} ${escape(r.last_name)}${vipIndicatorForDoorName(r)}</div>
           <div class="cell-meta">${escape(r.email || '')}${r.phone ? ` · ${escape(r.phone)}` : ''}</div></td>
       <td><div class="cell-business">${escape(r.business_name)}</div></td>
       <td>${p1}</td>
