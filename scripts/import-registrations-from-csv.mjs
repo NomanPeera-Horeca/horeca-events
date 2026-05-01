@@ -21,6 +21,8 @@
  *
  * Column headers are matched flexibly (case/spacing insensitive), e.g.:
  *   First Name, Last Name, Email, Phone, Business, Company, Role, Locations, Notes, Source
+ * Google Forms-style exports also work: Timestamp, Full Name, Phone Number,
+ * Number of Seats (Maximum 2 per registration), How did you hear about this event?
  *
  * Rows with the same email as an existing registration for that event are skipped.
  */
@@ -97,15 +99,38 @@ function normKey(h) {
 /** Map normalized header → canonical field */
 function headerToField(n) {
   const aliases = [
+    ["form_timestamp", ["timestamp"]],
+    ["full_name", ["full_name", "fullname", "complete_name", "name"]],
     ["first_name", ["first_name", "firstname", "first", "given_name", "givenname", "fname"]],
     ["last_name", ["last_name", "lastname", "last", "surname", "family_name", "lname"]],
     ["email", ["email", "e_mail", "email_address"]],
-    ["phone", ["phone", "mobile", "whatsapp", "tel", "telephone", "cell"]],
-    ["business_name", ["business_name", "business", "company", "restaurant", "organization", "org"]],
-    ["role", ["role", "title", "job_title", "position"]],
+    ["phone", ["phone", "phone_number", "mobile", "whatsapp", "tel", "telephone", "cell"]],
+    [
+      "business_name",
+      [
+        "business_name",
+        "business",
+        "company",
+        "restaurant",
+        "restaurant_or_business_name",
+        "organization",
+        "org",
+      ],
+    ],
+    ["role", ["role", "your_role", "title", "job_title", "position"]],
     ["locations", ["locations", "location", "units", "of_locations"]],
+    ["seat_count_text", ["number_of_seats_maximum_2_per_registration", "number_of_seats", "seats", "party_size"]],
     ["challenge", ["notes", "note", "comments", "challenge", "message", "details"]],
-    ["source", ["source", "referral", "heard_from", "how_heard"]],
+    [
+      "source",
+      [
+        "source",
+        "referral",
+        "heard_from",
+        "how_heard",
+        "how_did_you_hear_about_this_event",
+      ],
+    ],
     ["plus_one_first_name", ["guest_first", "plus_one_first_name", "plusone_first"]],
     ["plus_one_last_name", ["guest_last", "plus_one_last_name", "plusone_last"]],
     ["plus_one_email", ["guest_email", "plus_one_email", "plusone_email"]],
@@ -126,22 +151,61 @@ function rowsToObjects(headerRow, dataRows) {
       const f = fields[i];
       if (!f) continue;
       const v = cells[i] != null ? String(cells[i]).trim() : "";
-      if (v !== "") o[f] = v;
+      if (v === "") continue;
+      if (f === "email" && o.email) continue;
+      o[f] = v;
     }
     return o;
   });
 }
 
+/** 1 or 2 from "2 People" / "1 Person" (Google Forms). */
+function seatsRequestedFromText(text) {
+  const s = String(text || "").toLowerCase();
+  if (/2\s*people|2\s*person(s)?/.test(s)) return 2;
+  if (/1\s*person|1\s*people|one\s*person/.test(s)) return 1;
+  if (/^\s*2\s*$/.test(s)) return 2;
+  if (/^\s*1\s*$/.test(s)) return 1;
+  return 1;
+}
+
+function splitFullName(full) {
+  const t = String(full || "").trim().replace(/\s+/g, " ");
+  if (!t) return { first: "", last: "" };
+  const parts = t.split(" ");
+  if (parts.length === 1) return { first: parts[0], last: "" };
+  return { first: parts[0], last: parts.slice(1).join(" ") };
+}
+
 function buildRegistration(row, eventId, opts) {
+  let first = (row.first_name || "").trim();
+  let last = (row.last_name || "").trim();
+  if (!first && row.full_name) {
+    const sp = splitFullName(row.full_name);
+    first = sp.first;
+    last = sp.last;
+  }
   const email = (row.email || "").toLowerCase().trim();
-  const first = (row.first_name || "").trim();
-  const last = (row.last_name || "").trim();
-  if (!email || !first || !last) return { error: "missing email, first_name, or last_name" };
+  if (!email || !first) return { error: "missing email or name" };
 
   const phone = (row.phone || "").trim() || opts.defaultPhone || null;
   const hasPlus =
     !!(row.plus_one_email && String(row.plus_one_email).trim()) ||
     !!(row.plus_one_first_name && String(row.plus_one_first_name).trim());
+
+  const seatsHint = seatsRequestedFromText(row.seat_count_text);
+  let attendee_count = hasPlus ? 2 : seatsHint;
+  if (attendee_count !== 1 && attendee_count !== 2) attendee_count = 1;
+
+  const challengeParts = [];
+  if (row.form_timestamp)
+    challengeParts.push(`Original form: ${row.form_timestamp}`);
+  if (row.challenge) challengeParts.push(String(row.challenge).trim());
+  if (!hasPlus && seatsHint === 2)
+    challengeParts.push(
+      "Legacy import: 2 seats selected (no second guest contact in source sheet).",
+    );
+  const challenge = challengeParts.length ? challengeParts.join(" | ") : null;
 
   const reg = {
     event_id: eventId,
@@ -154,8 +218,8 @@ function buildRegistration(row, eventId, opts) {
     business_name: (row.business_name || "").trim() || null,
     role: (row.role || "").trim() || null,
     locations: (row.locations || "").trim() || null,
-    challenge: (row.challenge || "").trim() || null,
-    source: (row.source || "").trim() || "Google Drive / Sheet import",
+    challenge,
+    source: (row.source || "").trim() || "Google Form import (legacy)",
     has_plus_one: hasPlus,
     plus_one_first_name: hasPlus
       ? (row.plus_one_first_name || "").trim() || null
@@ -168,7 +232,7 @@ function buildRegistration(row, eventId, opts) {
       : null,
     plus_one_phone: hasPlus ? (row.plus_one_phone || "").trim() || null : null,
     plus_one_role: null,
-    attendee_count: hasPlus ? 2 : 1,
+    attendee_count,
     is_vip: opts.vip,
     user_agent: "import/google-drive-csv",
     utm_source: null,
