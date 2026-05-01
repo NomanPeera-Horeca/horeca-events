@@ -1,4 +1,4 @@
-# Deployment Guide — Step by Step
+# Deployment Guide: Step by Step
 
 This is exactly what you asked for. The exact sequence. No fluff.
 
@@ -54,7 +54,7 @@ The static sites are just files. Supabase does all the heavy lifting.
 
 ---
 
-## 📋 THE EXACT SEQUENCE — Step 1 through 10
+## 📋 THE EXACT SEQUENCE: Step 1 through 10
 
 ### 🟢 STEP 1: Set Up Supabase (10 min)
 
@@ -66,7 +66,7 @@ The static sites are just files. Supabase does all the heavy lifting.
 6. **Copy these 3 values from Settings → API:**
    - `Project URL` (looks like `https://abc123xyz.supabase.co`)
    - `anon public` key
-   - `service_role` key (KEEP SECRET — never put in frontend)
+   - `service_role` key (KEEP SECRET; never put in frontend)
 
 ✅ **Done when:** You have those 3 values saved.
 
@@ -106,7 +106,7 @@ The schema seeds your email as `noman@thehorecastore.com`. If your real email di
 1. Supabase → **Storage** in left sidebar
 2. Click **New bucket**
 3. Name: `qr-codes`
-4. Public bucket: **YES** (toggle ON — critical for emails to display QR)
+4. Public bucket: **YES** (toggle ON; critical for emails to display QR)
 5. File size limit: 1 MB
 6. Allowed MIME types: `image/png`
 7. Click **Create**
@@ -124,7 +124,7 @@ For each row in `email_templates`, paste the corresponding HTML:
 | Template Slug | Source File | Notes |
 |---|---|---|
 | `approval` | `/emails/approval.html` | Whole file |
-| `approval-plus-one` | `/emails/approval-plus-one.html` | Whole file (NEW — for guest emails) |
+| `approval-plus-one` | `/emails/approval-plus-one.html` | Whole file (NEW; for guest emails) |
 | `rejection-fully-booked` | `/emails/rejection.html` | Variant 1 (the active HTML at top) |
 | `rejection-not-fit` | `/emails/rejection.html` | Variant 2 body in a copy of the template |
 | `rejection-future-edition` | `/emails/rejection.html` | Variant 3 body in a copy of the template |
@@ -292,23 +292,23 @@ If you want to use Render instead:
 | Form submits but no row in Supabase | Check browser console. Verify SUPABASE_URL and ANON_KEY are correct. Check RLS policy allows public INSERT. |
 | Cannot log into admin | Email in `admin_users` must EXACTLY match the email in Supabase Auth. |
 | Approval email not sent | Check Supabase Edge Function logs: `supabase functions logs send-registration-email`. Verify Resend domain is verified. Verify RESEND_API_KEY is set. |
-| QR shows broken image in email | Make sure `qr-codes` bucket is set to PUBLIC. Open the QR URL directly — should display. |
+| QR shows broken image in email | Make sure `qr-codes` bucket is set to PUBLIC. Open the QR URL directly; it should display. |
 | Plus-one email not sent | Verify `approval-plus-one` template exists in `email_templates` table with HTML. The Edge Function looks up this slug. |
 
 ---
 
 ## 📊 What You Now Have
 
-✅ Real database — every form submission persisted forever  
-✅ Admin panel — see who registered, approve/reject/ask with one click  
-✅ Email automation — branded emails from `events@thehorecastore.com`  
-✅ **Plus-One support** — guests get their own personal email saying "Noman registered you"  
-✅ QR codes — auto-generated on approval, separate QR for guest  
-✅ Brand consistency — every email has identical header + footer  
-✅ Audit trail — every action logged in `activity_log`  
-✅ Multi-event support — Vol. III, Vol. IV, Vol. VIII Dubai all from one panel  
-✅ Capacity tracking — auto-flags when event hits 100  
-✅ UTM tracking — see which channel drove the RSVP  
+✅ Real database: every form submission persisted forever  
+✅ Admin panel: see who registered, approve/reject/ask with one click  
+✅ Email automation: branded emails from `events@thehorecastore.com`  
+✅ **Plus-One support:** guests get their own personal email saying "Noman registered you"  
+✅ QR codes: auto-generated on approval, separate QR for guest  
+✅ Brand consistency: every email has identical header + footer  
+✅ Audit trail: every action logged in `activity_log`  
+✅ Multi-event support: Vol. III, Vol. IV, Vol. VIII Dubai all from one panel  
+✅ Capacity tracking: auto-flags when event hits 100  
+✅ UTM tracking: see which channel drove the RSVP  
 
 This is conference-grade infrastructure. Same architecture as Aspire, Inman, Saastr.
 

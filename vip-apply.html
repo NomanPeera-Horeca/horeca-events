@@ -807,7 +807,7 @@ async function submitVipApply(e) {
         const rlsFallback = {
           ...base,
           is_vip: false,
-          challenge: summary ? '[VIP apply — mark VIP in admin] ' + summary : '[VIP apply — mark VIP in admin]',
+          challenge: summary ? '[VIP apply - mark VIP in admin] ' + summary : '[VIP apply - mark VIP in admin]',
         };
         console.warn('VIP apply: retrying without is_vip (check RLS / anon insert policy).', insertError);
         ({ error: insertError } = await supabaseClient.from('registrations').insert([rlsFallback]));
@@ -831,7 +831,7 @@ async function submitVipApply(e) {
       }
       alert(
         'Sorry, something went wrong saving your request.\n\n' +
-          'Please email events@thehorecastore.com — and if you can, mention this detail: ' +
+          'Please email events@thehorecastore.com. If you can, mention this detail: ' +
           hint
       );
       submitBtn.disabled = false;
@@ -845,9 +845,9 @@ async function submitVipApply(e) {
 
   let toastMsg =
     '<div class="toast-headline">Your VIP request is in.</div>' +
-    '<p class="toast-para">We have received your application and our leadership team will review it with the care these evenings deserve. You should expect a <em>personal</em> reply at the email address you shared—most notes go out within a few business days, though busy weeks can occasionally run a little longer.</p>' +
+    '<p class="toast-para">We have received your application and our leadership team will review it with the care these evenings deserve. You should expect a <em>personal</em> reply at the email address you shared. Most notes go out within a few business days, though busy weeks can occasionally run a little longer.</p>' +
     '<p class="toast-para">There is nothing else you need to do on this page for now. Please watch your inbox (and, kindly, your spam or promotions folder) so our note does not slip past you.</p>' +
-    '<p class="toast-para">If your plans change before you hear from us, simply reply once we write in—or reach out anytime to <em>events@thehorecastore.com</em>—and we will help.</p>' +
+    '<p class="toast-para">If your plans change before you hear from us, simply reply once we write in, or reach out anytime to <em>events@thehorecastore.com</em>, and we will help.</p>' +
     '<p class="toast-tagline">Thank you for your interest in The Horeca Meetup. We are truly glad you are considering joining us at the table.</p>';
   if (hasPlusOne) {
     toastMsg =
