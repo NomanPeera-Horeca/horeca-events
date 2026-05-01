@@ -276,28 +276,81 @@ main {
   line-height: 1.55;
 }
 
+.vip-toast-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1999;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+  pointer-events: none;
+}
+.vip-toast-backdrop.show {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+  pointer-events: auto;
+}
+
 .toast {
   position: fixed;
-  bottom: 28px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%) translateY(140%);
+  z-index: 2000;
+  max-width: 540px;
+  width: min(540px, calc(100% - 48px));
+  max-height: min(88vh, 640px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: var(--bg-card);
   border: 1px solid var(--gold);
   border-left: 4px solid var(--gold);
-  padding: 20px 28px;
-  z-index: 2000;
-  max-width: 420px;
-  width: calc(100% - 40px);
+  padding: 28px 32px;
   box-shadow: 0 24px 60px rgba(0,0,0,0.55);
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, calc(-50% + 16px)) scale(0.98);
+  transition: opacity 0.4s ease, transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.45s;
 }
-.toast.show { transform: translateX(-50%) translateY(0); }
-.toast-text { font-size: 14px; color: var(--ink); line-height: 1.5; }
-.toast-text strong { color: var(--gold); font-weight: 600; }
+.toast.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+  transition-delay: 0s;
+}
+.toast-text {
+  font-size: 15px;
+  color: var(--ink);
+  line-height: 1.65;
+}
+.toast-text strong {
+  display: block;
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 1.35;
+  margin-bottom: 12px;
+  letter-spacing: 0.02em;
+}
+.toast-text .toast-lead { display: block; margin-bottom: 0.85em; text-align: center; }
+.toast-text .toast-foot {
+  display: block;
+  margin-top: 14px;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--ink-mute);
+  line-height: 1.55;
+}
 
 @media (max-width: 560px) {
   .form-grid { grid-template-columns: 1fr; }
   .form-card { padding: 28px 20px 24px; }
+  .toast { padding: 24px 22px; }
+  .toast-text strong { font-size: 16px; }
 }
 </style>
 </head>
@@ -467,6 +520,7 @@ main {
   </div>
 </main>
 
+<div class="vip-toast-backdrop" id="vipToastBackdrop" aria-hidden="true"></div>
 <div class="toast" id="vipToast" role="status" aria-live="polite">
   <div class="toast-text" id="vipToastText"></div>
 </div>
@@ -519,13 +573,36 @@ const supabaseClient =
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     : null;
 
+let vipToastTimer = null;
+function hideVipToast() {
+  const toast = document.getElementById('vipToast');
+  const backdrop = document.getElementById('vipToastBackdrop');
+  if (vipToastTimer) {
+    clearTimeout(vipToastTimer);
+    vipToastTimer = null;
+  }
+  toast.classList.remove('show');
+  if (backdrop) {
+    backdrop.classList.remove('show');
+    backdrop.setAttribute('aria-hidden', 'true');
+  }
+}
+
 function showVipToast(html) {
   const toast = document.getElementById('vipToast');
+  const backdrop = document.getElementById('vipToastBackdrop');
   const toastText = document.getElementById('vipToastText');
   toastText.innerHTML = html;
+  if (vipToastTimer) clearTimeout(vipToastTimer);
+  if (backdrop) {
+    backdrop.setAttribute('aria-hidden', 'false');
+    backdrop.classList.add('show');
+  }
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 9000);
+  vipToastTimer = setTimeout(hideVipToast, 16000);
 }
+
+document.getElementById('vipToastBackdrop').addEventListener('click', hideVipToast);
 
 document.getElementById('plusOneToggle').addEventListener('change', function (e) {
   const wrap = document.getElementById('plusOneFields');
@@ -711,10 +788,18 @@ async function submitVipApply(e) {
   }
 
   let toastMsg =
-    '<strong>Thank you for your VIP request.</strong> Our management will review it personally and get back to you soon. We truly appreciate your interest in The Horeca Meetup and will treat it with care.';
+    '<strong>Your VIP request is in.</strong>' +
+    '<span class="toast-lead">We have received your application and our leadership team will review it with the care these evenings deserve. You should expect a <em>personal</em> reply at the email address you shared—most notes go out within a few business days, though busy weeks can occasionally run a little longer.</span>' +
+    '<span class="toast-lead">There is nothing else you need to do on this page for now. Please watch your inbox (and, kindly, your spam or promotions folder) so our note does not slip past you.</span>' +
+    '<span class="toast-lead">If your plans change before you hear from us, simply reply once we write in—or reach out anytime to <em>events@thehorecastore.com</em>—and we will help.</span>' +
+    '<span class="toast-foot">Thank you for your interest in The Horeca Meetup. We are truly glad you are considering joining us at the table.</span>';
   if (hasPlusOne) {
     toastMsg =
-      '<strong>Thank you for your VIP request for you and your guest.</strong> Our management will review it personally and get back to you soon. We truly appreciate your interest in The Horeca Meetup.';
+      '<strong>Your VIP application for you and your guest is in.</strong>' +
+      '<span class="toast-lead">We have captured both names and contact details. Our team will review your joint request carefully and reply to the <em>primary</em> email you entered, with clear next steps and anything we need for your guest.</span>' +
+      '<span class="toast-lead">You may step away from this page for now. When our message arrives, either of you can reply in that thread or write directly to <em>events@thehorecastore.com</em> if something shifts before the dinner.</span>' +
+      '<span class="toast-lead">Should dates, attendance, or dietary realities change for either of you, a quick note back lets us adjust your request without losing your place in line.</span>' +
+      '<span class="toast-foot">We appreciate you sharing The Horeca Meetup with someone you trust. That means a great deal to us.</span>';
   }
   showVipToast(toastMsg);
 
