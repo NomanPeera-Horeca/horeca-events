@@ -187,6 +187,15 @@ async function qrPayloadToPngBytes(payload: string): Promise<Uint8Array> {
   return out;
 }
 
+type ResendTag = { name: string; value: string };
+
+/** Resend tag values must match ^[A-Za-z0-9_-]+$ · sanitise and clip to 256. */
+function sanitiseTagValue(v: unknown): string {
+  return String(v ?? "")
+    .replace(/[^A-Za-z0-9_-]+/g, "_")
+    .slice(0, 256);
+}
+
 async function sendResend(params: {
   apiKey: string;
   from: string;
@@ -194,6 +203,7 @@ async function sendResend(params: {
   to: string[];
   subject: string;
   html: string;
+  tags?: ResendTag[];
   attachments?: {
     filename: string;
     content: string;
@@ -201,7 +211,8 @@ async function sendResend(params: {
     content_type?: string;
   }[];
 }) {
-  const { apiKey, from, fromName, to, subject, html, attachments } = params;
+  const { apiKey, from, fromName, to, subject, html, attachments, tags } =
+    params;
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -214,6 +225,10 @@ async function sendResend(params: {
       subject,
       html,
       attachments: attachments ?? [],
+      tags: (tags ?? []).map((t) => ({
+        name: t.name,
+        value: sanitiseTagValue(t.value),
+      })),
     }),
   });
   if (!res.ok) {
@@ -598,6 +613,12 @@ Deno.serve(async (req) => {
           to: [reg.email as string],
           subject,
           html: emailHtml,
+          tags: [
+            { name: "registration_id", value: String(reg.id) },
+            { name: "event_slug", value: String(ev?.slug ?? "") },
+            { name: "template_slug", value: String(template.slug) },
+            { name: "recipient_type", value: "main" },
+          ],
         });
       } catch (e) {
         console.error(e);
@@ -650,6 +671,12 @@ Deno.serve(async (req) => {
               to: [poEmail],
               subject: pSub,
               html: pHtml,
+              tags: [
+                { name: "registration_id", value: String(reg.id) },
+                { name: "event_slug", value: String(ev?.slug ?? "") },
+                { name: "template_slug", value: String(plusTpl.slug) },
+                { name: "recipient_type", value: "plus_one" },
+              ],
             });
             plusOneEmailSent = true;
           } catch (e) {
@@ -692,6 +719,12 @@ Deno.serve(async (req) => {
         to: [to],
         subject,
         html,
+        tags: [
+          { name: "registration_id", value: String(reg.id) },
+          { name: "event_slug", value: String(ev?.slug ?? "") },
+          { name: "template_slug", value: String(template.slug) },
+          { name: "recipient_type", value: "main" },
+        ],
       });
       return corsJson({ ok: true, id: (sent as { id?: string }).id });
     } catch (e) {

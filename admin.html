@@ -478,6 +478,540 @@ th.vip-apply-th {
   .modal-detail { grid-template-columns: 1fr; gap: 4px; }
 }
 </style>
+
+<!-- Inter (used inside the engagement view — matches admin-dashboard-v3.html exactly) -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     ENGAGEMENT DASHBOARD · scoped to .engagement-view
+     Matches docs/admin-dashboard-v3.html pixel-for-pixel (typography,
+     colours, spacing, hover states, motion).
+     ═══════════════════════════════════════════════════════════════════════ -->
+<style>
+  .engagement-view {
+    /* palette tokens from admin-dashboard-v3.html */
+    --bg-base: #0a0907;
+    --bg-elevated: #131110;
+    --bg-card: #1a1816;
+    --bg-card-hover: #221f1c;
+    --bg-row-hover: #1d1a17;
+    --bg-row-zebra: #0f0d0b;
+    --border: #2a2624;
+    --border-light: #3a3431;
+    --gold: #c9a55c;
+    --gold-bright: #e0b870;
+    --gold-dim: #8b6f3a;
+    --gold-soft: rgba(201, 165, 92, 0.1);
+    --cream: #f5f1e8;
+    --text-primary: #f5f1e8;
+    --text-secondary: #b8aea0;
+    --text-tertiary: #6b6358;
+    --text-dim: #4a4540;
+    --green: #6ba368;
+    --green-bg: rgba(107, 163, 104, 0.1);
+    --red: #c93838;
+    --red-bg: rgba(201, 56, 56, 0.12);
+    --orange: #ff8a3d;
+    --orange-bg: rgba(255, 138, 61, 0.12);
+    --blue: #5a8aa8;
+    --blue-bg: rgba(90, 138, 168, 0.1);
+
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: 0;
+  }
+
+  .engagement-view * { box-sizing: border-box; }
+
+  .engagement-view .container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 28px 32px;
+  }
+
+  /* ───── PAGE HEADER ───── */
+  .engagement-view .page-header {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .engagement-view .page-header-left h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 38px;
+    font-weight: 500;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin: 0 0 8px;
+  }
+  .engagement-view .page-header-left h1 em {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 400;
+  }
+  .engagement-view .page-header-meta {
+    display: flex;
+    gap: 14px;
+    color: var(--text-tertiary);
+    font-size: 13px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .engagement-view .page-header-meta .dot { color: var(--gold-dim); }
+  .engagement-view .countdown {
+    background: var(--gold-soft);
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .engagement-view .countdown::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--gold);
+    animation: engPulse 2s ease-in-out infinite;
+  }
+  @keyframes engPulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.4; }
+  }
+
+  /* ───── STATS STRIP ───── */
+  .engagement-view .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .engagement-view .stat-cell {
+    background: var(--bg-elevated);
+    padding: 16px 18px;
+  }
+  .engagement-view .stat-cell .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-bottom: 8px;
+  }
+  .engagement-view .stat-cell .num {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    color: var(--text-primary);
+    font-weight: 500;
+    line-height: 1;
+  }
+  .engagement-view .stat-cell .num.gold  { color: var(--gold); }
+  .engagement-view .stat-cell .num.green { color: var(--green); }
+  .engagement-view .stat-cell .num.red   { color: var(--red); }
+  .engagement-view .stat-cell .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 4px;
+  }
+
+  /* ───── HINT BANNER ───── */
+  .engagement-view .hint {
+    background: linear-gradient(135deg, rgba(201, 165, 92, 0.08), rgba(201, 165, 92, 0.02));
+    border: 1px dashed var(--gold-dim);
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .engagement-view .hint::before { content: '👆'; font-size: 16px; }
+  .engagement-view .hint .gold { color: var(--gold); font-weight: 600; }
+
+  /* ───── CAMPAIGN ACCORDION ───── */
+  .engagement-view .campaign {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+  }
+  .engagement-view .campaign.expanded { border-color: var(--gold-dim); }
+  .engagement-view .campaign-bar {
+    padding: 18px 22px;
+    display: grid;
+    grid-template-columns: 24px 1fr auto;
+    gap: 20px;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .engagement-view .campaign-bar:hover { background: var(--bg-card); }
+  .engagement-view .chevron {
+    color: var(--gold);
+    font-size: 14px;
+    transition: transform 0.25s ease;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .engagement-view .campaign.expanded .chevron { transform: rotate(90deg); }
+  .engagement-view .campaign-info { display: flex; align-items: center; gap: 18px; min-width: 0; }
+  .engagement-view .campaign-icon {
+    width: 38px;
+    height: 38px;
+    background: var(--gold-soft);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .engagement-view .campaign-icon.scheduled {
+    background: var(--bg-card);
+    color: var(--text-dim);
+  }
+  .engagement-view .campaign-name {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+    line-height: 1.2;
+  }
+  .engagement-view .campaign-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .engagement-view .campaign-sub .dot  { color: var(--gold-dim); }
+  .engagement-view .campaign-sub .live { color: var(--gold); }
+
+  .engagement-view .campaign-stats {
+    display: flex;
+    gap: 22px;
+    align-items: center;
+  }
+  .engagement-view .cs { text-align: center; min-width: 58px; }
+  .engagement-view .cs .pct {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: var(--text-primary);
+    font-weight: 500;
+    line-height: 1;
+  }
+  .engagement-view .cs .pct.dim  { color: var(--text-dim); }
+  .engagement-view .cs .pct.gold { color: var(--gold-bright); }
+  .engagement-view .cs .pct.red  { color: var(--red); }
+  .engagement-view .cs .pct-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-top: 5px;
+  }
+
+  /* ───── EXPANDED TABLE ───── */
+  .engagement-view .recipient-table-wrap {
+    display: none;
+    border-top: 1px solid var(--border);
+    background: var(--bg-base);
+  }
+  .engagement-view .campaign.expanded .recipient-table-wrap { display: block; }
+  .engagement-view .table-toolbar {
+    padding: 12px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-card);
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .engagement-view .table-toolbar-left {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .engagement-view .filter-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-right: 6px;
+  }
+  .engagement-view .filter-mini {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 4px 11px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .engagement-view .filter-mini:hover { color: var(--gold); border-color: var(--gold-dim); }
+  .engagement-view .filter-mini.active {
+    background: var(--gold-soft);
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+  .engagement-view .table-toolbar-right { display: flex; gap: 8px; }
+  .engagement-view .eng-btn {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .engagement-view .eng-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
+
+  .engagement-view .table-scroll { overflow-x: auto; }
+  .engagement-view .recipient-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .engagement-view .recipient-table thead { background: var(--bg-card); }
+  .engagement-view .recipient-table thead th {
+    padding: 11px 16px;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .engagement-view .recipient-table thead th.center { text-align: center; }
+  .engagement-view .recipient-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s ease;
+  }
+  .engagement-view .recipient-table tbody tr:nth-child(even) { background: var(--bg-row-zebra); }
+  .engagement-view .recipient-table tbody tr:hover { background: var(--bg-row-hover); }
+  .engagement-view .recipient-table tbody tr:last-child { border-bottom: none; }
+  .engagement-view .recipient-table td {
+    padding: 13px 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+  .engagement-view .recipient-table td.center { text-align: center; }
+  .engagement-view .recipient-table td .name {
+    color: var(--text-primary);
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .engagement-view .recipient-table td .email {
+    color: var(--text-tertiary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+  .engagement-view .recipient-table td .biz  { color: var(--text-secondary); }
+  .engagement-view .recipient-table td .role {
+    color: var(--text-tertiary);
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  /* ───── CHECK / × ICONS ───── */
+  .engagement-view .check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .engagement-view .check.yes     { background: var(--green-bg); color: var(--green); }
+  .engagement-view .check.no      { background: var(--bg-card); color: var(--text-dim); }
+  .engagement-view .check.bounce  { background: var(--red-bg);   color: var(--red); }
+  .engagement-view .check.pending { background: var(--bg-card);  color: var(--text-dim); }
+
+  .engagement-view .fwd-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .engagement-view .fwd-pill.yes   { background: var(--orange-bg); color: var(--orange); }
+  .engagement-view .fwd-pill.maybe { background: var(--blue-bg);   color: var(--blue); }
+  .engagement-view .fwd-pill.no    { color: var(--text-dim); }
+
+  .engagement-view .count-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-card);
+    border-radius: 100px;
+    padding: 3px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 36px;
+    justify-content: center;
+  }
+  .engagement-view .count-pill.active { background: var(--gold-soft); color: var(--gold); }
+  .engagement-view .count-pill.zero   { background: transparent;       color: var(--text-dim); font-weight: 400; }
+
+  .engagement-view .activity-cell {
+    color: var(--text-tertiary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+  .engagement-view .activity-cell.recent { color: var(--gold); }
+
+  /* ───── ROW ACTION BUTTONS ───── */
+  .engagement-view .action-btns {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+  }
+  .engagement-view .action-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-tertiary);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .engagement-view .action-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
+  .engagement-view .action-btn.primary {
+    background: var(--gold);
+    color: var(--bg-base);
+    border-color: var(--gold);
+  }
+  .engagement-view .action-btn.primary:hover { background: var(--gold-bright); }
+
+  /* ───── BULK BAR ───── */
+  .engagement-view .bulk-bar {
+    padding: 14px 22px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-card);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .engagement-view .bulk-text { color: var(--text-secondary); font-size: 12px; }
+  .engagement-view .bulk-text .num {
+    color: var(--gold);
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .engagement-view .bulk-actions { display: flex; gap: 8px; }
+
+  /* ───── TOOLTIP ───── */
+  .engagement-view [data-tip] { position: relative; }
+  .engagement-view [data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    color: var(--text-primary);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    margin-bottom: 6px;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  /* ───── REALTIME GOLD PULSE ───── */
+  @keyframes engRowPulse {
+    0%   { background: var(--gold-soft); }
+    100% { background: transparent; }
+  }
+  .engagement-view tr.eng-pulse,
+  .engagement-view td.eng-pulse,
+  .engagement-view .eng-pulse { animation: engRowPulse 600ms ease-out; }
+
+  /* ───── EMPTY STATES ───── */
+  .engagement-view .eng-empty,
+  .engagement-view .eng-loading {
+    padding: 40px;
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ───── MOBILE ───── */
+  @media (max-width: 1100px) {
+    .engagement-view .stats-strip  { grid-template-columns: repeat(3, 1fr); }
+    .engagement-view .campaign-stats { gap: 12px; }
+    .engagement-view .cs .pct        { font-size: 18px; }
+  }
+  @media (max-width: 768px) {
+    .engagement-view .container        { padding: 16px; }
+    .engagement-view .stats-strip      { grid-template-columns: repeat(2, 1fr); }
+    .engagement-view .page-header      { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .engagement-view .page-header-left h1 { font-size: 28px; }
+    .engagement-view .campaign-bar     { grid-template-columns: 24px 1fr; }
+    .engagement-view .campaign-stats   { display: none; }
+  }
+  @media (max-width: 375px) {
+    .engagement-view .container        { padding: 12px; }
+    .engagement-view .stats-strip      { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
 </head>
 <body>
 
@@ -514,6 +1048,7 @@ th.vip-apply-th {
     <nav class="header-tabs" aria-label="Main views">
       <button type="button" class="header-tab active" id="tabRsvp" data-tab="rsvp">REGISTRATIONS</button>
       <button type="button" class="header-tab" id="tabDoor" data-tab="door">DOOR</button>
+      <button type="button" class="header-tab" id="tabEngagement" data-tab="engagement">ENGAGEMENT</button>
     </nav>
     <div class="header-user">
       <span class="user-email" id="userEmail"></span>
@@ -633,6 +1168,68 @@ th.vip-apply-th {
       <ul id="doorLast5"></ul>
     </div>
   </div>
+
+  <!-- ═══════════ ENGAGEMENT DASHBOARD (Mailchimp-style) ═══════════ -->
+  <div id="viewEngagement" class="view-panel engagement-view view-hidden">
+    <div class="container">
+
+      <!-- page header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>Engagement <em>Dashboard</em></h1>
+          <div class="page-header-meta" id="engHeaderMeta">
+            <span>Loading…</span>
+          </div>
+        </div>
+        <div class="countdown" id="engCountdown" style="display:none;"></div>
+      </div>
+
+      <!-- top stats strip: aggregated across ALL campaigns for current event -->
+      <div class="stats-strip">
+        <div class="stat-cell">
+          <div class="label">Sent</div>
+          <div class="num"      id="engStatSent">—</div>
+          <div class="meta"     id="engStatSentMeta">total recipients</div>
+        </div>
+        <div class="stat-cell">
+          <div class="label">Delivered</div>
+          <div class="num green" id="engStatDelivered">—</div>
+          <div class="meta"      id="engStatDeliveredMeta">— delivery rate</div>
+        </div>
+        <div class="stat-cell">
+          <div class="label">Opened</div>
+          <div class="num gold"  id="engStatOpened">—</div>
+          <div class="meta"      id="engStatOpenedMeta">— open rate</div>
+        </div>
+        <div class="stat-cell">
+          <div class="label">Clicked</div>
+          <div class="num gold"  id="engStatClicked">—</div>
+          <div class="meta"      id="engStatClickedMeta">— click rate</div>
+        </div>
+        <div class="stat-cell">
+          <div class="label">Forwarded</div>
+          <div class="num gold"  id="engStatForwarded">—</div>
+          <div class="meta"      id="engStatForwardedMeta">— likely shared</div>
+        </div>
+        <div class="stat-cell">
+          <div class="label">Bounced</div>
+          <div class="num red"   id="engStatBounced">—</div>
+          <div class="meta"      id="engStatBouncedMeta">— needs cleanup</div>
+        </div>
+      </div>
+
+      <!-- hint -->
+      <div class="hint">
+        <div>Click any <span class="gold">campaign bar below</span> to expand inline and see every recipient with their per-email engagement.</div>
+      </div>
+
+      <!-- campaign accordion (rendered from email_templates + v_campaign_summary) -->
+      <div id="engCampaignList">
+        <div class="eng-loading">Loading campaigns…</div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════ DETAIL MODAL ═══════════ -->
@@ -684,6 +1281,17 @@ let activeRegistration = null;
 let mainTab = 'rsvp';
 let doorFilter = 'pending';
 let doorChannel = null;
+
+/* ───── Engagement dashboard state ──────────────────────────────────────── */
+let engChannel = null;              // Supabase Realtime channel for email_events
+let engCampaignSummary = {};        // { slug: { sent_count, delivered_count, ... } }
+let engRecipientCache = {};         // { slug: [ {registration_id, ... } ] }
+let engExpanded = new Set();        // slugs currently expanded
+let engFilterBySlug = {};           // { slug: 'all'|'opened'|'notOpened'|'clicked'|'forwarded'|'bounced' }
+let engEventLoadedFor = null;       // event_id the current data was loaded for
+let engRegistrationCount = 0;       // total registrations for event (for "recipients queued")
+let engStatsTotals = null;          // { sent, delivered, opened, clicked, forwarded, bounced, base }
+const ENG_STATUS_MAP = { approval: 'sent', default: 'scheduled' };
 
 function getStaffMobileCheckinUrl() {
   if (!currentEventId) return '';
@@ -1235,8 +1843,10 @@ function setMainTab(tab) {
   mainTab = tab;
   document.getElementById('tabRsvp').classList.toggle('active', tab === 'rsvp');
   document.getElementById('tabDoor').classList.toggle('active', tab === 'door');
+  document.getElementById('tabEngagement').classList.toggle('active', tab === 'engagement');
   document.getElementById('viewRegs').classList.toggle('view-hidden', tab !== 'rsvp');
   document.getElementById('viewDoor').classList.toggle('view-hidden', tab !== 'door');
+  document.getElementById('viewEngagement').classList.toggle('view-hidden', tab !== 'engagement');
   if (tab === 'door') {
     renderDoorTable();
     loadDoorFeed();
@@ -1244,6 +1854,13 @@ function setMainTab(tab) {
   } else if (doorChannel) {
     supabaseClient.removeChannel(doorChannel);
     doorChannel = null;
+  }
+  if (tab === 'engagement') {
+    loadEngagementDashboard();
+    subscribeEngagementRealtime();
+  } else if (engChannel) {
+    supabaseClient.removeChannel(engChannel);
+    engChannel = null;
   }
 }
 
@@ -1364,10 +1981,16 @@ function setupEventListeners() {
       loadDoorFeed();
       subscribeDoorRealtime();
     }
+    if (mainTab === 'engagement') {
+      engEventLoadedFor = null;
+      loadEngagementDashboard();
+      subscribeEngagementRealtime();
+    }
   });
 
   document.getElementById('tabRsvp').addEventListener('click', () => setMainTab('rsvp'));
   document.getElementById('tabDoor').addEventListener('click', () => setMainTab('door'));
+  document.getElementById('tabEngagement').addEventListener('click', () => setMainTab('engagement'));
 
   document.querySelectorAll('.door-filter').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -1868,6 +2491,674 @@ function showToast(message) {
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 5000);
 }
+
+// ═══════════════════════════════════════════════════════════════
+// ENGAGEMENT DASHBOARD  (PRD v2.0 FINAL · Sections 5 + 9)
+// Wires to public.v_campaign_summary + public.v_recipient_engagement.
+// ═══════════════════════════════════════════════════════════════
+
+/** Campaign slugs that we surface on the dashboard (first is the "sent"
+ *  approval, the four after it are the scheduled reminders for Vol. II). */
+const ENG_CAMPAIGNS = [
+  { slug: 'approval',          name: 'Approval Email',          schedule: null },
+  { slug: 'reminder-2weeks',   name: '2-Week Reminder',         schedule: null },
+  { slug: 'reminder-1week',    name: '1-Week Reminder',         schedule: null },
+  { slug: 'reminder-day-before', name: 'Day-Before Reminder',   schedule: null },
+  { slug: 'reminder-day-of',   name: 'Day-Of · QR Resend',      schedule: null },
+];
+
+function engPct(num, denom) {
+  if (!denom || denom <= 0) return 0;
+  return Math.round((num / denom) * 100);
+}
+
+function engFmtPct(num, denom) {
+  if (!denom || denom <= 0) return '—';
+  return engPct(num, denom) + '%';
+}
+
+function engFmtTimeAgo(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '—';
+  const s = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (s < 60)      return 'just now';
+  if (s < 3600)    return Math.floor(s / 60)    + ' min ago';
+  if (s < 86400)   return Math.floor(s / 3600)  + ' hr ago';
+  if (s < 86400*7) return Math.floor(s / 86400) + ' days ago';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function engFmtSentLabel(iso) {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return null;
+  const date = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  return `Sent ${date} · ${time}`;
+}
+
+async function loadEngagementDashboard() {
+  if (!currentEventId) return;
+  if (engEventLoadedFor === currentEventId && Object.keys(engCampaignSummary).length) {
+    renderEngagementAll();
+    return;
+  }
+  engEventLoadedFor = currentEventId;
+  engCampaignSummary = {};
+  engRecipientCache  = {};
+
+  await Promise.all([
+    loadEngagementHeader(),
+    loadCampaignSummaries(),
+  ]);
+  renderEngagementAll();
+}
+
+async function loadEngagementHeader() {
+  const meta = document.getElementById('engHeaderMeta');
+  const countdownEl = document.getElementById('engCountdown');
+  countdownEl.style.display = 'none';
+  meta.innerHTML = '<span>Loading event…</span>';
+
+  const { data: ev } = await supabaseClient
+    .from('events')
+    .select('city, volume_roman, event_date, status')
+    .eq('id', currentEventId)
+    .maybeSingle();
+
+  const { count: regCount } = await supabaseClient
+    .from('registrations')
+    .select('*', { count: 'exact', head: true })
+    .eq('event_id', currentEventId);
+
+  const { count: approvedCount } = await supabaseClient
+    .from('registrations')
+    .select('*', { count: 'exact', head: true })
+    .eq('event_id', currentEventId)
+    .eq('status', 'approved');
+
+  engRegistrationCount = regCount || 0;
+
+  if (!ev) {
+    meta.innerHTML = '<span>Event not found</span>';
+    return;
+  }
+
+  const d = ev.event_date ? new Date(ev.event_date) : null;
+  const dateStr = d && !isNaN(d.getTime())
+    ? d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    : '';
+  const approvedSeats = approvedCount || 0;
+
+  meta.innerHTML = `
+    <span>${escape(ev.city || '')} Vol. ${escape(ev.volume_roman || '')}</span>
+    <span class="dot">·</span>
+    <span>${escape(dateStr)}</span>
+    <span class="dot">·</span>
+    <span>${approvedSeats} of 100 seats confirmed</span>
+  `;
+
+  if (d && !isNaN(d.getTime())) {
+    const msUntil = d.getTime() - Date.now();
+    if (msUntil > 0) {
+      const days = Math.ceil(msUntil / 86400000);
+      countdownEl.textContent = `${days} ${days === 1 ? 'day' : 'days'} to event`;
+      countdownEl.style.display = 'flex';
+    } else if (msUntil > -86400000) {
+      countdownEl.textContent = 'Event day';
+      countdownEl.style.display = 'flex';
+    }
+  }
+}
+
+async function loadCampaignSummaries() {
+  const { data, error } = await supabaseClient
+    .from('v_campaign_summary')
+    .select('*')
+    .eq('event_id', currentEventId);
+
+  if (error) {
+    console.error('[eng] loadCampaignSummaries', error);
+    engCampaignSummary = {};
+    return;
+  }
+  engCampaignSummary = {};
+  (data || []).forEach((row) => {
+    engCampaignSummary[row.email_template_slug] = row;
+  });
+}
+
+/** Renders top stats strip + accordion. Safe to re-invoke. */
+function renderEngagementAll() {
+  renderEngagementStats();
+  renderCampaignList();
+}
+
+function renderEngagementStats() {
+  let sent = 0, delivered = 0, opened = 0, clicked = 0, forwarded = 0, bounced = 0;
+  ENG_CAMPAIGNS.forEach((c) => {
+    const s = engCampaignSummary[c.slug];
+    if (!s) return;
+    sent      += s.sent_count      || 0;
+    delivered += s.delivered_count || 0;
+    opened    += s.opened_count    || 0;
+    clicked   += s.clicked_count   || 0;
+    forwarded += s.forwarded_count || 0;
+    bounced   += s.bounced_count   || 0;
+  });
+
+  engStatsTotals = { sent, delivered, opened, clicked, forwarded, bounced };
+
+  document.getElementById('engStatSent').textContent      = sent || '0';
+  document.getElementById('engStatSentMeta').textContent  = 'total recipients';
+
+  document.getElementById('engStatDelivered').textContent = delivered || '0';
+  document.getElementById('engStatDeliveredMeta').textContent =
+    sent ? (engPct(delivered, sent) + '% delivery rate') : '—';
+
+  document.getElementById('engStatOpened').textContent = opened || '0';
+  document.getElementById('engStatOpenedMeta').textContent =
+    delivered ? (engPct(opened, delivered) + '% open rate') : '—';
+
+  document.getElementById('engStatClicked').textContent = clicked || '0';
+  document.getElementById('engStatClickedMeta').textContent =
+    delivered ? (engPct(clicked, delivered) + '% click rate') : '—';
+
+  document.getElementById('engStatForwarded').textContent = forwarded || '0';
+  document.getElementById('engStatForwardedMeta').textContent =
+    delivered ? (engPct(forwarded, delivered) + '% likely shared') : '—';
+
+  document.getElementById('engStatBounced').textContent = bounced || '0';
+  document.getElementById('engStatBouncedMeta').textContent =
+    sent ? (engPct(bounced, sent) + '% needs cleanup') : '—';
+}
+
+function renderCampaignList() {
+  const host = document.getElementById('engCampaignList');
+  host.innerHTML = '';
+  ENG_CAMPAIGNS.forEach((c) => {
+    host.appendChild(renderCampaignCard(c));
+  });
+  if (!ENG_CAMPAIGNS.length) {
+    host.innerHTML = '<div class="eng-empty">No campaigns configured.</div>';
+  }
+}
+
+function renderCampaignCard(campaign) {
+  const summary = engCampaignSummary[campaign.slug];
+  const isSent  = !!(summary && (summary.sent_count || 0) > 0);
+  const card = document.createElement('div');
+  card.className = 'campaign' + (engExpanded.has(campaign.slug) ? ' expanded' : '');
+  card.id = 'eng-c-' + campaign.slug;
+  card.dataset.slug = campaign.slug;
+
+  const recipients = isSent ? (summary.sent_count || 0) : engRegistrationCount;
+  const deliveredPct = isSent ? engFmtPct(summary.delivered_count, summary.sent_count) : '—';
+  const openedPct    = isSent ? engFmtPct(summary.opened_count,    summary.delivered_count || summary.sent_count) : '—';
+  const clickedPct   = isSent ? engFmtPct(summary.clicked_count,   summary.delivered_count || summary.sent_count) : '—';
+  const calAddPct    = isSent ? engFmtPct(summary.cal_added_count, summary.delivered_count || summary.sent_count) : '—';
+  const fwdPct       = isSent ? engFmtPct(summary.forwarded_count, summary.delivered_count || summary.sent_count) : '—';
+  const bouncedPct   = isSent ? engFmtPct(summary.bounced_count,   summary.sent_count) : '—';
+
+  const subLeft = isSent
+    ? (engFmtSentLabel(summary.first_sent_at) || 'Sent')
+    : `Scheduled${campaign.schedule ? ' · ' + campaign.schedule : ''}`;
+  const recipText = isSent
+    ? `${recipients} recipients`
+    : `${recipients || 0} recipients queued`;
+
+  const pctClassGold = isSent ? 'gold' : 'dim';
+  const pctClassBnc  = isSent ? 'red'  : 'dim';
+
+  card.innerHTML = `
+    <div class="campaign-bar" data-role="bar">
+      <span class="chevron">▶</span>
+      <div class="campaign-info">
+        <div class="campaign-icon${isSent ? '' : ' scheduled'}">${isSent ? '📧' : '⏸'}</div>
+        <div>
+          <div class="campaign-name">${escape(campaign.name)}</div>
+          <div class="campaign-sub">
+            <span>${escape(subLeft)}</span>
+            <span class="dot">·</span>
+            <span>${escape(recipText)}</span>
+            ${isSent ? '<span class="dot">·</span><span class="live">● Live · tracking</span>' : ''}
+          </div>
+        </div>
+      </div>
+      <div class="campaign-stats">
+        <div class="cs"><div class="pct ${pctClassGold}">${deliveredPct}</div><div class="pct-label">Delivered</div></div>
+        <div class="cs"><div class="pct ${pctClassGold}">${openedPct}</div><div class="pct-label">Opened</div></div>
+        <div class="cs"><div class="pct ${pctClassGold}">${clickedPct}</div><div class="pct-label">Clicked</div></div>
+        <div class="cs"><div class="pct ${pctClassGold}">${calAddPct}</div><div class="pct-label">Cal Add</div></div>
+        <div class="cs"><div class="pct ${pctClassGold}">${fwdPct}</div><div class="pct-label">Fwd</div></div>
+        <div class="cs"><div class="pct ${pctClassBnc}">${bouncedPct}</div><div class="pct-label">Bounced</div></div>
+      </div>
+    </div>
+    <div class="recipient-table-wrap">
+      ${isSent
+        ? renderRecipientTableShell(campaign.slug)
+        : '<div class="eng-empty">Campaign not yet sent. Recipient table will populate after the scheduled send.</div>'}
+    </div>
+  `;
+
+  const bar = card.querySelector('[data-role="bar"]');
+  bar.addEventListener('click', () => toggleEngCampaign(campaign.slug));
+
+  const wrap = card.querySelector('.recipient-table-wrap');
+  if (wrap) wrap.addEventListener('click', (e) => e.stopPropagation());
+
+  if (isSent && engExpanded.has(campaign.slug)) {
+    queueRecipientRender(campaign.slug);
+  }
+
+  return card;
+}
+
+function renderRecipientTableShell(slug) {
+  const filter = engFilterBySlug[slug] || 'all';
+  return `
+    <div class="table-toolbar">
+      <div class="table-toolbar-left" data-filter-group="${escape(slug)}">
+        <span class="filter-label">Filter:</span>
+        <div class="filter-mini ${filter==='all'?'active':''}"        data-filter="all">All <span data-count="all">—</span></div>
+        <div class="filter-mini ${filter==='opened'?'active':''}"     data-filter="opened">Opened <span data-count="opened">—</span></div>
+        <div class="filter-mini ${filter==='notOpened'?'active':''}"  data-filter="notOpened">Not Opened <span data-count="notOpened">—</span></div>
+        <div class="filter-mini ${filter==='clicked'?'active':''}"    data-filter="clicked">Clicked <span data-count="clicked">—</span></div>
+        <div class="filter-mini ${filter==='forwarded'?'active':''}"  data-filter="forwarded">Forwarded <span data-count="forwarded">—</span></div>
+        <div class="filter-mini ${filter==='bounced'?'active':''}"    data-filter="bounced">Bounced <span data-count="bounced">—</span></div>
+      </div>
+      <div class="table-toolbar-right">
+        <button class="eng-btn" data-action="export-csv" data-slug="${escape(slug)}">Export CSV</button>
+        <button class="eng-btn" data-action="resend-cold" data-slug="${escape(slug)}">Resend to Cold</button>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table class="recipient-table" data-slug="${escape(slug)}">
+        <thead>
+          <tr>
+            <th>Recipient</th>
+            <th>Business</th>
+            <th class="center" data-tip="Email reached inbox">Delivered</th>
+            <th class="center" data-tip="At least one open">Opened</th>
+            <th class="center" data-tip="Total opens">Times</th>
+            <th class="center" data-tip="Link clicks">Clicked</th>
+            <th class="center" data-tip="Added event to their calendar">Cal Add</th>
+            <th class="center" data-tip="Email opened from multiple cities or devices — likely forwarded">Fwd</th>
+            <th>Last Activity</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody data-slug="${escape(slug)}"><tr><td colspan="10" class="eng-loading">Loading recipients…</td></tr></tbody>
+      </table>
+    </div>
+    <div class="bulk-bar">
+      <div class="bulk-text"><span data-role="showing-count" data-slug="${escape(slug)}">Showing 0</span> of <span data-role="total-count" data-slug="${escape(slug)}">0</span> recipients</div>
+      <div class="bulk-actions">
+        <button class="eng-btn" data-action="whatsapp-cold" data-slug="${escape(slug)}">Send WhatsApp to Cold (<span data-role="cold-count" data-slug="${escape(slug)}">0</span>)</button>
+        <button class="eng-btn" data-action="open-full" data-slug="${escape(slug)}">Open Full View</button>
+      </div>
+    </div>
+  `;
+}
+
+function toggleEngCampaign(slug) {
+  const card = document.getElementById('eng-c-' + slug);
+  if (!card) return;
+  const summary = engCampaignSummary[slug];
+  const isSent  = !!(summary && (summary.sent_count || 0) > 0);
+
+  if (engExpanded.has(slug)) {
+    engExpanded.delete(slug);
+    card.classList.remove('expanded');
+    return;
+  }
+  engExpanded.add(slug);
+  card.classList.add('expanded');
+
+  if (isSent) {
+    const wrap = card.querySelector('.recipient-table-wrap');
+    if (wrap && !wrap.dataset.hydrated) {
+      wrap.innerHTML = renderRecipientTableShell(slug);
+      wrap.addEventListener('click', (e) => e.stopPropagation());
+      wrap.dataset.hydrated = '1';
+      wireUpCampaignToolbar(card, slug);
+    }
+    queueRecipientRender(slug);
+  }
+}
+
+function wireUpCampaignToolbar(card, slug) {
+  card.querySelectorAll('[data-filter]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      engFilterBySlug[slug] = el.dataset.filter;
+      card.querySelectorAll('[data-filter]').forEach((x) => x.classList.toggle('active', x === el));
+      renderRecipientRows(slug);
+    });
+  });
+  card.querySelectorAll('[data-action]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleEngAction(btn.dataset.action, slug);
+    });
+  });
+}
+
+async function queueRecipientRender(slug) {
+  if (engRecipientCache[slug]) {
+    renderRecipientRows(slug);
+    return;
+  }
+  await loadRecipientsForSlug(slug);
+  renderRecipientRows(slug);
+}
+
+async function loadRecipientsForSlug(slug) {
+  const { data, error } = await supabaseClient
+    .from('v_recipient_engagement')
+    .select('*')
+    .eq('email_template_slug', slug)
+    .eq('event_id', currentEventId)
+    .order('open_count', { ascending: false });
+  if (error) {
+    console.error('[eng] loadRecipients', slug, error);
+    engRecipientCache[slug] = [];
+    return;
+  }
+  engRecipientCache[slug] = data || [];
+}
+
+function engRecipientStateBucket(r) {
+  if (r.bounced) return 'bounced';
+  if (!r.opened) return 'notOpened';
+  return 'opened';
+}
+
+function filterRecipients(slug) {
+  const rows = engRecipientCache[slug] || [];
+  const filter = engFilterBySlug[slug] || 'all';
+  switch (filter) {
+    case 'opened':    return rows.filter((r) => r.opened && !r.bounced);
+    case 'notOpened': return rows.filter((r) => r.delivered && !r.opened && !r.bounced);
+    case 'clicked':   return rows.filter((r) => (r.click_count || 0) > 0);
+    case 'forwarded': return rows.filter((r) => !!r.forwarded_status);
+    case 'bounced':   return rows.filter((r) => r.bounced);
+    case 'all':
+    default:          return rows;
+  }
+}
+
+function renderRecipientRows(slug) {
+  const card = document.getElementById('eng-c-' + slug);
+  if (!card) return;
+  const tbody = card.querySelector(`tbody[data-slug="${CSS.escape(slug)}"]`);
+  if (!tbody) return;
+
+  const rows = engRecipientCache[slug] || [];
+  const visible = filterRecipients(slug);
+
+  if (!visible.length) {
+    tbody.innerHTML = '<tr><td colspan="10" class="eng-empty">No recipients match this filter.</td></tr>';
+  } else {
+    tbody.innerHTML = visible.map((r) => renderRecipientRowHtml(r)).join('');
+  }
+
+  const counts = {
+    all:       rows.length,
+    opened:    rows.filter((r) => r.opened && !r.bounced).length,
+    notOpened: rows.filter((r) => r.delivered && !r.opened && !r.bounced).length,
+    clicked:   rows.filter((r) => (r.click_count || 0) > 0).length,
+    forwarded: rows.filter((r) => !!r.forwarded_status).length,
+    bounced:   rows.filter((r) => r.bounced).length,
+  };
+  Object.entries(counts).forEach(([k, v]) => {
+    const el = card.querySelector(`[data-count="${k}"]`);
+    if (el) el.textContent = v;
+  });
+
+  const showingEl = card.querySelector(`[data-role="showing-count"][data-slug="${CSS.escape(slug)}"]`);
+  const totalEl   = card.querySelector(`[data-role="total-count"][data-slug="${CSS.escape(slug)}"]`);
+  const coldEl    = card.querySelector(`[data-role="cold-count"][data-slug="${CSS.escape(slug)}"]`);
+  if (showingEl) showingEl.textContent = 'Showing ' + visible.length;
+  if (totalEl)   totalEl.textContent   = rows.length;
+  if (coldEl)    coldEl.textContent    = counts.notOpened;
+}
+
+function renderRecipientRowHtml(r) {
+  const fullName = r.full_name || r.email || '—';
+
+  const deliveredCell = r.bounced
+    ? '<span class="check bounce">✗</span>'
+    : (r.delivered
+        ? '<span class="check yes">✓</span>'
+        : '<span class="check pending">—</span>');
+
+  const openedCell = r.opened
+    ? '<span class="check yes">✓</span>'
+    : '<span class="check no">—</span>';
+
+  const timesCount = r.open_count || 0;
+  const timesCell  = timesCount > 0
+    ? `<span class="count-pill active">${timesCount}</span>`
+    : '<span class="count-pill zero">0</span>';
+
+  const clickCount = r.click_count || 0;
+  const clickedCell = clickCount > 0
+    ? `<span class="count-pill active">${clickCount}</span>`
+    : '<span class="count-pill zero">0</span>';
+
+  const calCell = r.calendar_added
+    ? '<span class="check yes">✓</span>'
+    : '<span class="check no">—</span>';
+
+  let fwdCell = '<span class="fwd-pill no">—</span>';
+  if (r.forwarded_status === 'yes') {
+    fwdCell = '<span class="fwd-pill yes" data-tip="Opens from 2+ cities or 3+ IPs">↗ Yes</span>';
+  } else if (r.forwarded_status === 'maybe') {
+    fwdCell = '<span class="fwd-pill maybe" data-tip="Opens from 3+ distinct devices">↗ Maybe</span>';
+  }
+
+  let activityText = '—';
+  let activityClass = 'activity-cell';
+  if (r.bounced) {
+    activityText = 'bounced';
+    activityClass = 'activity-cell';
+  } else if (r.last_activity) {
+    activityText = engFmtTimeAgo(r.last_activity);
+    const hrsAgo = (Date.now() - new Date(r.last_activity).getTime()) / 3600000;
+    if (hrsAgo < 6) activityClass += ' recent';
+  } else if (!r.opened && r.delivered) {
+    activityText = 'sent';
+  }
+
+  let action;
+  if (r.bounced) {
+    action = { label: 'Fix Email', cls: '', fn: 'engActionFixEmail' };
+  } else if (!r.opened) {
+    action = { label: 'Nudge', cls: 'primary', fn: 'engActionNudge' };
+  } else {
+    action = { label: 'View', cls: '', fn: 'engActionView' };
+  }
+
+  const activityStyle = r.bounced ? ' style="color:var(--red);"' : '';
+
+  return `
+    <tr data-registration-id="${escape(r.registration_id)}">
+      <td>
+        <div class="name">${escape(fullName)}</div>
+        <div class="email">${escape(r.email || '')}</div>
+      </td>
+      <td>
+        <div class="biz">${escape(r.business_name || '—')}</div>
+        <div class="role">${escape(r.role_title || '')}</div>
+      </td>
+      <td class="center">${deliveredCell}</td>
+      <td class="center">${openedCell}</td>
+      <td class="center">${timesCell}</td>
+      <td class="center">${clickedCell}</td>
+      <td class="center">${calCell}</td>
+      <td class="center">${fwdCell}</td>
+      <td><span class="${activityClass}"${activityStyle}>${escape(activityText)}</span></td>
+      <td>
+        <div class="action-btns">
+          <button class="action-btn ${action.cls}" onclick="${action.fn}('${escape(r.registration_id)}')">${escape(action.label)}</button>
+        </div>
+      </td>
+    </tr>
+  `;
+}
+
+function engActionView(regId) {
+  const reg = allRegistrations.find((x) => x.id === regId);
+  if (reg && typeof viewDetail === 'function') {
+    viewDetail(regId);
+  } else {
+    showToast('<strong>View.</strong> Recipient detail opens from the Registrations tab.');
+  }
+}
+function engActionNudge(regId) {
+  const reg = allRegistrations.find((x) => x.id === regId);
+  const phone = reg ? normPhoneDigits(reg.phone || '') : '';
+  const name = reg ? (reg.first_name || reg.email || 'there') : 'there';
+  const msg = encodeURIComponent(
+    `Hi ${name}, just a nudge — you're on the guest list for The Horeca Meetup. Haven't seen you open the confirmation email yet. Let me know if you need anything? — Noman`
+  );
+  if (phone) {
+    window.open(`https://wa.me/${phone}?text=${msg}`, '_blank', 'noopener');
+  } else {
+    showToast('<strong>No phone on file.</strong> Open the registration to add one.');
+  }
+}
+function engActionFixEmail(regId) {
+  const reg = allRegistrations.find((x) => x.id === regId);
+  if (reg && typeof viewDetail === 'function') {
+    viewDetail(regId);
+    showToast('<strong>Fix email.</strong> Update the address in the guest detail, then re-approve.');
+  } else {
+    showToast('<strong>Bounced.</strong> Open this guest in the Registrations tab to fix their email.');
+  }
+}
+
+function handleEngAction(action, slug) {
+  if (action === 'export-csv')       return engExportCsv(slug);
+  if (action === 'resend-cold')      return engResendCold(slug);
+  if (action === 'whatsapp-cold')    return engWhatsAppCold(slug);
+  if (action === 'open-full')        return engOpenFullView(slug);
+}
+
+function engExportCsv(slug) {
+  const rows = filterRecipients(slug);
+  if (!rows.length) { showToast('<strong>Nothing to export.</strong>'); return; }
+  const header = ['name','email','business','role','delivered','opened','open_count','click_count','cal_added','forwarded','last_activity'];
+  const csv = [header.join(',')]
+    .concat(rows.map((r) => [
+      r.full_name, r.email, r.business_name, r.role_title,
+      r.delivered, r.opened, r.open_count, r.click_count,
+      r.calendar_added, r.forwarded_status || '', r.last_activity || '',
+    ].map((x) => `"${String(x ?? '').replace(/"/g, '""')}"`).join(',')))
+    .join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${slug}-engagement.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+function engResendCold(slug) {
+  showToast('<strong>Resend to Cold.</strong> Phase 2 — use the Registrations tab → Approved → Resend for individual guests.');
+}
+function engWhatsAppCold(slug) {
+  showToast('<strong>Send WhatsApp to Cold.</strong> Phase 2 — for now, open each cold guest via the row Nudge button.');
+}
+function engOpenFullView(slug) {
+  const rows = filterRecipients(slug);
+  const total = (engRecipientCache[slug] || []).length;
+  showToast(`<strong>${slug}</strong> · ${rows.length} of ${total} rows visible inline. Full-page view is Phase 2.`);
+}
+
+/* ───── Realtime: subscribe to email_events INSERT ────────────────────── */
+function subscribeEngagementRealtime() {
+  if (!currentEventId) return;
+  if (engChannel) {
+    supabaseClient.removeChannel(engChannel);
+    engChannel = null;
+  }
+  engChannel = supabaseClient
+    .channel('email_events_' + currentEventId)
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'email_events' },
+      async (payload) => {
+        const row = payload && payload.new;
+        if (!row || !row.registration_id || !row.email_template_slug) return;
+        await refreshEngForEvent(row.registration_id, row.email_template_slug);
+      },
+    )
+    .subscribe();
+}
+
+async function refreshEngForEvent(registrationId, slug) {
+  // Refresh campaign summary for this slug + recipient row + stats strip.
+  const [{ data: sumRows }, { data: recRows }] = await Promise.all([
+    supabaseClient
+      .from('v_campaign_summary')
+      .select('*')
+      .eq('event_id', currentEventId)
+      .eq('email_template_slug', slug),
+    supabaseClient
+      .from('v_recipient_engagement')
+      .select('*')
+      .eq('event_id', currentEventId)
+      .eq('email_template_slug', slug)
+      .eq('registration_id', registrationId)
+      .maybeSingle()
+      .then((r) => ({ data: r.data ? [r.data] : [] })),
+  ]);
+
+  if (sumRows && sumRows.length) engCampaignSummary[slug] = sumRows[0];
+  else delete engCampaignSummary[slug];
+
+  if (recRows.length) {
+    const updatedRow = recRows[0];
+    const cache = engRecipientCache[slug] || [];
+    const idx = cache.findIndex((x) => x.registration_id === registrationId);
+    if (idx >= 0) cache[idx] = updatedRow; else cache.push(updatedRow);
+    engRecipientCache[slug] = cache;
+  }
+
+  // Re-render: stats strip + this campaign card (preserving expanded state)
+  renderEngagementStats();
+
+  const card = document.getElementById('eng-c-' + slug);
+  if (card) {
+    const scrollY = window.scrollY;
+    const newCard = renderCampaignCard(ENG_CAMPAIGNS.find((c) => c.slug === slug) || { slug, name: slug });
+    if (engExpanded.has(slug)) newCard.classList.add('expanded');
+    card.replaceWith(newCard);
+    window.scrollTo({ top: scrollY });
+
+    // Hydrate toolbar and repaint recipient rows (if expanded).
+    if (engExpanded.has(slug)) {
+      const wrap = newCard.querySelector('.recipient-table-wrap');
+      if (wrap && !wrap.dataset.hydrated) wrap.dataset.hydrated = '1';
+      wireUpCampaignToolbar(newCard, slug);
+      renderRecipientRows(slug);
+
+      // Gold pulse on the affected row.
+      const row = newCard.querySelector(`tr[data-registration-id="${CSS.escape(registrationId)}"]`);
+      if (row) {
+        row.classList.remove('eng-pulse');
+        // restart animation on next frame
+        requestAnimationFrame(() => row.classList.add('eng-pulse'));
+      }
+    }
+  }
+}
+
 
 // Boot
 init();
