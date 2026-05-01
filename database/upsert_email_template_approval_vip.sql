@@ -1,4 +1,6 @@
 -- Add is_vip and upsert approval-vip email template (VIP shoutout + plated dinner)
+-- Run in Supabase SQL Editor so the ADMIN dropdown shows "Approval: VIP guest" (slug approval-vip).
+-- Without this row, VIP hosts only see the standard main approval template (same QR flow).
 -- Run: supabase db query --linked < database/upsert_email_template_approval_vip.sql
 
 ALTER TABLE public.registrations

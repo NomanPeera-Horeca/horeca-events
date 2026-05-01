@@ -4,6 +4,7 @@
  * - On approve: unique qr_token (+ plus_one_qr_token), PNGs of check-in URLs, Storage upload,
  *   Resend HTML with QR embedded as data:image/png (reliable in Outlook vs CID/external),
  *   optional +1 email from template slug approval-plus-one
+ * - On resend_approval: resends approval or approval-vip email using existing QR tokens (no rotation).
  * - Deploy: supabase functions deploy send-registration-email --no-verify-jwt
  * - Secret (optional): PUBLIC_EVENTS_ORIGIN (default https://events.thehorecastore.com)
  */
@@ -287,6 +288,65 @@ Deno.serve(async (req) => {
     let pngMainBytes: Uint8Array | null = null;
     let pngPlusBytes: Uint8Array | null = null;
 
+    if (action_type === "resend_approval") {
+      const slug = String(template.slug || "");
+      const okResendSlug =
+        slug === "approval" ||
+        slug === "approval-vip" ||
+        (slug.startsWith("approval") && slug !== "approval-plus-one");
+      if (!okResendSlug) {
+        return corsJson(
+          {
+            error: "resend_approval_bad_template",
+            detail:
+              "Template slug must be approval, approval-vip, or approval-* (not approval-plus-one)",
+            slug,
+          },
+          400,
+        );
+      }
+      if (String(reg.status || "") !== "approved") {
+        return corsJson(
+          { error: "resend_approval_not_approved", status: reg.status },
+          400,
+        );
+      }
+      qrToken = reg.qr_token as string | null;
+      plusOneToken = reg.plus_one_qr_token as string | null;
+      qrUrl = reg.qr_code_url as string | null;
+      plusOneUrl = reg.plus_one_qr_code_url as string | null;
+      if (!qrToken || !String(qrToken).trim()) {
+        return corsJson(
+          {
+            error: "missing_qr_token",
+            detail: "Guest has no QR token; run Approve once first.",
+          },
+          400,
+        );
+      }
+      try {
+        pngMainBytes = await qrPayloadToPngBytes(checkinLink(qrToken));
+      } catch (e) {
+        console.error("QR main resend", e);
+        return corsJson(
+          { error: "qr_generation_failed", detail: String(e) },
+          500,
+        );
+      }
+      const hasPlusResend = Boolean(reg.has_plus_one);
+      if (hasPlusResend && plusOneToken && String(plusOneToken).trim()) {
+        try {
+          pngPlusBytes = await qrPayloadToPngBytes(checkinLink(plusOneToken));
+        } catch (e) {
+          console.error("QR plus resend", e);
+          return corsJson(
+            { error: "qr_generation_failed_plus_one", detail: String(e) },
+            500,
+          );
+        }
+      }
+    }
+
     if (action_type === "approve") {
       qrToken = makeQrToken();
       const hasPlus = Boolean(reg.has_plus_one);
@@ -494,7 +554,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (action_type === "approve" && pngMainBytes) {
+    if (
+      (action_type === "approve" || action_type === "resend_approval") &&
+      pngMainBytes
+    ) {
       // Inline PNG as data-URL so Outlook shows the QR without CID / external fetch.
       const mainDataUrl =
         `data:image/png;base64,${uint8ToBase64(pngMainBytes)}`;
@@ -523,6 +586,9 @@ Deno.serve(async (req) => {
           502,
         );
       }
+
+      let plusOneEmailSent = false;
+      let plusOneEmailDetail: string | null = null;
 
       if (
         hasPlus && pngPlusBytes && reg.plus_one_email &&
@@ -565,6 +631,7 @@ Deno.serve(async (req) => {
               subject: pSub,
               html: pHtml,
             });
+            plusOneEmailSent = true;
           } catch (e) {
             console.error("plus-one resend", e);
             return corsJson(
@@ -576,7 +643,13 @@ Deno.serve(async (req) => {
               502,
             );
           }
+        } else {
+          plusOneEmailDetail =
+            "Plus-one email was not sent: no active email_templates row with slug approval-plus-one and non-empty body_html. Paste emails/approval-plus-one.html in Supabase.";
         }
+      } else if (hasPlus) {
+        plusOneEmailDetail =
+          "Plus-one email was not sent: plus_one_email is missing on this registration.";
       }
 
       return corsJson({
@@ -585,6 +658,8 @@ Deno.serve(async (req) => {
         plus_one_qr_code_url: plusOneUrl,
         qr_token: qrToken,
         plus_one_qr_token: plusOneToken,
+        plus_one_email_sent: plusOneEmailSent,
+        plus_one_email_detail: plusOneEmailDetail,
       });
     }
 

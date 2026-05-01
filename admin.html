@@ -1297,6 +1297,11 @@ function openAction(id, actionType) {
     }
   }
 
+  const hasVipTemplate = orderedTemplates.some((t) => t.slug === 'approval-vip');
+  const plusOneTplRow = emailTemplates.find((t) => t.slug === 'approval-plus-one');
+  const plusOneTemplateHasBody =
+    plusOneTplRow && String(plusOneTplRow.body_html || '').trim().length > 0;
+
   const titleMap = {
     approve: 'Approve <em>& Send QR</em>',
     resend_approval: 'Resend <em>confirmation</em>',
@@ -1328,6 +1333,21 @@ function openAction(id, actionType) {
       ${(actionType === 'approve' || actionType === 'resend_approval') && activeRegistration.is_vip ? `
       <p style="color: var(--gold); margin: -8px 0 16px 0; font-size: 13px; line-height: 1.5; padding: 12px 14px; border: 1px solid rgba(201,165,92,0.35); background: rgba(201,165,92,0.08); border-radius: 2px;">
         This guest is marked <strong style="color: var(--ink);">VIP</strong>.${actionType === 'resend_approval' ? ' Same QR links as before. ' : ' '}The VIP approval template is selected by default. You can switch to the standard approval if needed.
+      </p>
+      ` : ''}
+      ${(actionType === 'approve' || actionType === 'resend_approval') && !hasVipTemplate ? `
+      <p style="color: var(--ink-soft); margin: -8px 0 16px 0; font-size: 13px; line-height: 1.55; padding: 12px 14px; border: 1px solid rgba(212, 165, 116, 0.4); background: rgba(20,20,20,0.9); border-radius: 2px;">
+        <strong style="color: var(--orange);">VIP confirmation template missing.</strong>
+        Your database has no active row with slug <code style="font-size:11px;color:var(--gold);">approval-vip</code>, so only the standard approval appears above.
+        In Supabase → SQL Editor, run the repo file <code style="font-size:11px;color:var(--gold);">database/upsert_email_template_approval_vip.sql</code>, then reload this admin page.
+        Until then, VIPs get the same QR email as everyone else if you pick &ldquo;Approval - Main Attendee&rdquo;.
+      </p>
+      ` : ''}
+      ${(actionType === 'approve' || actionType === 'resend_approval') && activeRegistration.has_plus_one && !plusOneTemplateHasBody ? `
+      <p style="color: var(--ink-soft); margin: -8px 0 16px 0; font-size: 13px; line-height: 1.55; padding: 12px 14px; border: 1px solid rgba(212, 98, 106, 0.45); background: rgba(212, 98, 106, 0.07); border-radius: 2px;">
+        <strong style="color: var(--red);">Guest (+1) email will not send.</strong>
+        There is no HTML in <code style="font-size:11px;color:var(--gold);">email_templates.body_html</code> for slug <code style="font-size:11px;color:var(--gold);">approval-plus-one</code>.
+        Open Table Editor → paste the contents of <code style="font-size:11px;color:var(--gold);">emails/approval-plus-one.html</code> into that row → Save → approve again or use Resend confirmation.
       </p>
       ` : ''}
 
@@ -1476,7 +1496,19 @@ async function confirmAction(actionType) {
         );
         alert('Email did not send:\n\n' + emailProblem);
       } else {
-        showToast(`<strong>Confirmation resent.</strong> Email sent to ${escape(activeRegistration.email)}. QR unchanged.`);
+        let plusLine = '';
+        if (activeRegistration.has_plus_one && fnData && typeof fnData === 'object') {
+          if (fnData.plus_one_email_sent === true && activeRegistration.plus_one_email) {
+            plusLine =
+              `<br><small style="color:var(--green);">+1 confirmation sent to ${escape(activeRegistration.plus_one_email)}.</small>`;
+          } else if (fnData.plus_one_email_detail) {
+            plusLine =
+              `<br><span style="color:var(--orange);font-size:12px;"><strong>+1 email:</strong> ${escape(String(fnData.plus_one_email_detail))}</span>`;
+          }
+        }
+        showToast(
+          `<strong>Confirmation resent.</strong> Email sent to ${escape(activeRegistration.email)}. QR unchanged.${plusLine}`
+        );
       }
 
       await loadRegistrations();
@@ -1560,8 +1592,18 @@ async function confirmAction(actionType) {
           '\n\nOpen browser DevTools → Network → find the functions/v1/send-registration-email call for details.\nIn Supabase: Edge Functions → send-registration-email → Logs.'
       );
     } else {
+      let plusLine = '';
+      if (actionType === 'approve' && activeRegistration.has_plus_one && fnData && typeof fnData === 'object') {
+        if (fnData.plus_one_email_sent === true && activeRegistration.plus_one_email) {
+          plusLine =
+            `<br><small style="color:var(--green);">+1 confirmation sent to ${escape(activeRegistration.plus_one_email)}.</small>`;
+        } else if (fnData.plus_one_email_detail) {
+          plusLine =
+            `<br><span style="color:var(--orange);font-size:12px;"><strong>+1 email:</strong> ${escape(String(fnData.plus_one_email_detail))}</span>`;
+        }
+      }
       showToast(
-        `<strong>${actionType === 'approve' ? 'Approved' : actionType === 'reject' ? 'Rejected' : actionType === 'question' ? 'Question sent' : 'Reminder sent'}.</strong> Email dispatched to ${escape(activeRegistration.email)}.`
+        `<strong>${actionType === 'approve' ? 'Approved' : actionType === 'reject' ? 'Rejected' : actionType === 'question' ? 'Question sent' : 'Reminder sent'}.</strong> Email dispatched to ${escape(activeRegistration.email)}.${plusLine}`
       );
     }
     
