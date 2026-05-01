@@ -288,6 +288,51 @@ th.vip-apply-th {
 .cell-contact { font-family: var(--mono); font-size: 11px; color: var(--ink-soft); line-height: 1.6; }
 .cell-contact a { color: var(--gold); }
 .cell-plus-one { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; color: var(--gold); background: rgba(201,165,92,0.1); padding: 3px 8px; margin-top: 4px; }
+.pair-slot-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 8px;
+  opacity: 0.9;
+}
+.pair-guest-slot-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.pair-with-ref {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-mute);
+  margin-top: 8px;
+  line-height: 1.45;
+}
+.registrations-table tbody tr.reg-pair-primary td {
+  border-bottom: none;
+  padding-bottom: 12px;
+}
+.registrations-table tbody tr.reg-pair-guest td {
+  background: rgba(201, 165, 92, 0.045);
+  box-shadow: inset 3px 0 0 rgba(201, 165, 92, 0.65);
+  padding-top: 14px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--rule);
+}
+.registrations-table tbody tr.reg-pair-primary + tr.reg-pair-guest td {
+  border-top: 1px dashed rgba(201, 165, 92, 0.25);
+}
+.reg-pair-actions-muted {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-mute);
+  letter-spacing: 0.04em;
+  padding: 8px 0;
+}
 
 .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; border: 1px solid var(--rule-strong); }
 .status-pill.pending { color: var(--orange); border-color: var(--orange); }
@@ -451,7 +496,7 @@ th.vip-apply-th {
 
   <div class="table-controls">
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="Search by name, email, or business...">
+      <input type="text" id="searchInput" placeholder="Search name, email, phone, business, or guest…">
     </div>
   </div>
 
@@ -817,6 +862,98 @@ function vipIndicatorForDoorName(r) {
   return '';
 }
 
+function registrationPartySearchHay(r) {
+  return `${r.first_name} ${r.last_name} ${r.email} ${r.business_name} ${r.phone || ''} ${r.plus_one_first_name || ''} ${r.plus_one_last_name || ''} ${r.plus_one_email || ''} ${r.plus_one_phone || ''}`.toLowerCase();
+}
+
+/** One or two &lt;tr&gt;s: primary always; guest row when has_plus_one (same VIP / status / actions on registration). */
+function registrationTableRowsHtml(r) {
+  const id = r.id;
+  const primaryName = `${escape(r.first_name)} ${escape(r.last_name)}`;
+  const guestFirst = escape(r.plus_one_first_name || '');
+  const guestLast = escape(r.plus_one_last_name || '');
+  const guestEmail = r.plus_one_email ? escape(r.plus_one_email) : '';
+  const guestPhone = r.plus_one_phone ? escape(String(r.plus_one_phone)) : '';
+  const guestRole = escape(r.plus_one_role || 'Guest');
+  const mailtoGuest = r.plus_one_email ? `mailto:${escape(r.plus_one_email)}` : '#';
+  const telGuest = r.plus_one_phone ? `tel:${escape(String(r.plus_one_phone))}` : '#';
+
+  const vipCell = vipIndicatorForRegistrationsColumn(r);
+  const statusCell = `<span class="status-pill ${r.status}">${r.status.replace('_', ' ')}</span>`;
+  const timeCell = `<span class="cell-time">${timeAgo(r.created_at)}</span>`;
+  const actionsPrimary = `
+        <div class="action-buttons">
+          <button class="action-btn view" onclick="viewDetail('${id}')">View</button>
+          ${r.status === 'pending' || r.status === 'needs_info' ? `
+            <button class="action-btn approve" onclick="openAction('${id}', 'approve')">✓ Approve</button>
+            <button class="action-btn question" onclick="openAction('${id}', 'question')">? Ask</button>
+            <button class="action-btn reject" onclick="openAction('${id}', 'reject')">✗ Reject</button>
+          ` : ''}
+          ${r.status === 'approved' ? `
+            <button class="action-btn approve" onclick="openAction('${id}', 'resend_approval')">Resend confirmation</button>
+            <button class="action-btn" onclick="openAction('${id}', 'reminder')">📧 Send Reminder</button>
+          ` : ''}
+        </div>`;
+
+  const primaryTr = `
+    <tr class="${r.has_plus_one ? 'reg-pair-primary' : 'reg-pair-single'}" data-registration-id="${id}">
+      <td>
+        ${r.has_plus_one ? '<div class="pair-slot-label">Primary guest</div>' : ''}
+        <div class="cell-name">${primaryName}</div>
+        <div class="cell-meta">
+          <span>${escape(r.role || 'Role not specified')}</span>
+        </div>
+      </td>
+      <td>
+        <div class="cell-business">${escape(r.business_name)}</div>
+        <div class="cell-role-locations">${escape(r.locations || 'Locations not specified')}</div>
+      </td>
+      <td class="vip-apply-cell">${vipCell}</td>
+      <td>
+        <div class="cell-contact">
+          <a href="mailto:${escape(r.email)}">${escape(r.email)}</a><br>
+          <a href="tel:${escape(r.phone)}">${escape(r.phone)}</a>
+        </div>
+      </td>
+      <td>${statusCell}</td>
+      <td>${timeCell}</td>
+      <td>${actionsPrimary}</td>
+    </tr>`;
+
+  if (!r.has_plus_one) return primaryTr;
+
+  const guestTr = `
+    <tr class="reg-pair-guest" data-registration-id="${id}" data-pair-role="plus-one">
+      <td>
+        <div class="pair-guest-slot-label">+1 · same party</div>
+        <div class="cell-name">${guestFirst} ${guestLast}</div>
+        <div class="cell-meta">
+          <span>${guestRole}</span>
+        </div>
+        <div class="pair-with-ref">Registered with ${primaryName}</div>
+      </td>
+      <td>
+        <div class="cell-business">${escape(r.business_name)}</div>
+        <div class="cell-role-locations" style="color:var(--ink-mute)">Same organization · ${escape(r.locations || 'Locations not specified')}</div>
+      </td>
+      <td class="vip-apply-cell">${vipCell}</td>
+      <td>
+        <div class="cell-contact">
+          ${r.plus_one_email ? `<a href="${mailtoGuest}">${guestEmail}</a>` : '<span style="color:var(--ink-mute)">No email</span>'}<br>
+          ${r.plus_one_phone ? `<a href="${telGuest}">${guestPhone}</a>` : '<span style="color:var(--ink-mute)">No phone</span>'}
+        </div>
+      </td>
+      <td>${statusCell}</td>
+      <td>${timeCell}</td>
+      <td>
+        <div class="reg-pair-actions-muted">Actions above apply to both</div>
+        <button type="button" class="action-btn view" style="margin-top:6px" onclick="viewDetail('${id}')">View party</button>
+      </td>
+    </tr>`;
+
+  return primaryTr + guestTr;
+}
+
 function renderTable() {
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
   const tbody = document.getElementById('registrationsBody');
@@ -826,9 +963,7 @@ function renderTable() {
     filtered = filtered.filter(r => r.status === currentFilter);
   }
   if (search) {
-    filtered = filtered.filter(r => 
-      `${r.first_name} ${r.last_name} ${r.email} ${r.business_name}`.toLowerCase().includes(search)
-    );
+    filtered = filtered.filter(r => registrationPartySearchHay(r).includes(search));
   }
   
   if (filtered.length === 0) {
@@ -836,44 +971,7 @@ function renderTable() {
     return;
   }
   
-  tbody.innerHTML = filtered.map(r => `
-    <tr>
-      <td>
-        <div class="cell-name">${escape(r.first_name)} ${escape(r.last_name)}</div>
-        <div class="cell-meta">
-          <span>${escape(r.role || 'Role not specified')}</span>
-        </div>
-        ${r.has_plus_one ? `<div class="cell-plus-one">+1 ${escape(r.plus_one_first_name || '')} ${escape(r.plus_one_last_name || '')}</div>` : ''}
-      </td>
-      <td>
-        <div class="cell-business">${escape(r.business_name)}</div>
-        <div class="cell-role-locations">${escape(r.locations || 'Locations not specified')}</div>
-      </td>
-      <td class="vip-apply-cell">${vipIndicatorForRegistrationsColumn(r)}</td>
-      <td>
-        <div class="cell-contact">
-          <a href="mailto:${escape(r.email)}">${escape(r.email)}</a><br>
-          <a href="tel:${escape(r.phone)}">${escape(r.phone)}</a>
-        </div>
-      </td>
-      <td><span class="status-pill ${r.status}">${r.status.replace('_', ' ')}</span></td>
-      <td><span class="cell-time">${timeAgo(r.created_at)}</span></td>
-      <td>
-        <div class="action-buttons">
-          <button class="action-btn view" onclick="viewDetail('${r.id}')">View</button>
-          ${r.status === 'pending' || r.status === 'needs_info' ? `
-            <button class="action-btn approve" onclick="openAction('${r.id}', 'approve')">✓ Approve</button>
-            <button class="action-btn question" onclick="openAction('${r.id}', 'question')">? Ask</button>
-            <button class="action-btn reject" onclick="openAction('${r.id}', 'reject')">✗ Reject</button>
-          ` : ''}
-          ${r.status === 'approved' ? `
-            <button class="action-btn approve" onclick="openAction('${r.id}', 'resend_approval')">Resend confirmation</button>
-            <button class="action-btn" onclick="openAction('${r.id}', 'reminder')">📧 Send Reminder</button>
-          ` : ''}
-        </div>
-      </td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = filtered.map(registrationTableRowsHtml).join('');
 }
 
 
