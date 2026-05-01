@@ -198,6 +198,88 @@ header { flex-wrap: wrap; row-gap: 12px; }
 .registrations-table tbody tr { border-bottom: 1px solid var(--rule); transition: background 0.2s; }
 .registrations-table tbody tr:hover { background: var(--bg-row-hover); }
 .registrations-table td { padding: 18px 20px; font-size: 13px; vertical-align: top; }
+.registrations-table td.vip-apply-cell { vertical-align: middle; }
+
+/* VIP column: matches public site “Horeca” treatment (white serif on black) */
+th.vip-apply-th {
+  color: var(--ink);
+  line-height: 1.25;
+}
+.vip-th-eyebrow {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.vip-th-word {
+  display: block;
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 400;
+  font-style: italic;
+  color: #fff;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+.vip-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  border: 1px solid var(--rule);
+  padding: 10px 14px 12px;
+  max-width: 100%;
+}
+.vip-badge--yes {
+  background: #000;
+  border-color: rgba(255,255,255,0.12);
+}
+.vip-badge-serif {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 400;
+  font-style: italic;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.vip-badge-mono {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-style: normal;
+}
+.vip-badge--pending {
+  background: rgba(0,0,0,0.45);
+  border-color: rgba(201,165,92,0.45);
+}
+.vip-badge--pending .vip-badge-mono {
+  color: var(--gold);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+.vip-badge--pending .vip-badge-serif-sm {
+  font-family: var(--serif);
+  font-size: 12px;
+  font-weight: 400;
+  font-style: italic;
+  color: rgba(255,255,255,0.88);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.vip-badge--no {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--ink-mute);
+  text-transform: uppercase;
+}
 
 .cell-name { font-family: var(--serif); font-size: 16px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
 .cell-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); display: flex; gap: 12px; flex-wrap: wrap; }
@@ -377,13 +459,16 @@ header { flex-wrap: wrap; row-gap: 12px; }
     <table class="registrations-table">
       <thead>
         <tr>
-          <th style="width: 20%;">Attendee</th>
-          <th style="width: 20%;">Business</th>
+          <th style="width: 19%;">Attendee</th>
+          <th style="width: 19%;">Business</th>
+          <th class="vip-apply-th" style="width: 12%;">
+            <span class="vip-th-eyebrow">Applied as</span>
+            <span class="vip-th-word">VIP</span>
+          </th>
           <th style="width: 17%;">Contact</th>
           <th style="width: 9%;">Status</th>
-          <th style="width: 9%;">VIP</th>
           <th style="width: 9%;">Submitted</th>
-          <th style="width: 16%; text-align: right;">Actions</th>
+          <th style="width: 15%; text-align: right;">Actions</th>
         </tr>
       </thead>
       <tbody id="registrationsBody">
@@ -682,26 +767,52 @@ function updateStats() {
   document.getElementById('statTotal').textContent = totalSeats;
 }
 
-/** VIP column body for registrations grid */
+/** VIP column: confirmed flag, VIP-form data/challenge, or standard RSVP */
 function vipIndicatorForRegistrationsColumn(r) {
-  if (r.is_vip) {
-    return '<span class="status-pill" style="border-color:var(--gold);color:var(--gold);font-size:10px;padding:4px 10px;text-transform:uppercase;letter-spacing:0.06em">VIP</span>';
-  }
+  const hasVipFields =
+    !!(r.vip_optional_note && String(r.vip_optional_note).trim()) ||
+    !!r.vip_interest_keynote ||
+    !!r.vip_interest_qa ||
+    !!(r.vip_topic_note && String(r.vip_topic_note).trim());
   const ch = r.challenge && String(r.challenge);
-  if (ch && /\[VIP apply/i.test(ch)) {
-    return '<span class="status-pill" style="border-color:rgba(212,165,116,0.45);color:var(--gold);font-size:10px;padding:4px 10px;text-transform:uppercase;letter-spacing:0.05em;opacity:0.95" title="Submitted via VIP form but is_vip is off in the database. Open View, then Mark as VIP.">Apply</span>';
+  const challengeVip = !!(ch && /\[VIP apply/i.test(ch));
+  const appliedVipPath = hasVipFields || challengeVip;
+
+  if (r.is_vip) {
+    return (
+      '<div class="vip-badge vip-badge--yes" title="Confirmed VIP in database">' +
+      '<span class="vip-badge-serif">Yes</span>' +
+      '<span class="vip-badge-mono">VIP on roster</span>' +
+      '</div>'
+    );
   }
-  return '<span style="color:var(--ink-mute);font-size:13px">-</span>';
+  if (appliedVipPath) {
+    return (
+      '<div class="vip-badge vip-badge--pending" title="They applied via the VIP form. Open View, then Mark as VIP if they should be treated as VIP.">' +
+      '<span class="vip-badge-mono">VIP application</span>' +
+      '<span class="vip-badge-serif-sm">Review flag</span>' +
+      '</div>'
+    );
+  }
+  return '<span class="vip-badge--no" title="Main RSVP path (not VIP apply)">Standard</span>';
 }
 
 /** Small VIP marker next to name on Door tab */
 function vipIndicatorForDoorName(r) {
+  const hasVipFields =
+    !!(r.vip_optional_note && String(r.vip_optional_note).trim()) ||
+    !!r.vip_interest_keynote ||
+    !!r.vip_interest_qa ||
+    !!(r.vip_topic_note && String(r.vip_topic_note).trim());
+  const ch = r.challenge && String(r.challenge);
+  const challengeVip = !!(ch && /\[VIP apply/i.test(ch));
+  const appliedVipPath = hasVipFields || challengeVip;
+
   if (r.is_vip) {
     return ' <span class="status-pill" style="border-color:var(--gold);color:var(--gold);font-size:9px;padding:2px 7px;text-transform:uppercase;letter-spacing:0.05em">VIP</span>';
   }
-  const ch = r.challenge && String(r.challenge);
-  if (ch && /\[VIP apply/i.test(ch)) {
-    return ' <span class="status-pill" style="border-color:rgba(212,165,116,0.45);color:var(--gold);font-size:9px;padding:2px 7px;text-transform:uppercase" title="VIP apply: open guest and Mark as VIP">Apply</span>';
+  if (appliedVipPath) {
+    return ' <span class="status-pill" style="border-color:rgba(212,165,116,0.45);color:var(--gold);font-size:9px;padding:2px 7px;text-transform:uppercase" title="VIP application: open guest and Mark as VIP">Apply</span>';
   }
   return '';
 }
@@ -738,6 +849,7 @@ function renderTable() {
         <div class="cell-business">${escape(r.business_name)}</div>
         <div class="cell-role-locations">${escape(r.locations || 'Locations not specified')}</div>
       </td>
+      <td class="vip-apply-cell">${vipIndicatorForRegistrationsColumn(r)}</td>
       <td>
         <div class="cell-contact">
           <a href="mailto:${escape(r.email)}">${escape(r.email)}</a><br>
@@ -745,7 +857,6 @@ function renderTable() {
         </div>
       </td>
       <td><span class="status-pill ${r.status}">${r.status.replace('_', ' ')}</span></td>
-      <td>${vipIndicatorForRegistrationsColumn(r)}</td>
       <td><span class="cell-time">${timeAgo(r.created_at)}</span></td>
       <td>
         <div class="action-buttons">
