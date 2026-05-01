@@ -300,17 +300,16 @@ main {
   top: 50%;
   left: 50%;
   z-index: 2000;
-  max-width: 540px;
-  width: min(540px, calc(100% - 48px));
-  max-height: min(88vh, 640px);
+  max-width: min(720px, calc(100% - 40px));
+  width: 100%;
+  max-height: min(88vh, 680px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  background: var(--bg-card);
-  border: 1px solid var(--gold);
-  border-left: 4px solid var(--gold);
-  padding: 28px 32px;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.55);
-  text-align: center;
+  background: #000;
+  border: 1px solid var(--rule);
+  padding: 0;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.75);
+  text-align: left;
   opacity: 0;
   visibility: hidden;
   transform: translate(-50%, calc(-50% + 16px)) scale(0.98);
@@ -322,35 +321,84 @@ main {
   transform: translate(-50%, -50%) scale(1);
   transition-delay: 0s;
 }
-.toast-text {
-  font-size: 15px;
-  color: var(--ink);
-  line-height: 1.65;
+.toast-sponsor-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  padding: 32px 28px;
+  align-items: start;
 }
-.toast-text strong {
-  display: block;
-  color: var(--gold);
-  font-weight: 600;
-  font-size: 17px;
-  line-height: 1.35;
-  margin-bottom: 12px;
-  letter-spacing: 0.02em;
+@media (min-width: 560px) {
+  .toast-sponsor-layout {
+    grid-template-columns: 200px 1fr;
+    gap: 40px;
+    padding: 40px 48px;
+    align-items: center;
+  }
 }
-.toast-text .toast-lead { display: block; margin-bottom: 0.85em; text-align: center; }
-.toast-text .toast-foot {
-  display: block;
-  margin-top: 14px;
-  font-size: 13px;
-  font-style: italic;
+.toast-tier-label { display: flex; flex-direction: column; gap: 8px; }
+.toast-tier-rank {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
   color: var(--ink-mute);
+}
+.toast-tier-name.host {
+  font-family: var(--serif);
+  font-size: clamp(28px, 5vw, 36px);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  font-style: italic;
+  color: #fff;
+  line-height: 1.15;
+}
+.toast-tier-body { min-width: 0; }
+.toast-text .toast-headline {
+  font-family: var(--serif);
+  font-size: clamp(22px, 3.8vw, 32px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: #fff;
+  line-height: 1.2;
+  margin: 0 0 16px;
+}
+.toast-text .toast-para {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 300;
+  color: rgba(237, 237, 237, 0.9);
+  line-height: 1.6;
+  margin: 0 0 0.95em;
+}
+.toast-text .toast-para:last-of-type {
+  margin-bottom: 0;
+}
+.toast-text .toast-tagline {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  font-weight: 400;
+  font-style: normal;
   line-height: 1.55;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+}
+.toast-text em {
+  font-style: italic;
+  color: #fff;
 }
 
 @media (max-width: 560px) {
   .form-grid { grid-template-columns: 1fr; }
   .form-card { padding: 28px 20px 24px; }
-  .toast { padding: 24px 22px; }
-  .toast-text strong { font-size: 16px; }
+  .toast-sponsor-layout { padding: 28px 22px; }
+  .toast-tier-name.host { font-size: clamp(24px, 8vw, 32px); }
+  .toast-text .toast-headline { font-size: clamp(20px, 6vw, 28px); }
 }
 </style>
 </head>
@@ -522,7 +570,15 @@ main {
 
 <div class="vip-toast-backdrop" id="vipToastBackdrop" aria-hidden="true"></div>
 <div class="toast" id="vipToast" role="status" aria-live="polite">
-  <div class="toast-text" id="vipToastText"></div>
+  <div class="toast-sponsor-layout">
+    <div class="toast-tier-label">
+      <div class="toast-tier-rank">Request received</div>
+      <div class="toast-tier-name host">Horeca Store</div>
+    </div>
+    <div class="toast-tier-body">
+      <div class="toast-text" id="vipToastText"></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -788,18 +844,18 @@ async function submitVipApply(e) {
   }
 
   let toastMsg =
-    '<strong>Your VIP request is in.</strong>' +
-    '<span class="toast-lead">We have received your application and our leadership team will review it with the care these evenings deserve. You should expect a <em>personal</em> reply at the email address you shared—most notes go out within a few business days, though busy weeks can occasionally run a little longer.</span>' +
-    '<span class="toast-lead">There is nothing else you need to do on this page for now. Please watch your inbox (and, kindly, your spam or promotions folder) so our note does not slip past you.</span>' +
-    '<span class="toast-lead">If your plans change before you hear from us, simply reply once we write in—or reach out anytime to <em>events@thehorecastore.com</em>—and we will help.</span>' +
-    '<span class="toast-foot">Thank you for your interest in The Horeca Meetup. We are truly glad you are considering joining us at the table.</span>';
+    '<div class="toast-headline">Your VIP request is in.</div>' +
+    '<p class="toast-para">We have received your application and our leadership team will review it with the care these evenings deserve. You should expect a <em>personal</em> reply at the email address you shared—most notes go out within a few business days, though busy weeks can occasionally run a little longer.</p>' +
+    '<p class="toast-para">There is nothing else you need to do on this page for now. Please watch your inbox (and, kindly, your spam or promotions folder) so our note does not slip past you.</p>' +
+    '<p class="toast-para">If your plans change before you hear from us, simply reply once we write in—or reach out anytime to <em>events@thehorecastore.com</em>—and we will help.</p>' +
+    '<p class="toast-tagline">Thank you for your interest in The Horeca Meetup. We are truly glad you are considering joining us at the table.</p>';
   if (hasPlusOne) {
     toastMsg =
-      '<strong>Your VIP application for you and your guest is in.</strong>' +
-      '<span class="toast-lead">We have captured both names and contact details. Our team will review your joint request carefully and reply to the <em>primary</em> email you entered, with clear next steps and anything we need for your guest.</span>' +
-      '<span class="toast-lead">You may step away from this page for now. When our message arrives, either of you can reply in that thread or write directly to <em>events@thehorecastore.com</em> if something shifts before the dinner.</span>' +
-      '<span class="toast-lead">Should dates, attendance, or dietary realities change for either of you, a quick note back lets us adjust your request without losing your place in line.</span>' +
-      '<span class="toast-foot">We appreciate you sharing The Horeca Meetup with someone you trust. That means a great deal to us.</span>';
+      '<div class="toast-headline">Your VIP application for you and your guest is in.</div>' +
+      '<p class="toast-para">We have captured both names and contact details. Our team will review your joint request carefully and reply to the <em>primary</em> email you entered, with clear next steps and anything we need for your guest.</p>' +
+      '<p class="toast-para">You may step away from this page for now. When our message arrives, either of you can reply in that thread or write directly to <em>events@thehorecastore.com</em> if something shifts before the dinner.</p>' +
+      '<p class="toast-para">Should dates, attendance, or dietary realities change for either of you, a quick note back lets us adjust your request without losing your place in line.</p>' +
+      '<p class="toast-tagline">We appreciate you sharing The Horeca Meetup with someone you trust. That means a great deal to us.</p>';
   }
   showVipToast(toastMsg);
 
