@@ -32,10 +32,10 @@ VALUES (
 
 <tr><td style="height:4px;background:linear-gradient(90deg,#6b5228,#c9a55c,#f0e0b8,#c9a55c,#6b5228);font-size:0;line-height:0;">&nbsp;</td></tr>
 <tr><td style="background:linear-gradient(180deg,#1a1508 0%,#0a0a0a 100%);padding:28px 40px 32px;text-align:center;border-bottom:1px solid rgba(201,165,92,0.35);">
-<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 16px;"><tr><td style="background-color:#c9a55c;color:#0a0a0a;font-family:''Courier New'',monospace;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;padding:8px 20px;border:1px solid #e0c186;">VIP Host</td></tr></table>
+<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 16px;"><tr><td style="background-color:#c9a55c;color:#0a0a0a;font-family:''Courier New'',monospace;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;padding:10px 22px;border:1px solid #e0c186;text-align:center;line-height:1.35;">VIP guest<br>confirmation</td></tr></table>
 <div style="font-family:''Fraunces'',Georgia,serif;font-size:24px;font-weight:500;color:#ffffff;letter-spacing:-0.01em;">The Horeca <em style="font-style:italic;color:#c9a55c;">Meetup</em></div>
 <div style="font-family:''Courier New'',monospace;font-size:10px;letter-spacing:0.24em;color:#c9a55c;text-transform:uppercase;margin-top:8px;">{{event_city}} · Volume {{event_volume}}</div>
-<div style="font-family:''Fraunces'',Georgia,serif;font-size:14px;font-style:italic;color:#d4c4a8;margin-top:14px;line-height:1.5;">With respect and gratitude: you are receiving our highest tier of hospitality for this edition.</div>
+<div style="font-family:''Fraunces'',Georgia,serif;font-size:14px;font-style:italic;color:#d4c4a8;margin-top:14px;line-height:1.5;">An exclusive invitation: our highest tier of hospitality for you as our guest at this edition.</div>
 </td></tr>
 
 <tr><td style="padding:48px 40px 24px 40px;">
