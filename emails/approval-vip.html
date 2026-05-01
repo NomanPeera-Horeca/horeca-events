@@ -2,7 +2,7 @@
 <!-- ═══════════════════════════════════════════════════════════════════════
      APPROVAL EMAIL · VIP MAIN ATTENDEE
      Same merge fields as approval.html. Use when the guest is marked VIP in admin.
-     Variables: same as approval.html + all calendar / QR / host aliases from Edge Function.
+     Variables: same as approval.html + {{salutation_first_name}} (preferred in headline; avoids greeting with business_name when it matched first_name).
      ═══════════════════════════════════════════════════════════════════════ -->
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Your VIP seat is confirmed · The Horeca Meetup</title></head>
@@ -21,8 +21,8 @@
 </td></tr>
 
 <tr><td style="padding:48px 40px 24px 40px;">
-<div style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.24em;color:#8b6f3a;text-transform:uppercase;margin-bottom:16px;">VIP Confirmation · Reservation #{{reservation_id}}</div>
-<h1 style="margin:0 0 24px 0;font-family:'Fraunces',Georgia,serif;font-size:36px;font-weight:400;line-height:1.1;color:#0a0a0a;letter-spacing:-0.02em;">Your VIP seat is confirmed,<br><em style="font-style:italic;color:#8b6f3a;">{{first_name}}.</em></h1>
+<div style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.2em;color:#6b5228;text-transform:uppercase;margin-bottom:20px;line-height:1.45;">VIP confirmation · Reservation #{{reservation_id}}</div>
+<h1 style="margin:0 0 24px 0;font-family:'Fraunces',Georgia,serif;font-size:36px;font-weight:400;line-height:1.1;color:#0a0a0a;letter-spacing:-0.02em;">Your VIP seat is confirmed,<br><em style="font-style:italic;color:#8b6f3a;">{{salutation_first_name}}.</em></h1>
 <p style="margin:0 0 16px 0;font-size:16px;line-height:1.65;color:#3a3a3a;">We are honored to confirm you as a <strong style="color:#0a0a0a;">VIP guest</strong> at <strong>The Horeca Meetup {{event_city}} Vol. {{event_volume}}</strong>. The room is built around leaders like you. Your voice shapes the evening, and we have held a place with that in mind.</p>
 <p style="margin:0 0 16px 0;font-size:16px;line-height:1.65;color:#3a3a3a;">Your <strong>VIP evening</strong> includes a <strong>shoutout from the host</strong> during the program and a <strong>plated dinner</strong> at your table, so you stay in the conversation instead of the buffet line.</p>
 {{#if has_plus_one}}<p style="margin:0 0 16px 0;font-size:16px;line-height:1.65;color:#3a3a3a;">We have also sent <strong>{{plus_one_name}}</strong> their own confirmation at <strong>{{plus_one_email}}</strong> with a personal QR for entry.</p>{{/if}}

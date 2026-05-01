@@ -45,14 +45,33 @@ function applyIfBlocks(html: string, vars: Record<string, boolean>) {
   return out;
 }
 
+/** First name for greetings; avoids saluting with company if first_name matches business_name (autofill). */
+function salutationFirstName(reg: {
+  first_name?: string | null;
+  last_name?: string | null;
+  business_name?: string | null;
+}): string {
+  const fn = String(reg.first_name ?? "").trim();
+  const bn = String(reg.business_name ?? "").trim();
+  const ln = String(reg.last_name ?? "").trim();
+  if (!fn) return ln || "there";
+  if (bn && fn.toLowerCase() === bn.toLowerCase()) {
+    return ln || "there";
+  }
+  return fn;
+}
+
 function interpolate(
   html: string,
   map: Record<string, string | null | undefined>,
 ) {
   let out = html;
-  for (const [k, v] of Object.entries(map)) {
+  const entries = Object.entries(map).sort((a, b) => b[0].length - a[0].length);
+  for (const [k, v] of entries) {
+    if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(k)) continue;
     const val = v == null ? "" : String(v);
-    out = out.split(`{{${k}}}`).join(val);
+    const re = new RegExp(`\\{\\{\\s*${k}\\s*\\}\\}`, "g");
+    out = out.replace(re, () => val);
   }
   return out;
 }
@@ -505,6 +524,7 @@ Deno.serve(async (req) => {
 
     const vars: Record<string, string> = {
       first_name: reg.first_name ?? "",
+      salutation_first_name: salutationFirstName(reg),
       last_name: reg.last_name ?? "",
       full_name: `${reg.first_name ?? ""} ${reg.last_name ?? ""}`.trim(),
       business_name: reg.business_name ?? "",

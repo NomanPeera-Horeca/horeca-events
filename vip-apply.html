@@ -36,7 +36,7 @@ a { color: inherit; text-decoration: none; }
 .vip-nav {
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 2020;
   background: rgba(10,10,10,0.92);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--rule);
@@ -279,13 +279,16 @@ main {
 .vip-toast-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1999;
-  background: rgba(0, 0, 0, 0.58);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  z-index: 2000;
+  background:
+    radial-gradient(ellipse 120% 80% at 50% 20%, rgba(201, 165, 92, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 50% at 80% 100%, rgba(139, 111, 58, 0.14) 0%, transparent 45%),
+    rgba(6, 5, 4, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+  transition: opacity 0.4s ease, visibility 0s linear 0.4s;
   pointer-events: none;
 }
 .vip-toast-backdrop.show {
@@ -297,23 +300,38 @@ main {
 
 .toast {
   position: fixed;
-  top: 50%;
+  top: 52%;
   left: 50%;
-  z-index: 2000;
-  max-width: min(720px, calc(100% - 40px));
+  z-index: 2010;
+  max-width: min(760px, calc(100% - 40px));
   width: 100%;
-  max-height: min(88vh, 680px);
+  max-height: min(86vh, 720px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  background: #000;
-  border: 1px solid var(--rule);
+  background:
+    linear-gradient(165deg, rgba(35, 30, 22, 0.97) 0%, rgba(12, 11, 9, 0.99) 48%, rgba(18, 15, 11, 1) 100%);
+  border: 1px solid rgba(201, 165, 92, 0.42);
+  border-radius: 2px;
   padding: 0;
-  box-shadow: 0 32px 80px rgba(0,0,0,0.75);
+  box-shadow:
+    0 0 0 1px rgba(255, 250, 235, 0.06) inset,
+    0 48px 100px rgba(0, 0, 0, 0.65),
+    0 0 80px rgba(201, 165, 92, 0.08);
   text-align: left;
   opacity: 0;
   visibility: hidden;
-  transform: translate(-50%, calc(-50% + 16px)) scale(0.98);
-  transition: opacity 0.4s ease, transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.45s;
+  transform: translate(-50%, calc(-50% + 20px)) scale(0.97);
+  transition: opacity 0.45s ease, transform 0.5s cubic-bezier(0.34, 1.1, 0.64, 1), visibility 0s linear 0.5s;
+}
+.toast::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light), var(--gold), var(--gold-deep));
+  pointer-events: none;
 }
 .toast.show {
   opacity: 1;
@@ -321,37 +339,100 @@ main {
   transform: translate(-50%, -50%) scale(1);
   transition-delay: 0s;
 }
+.toast-dismiss {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 2;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 10px 16px;
+  color: var(--gold-light);
+  background: rgba(201, 165, 92, 0.1);
+  border: 1px solid rgba(201, 165, 92, 0.35);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.toast-dismiss:hover {
+  background: rgba(201, 165, 92, 0.18);
+  border-color: rgba(201, 165, 92, 0.55);
+  color: #fff;
+}
 .toast-sponsor-layout {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr;
   gap: 28px;
-  padding: 32px 28px;
+  padding: 36px 28px 40px;
   align-items: start;
 }
 @media (min-width: 560px) {
   .toast-sponsor-layout {
-    grid-template-columns: 200px 1fr;
-    gap: 40px;
-    padding: 40px 48px;
+    grid-template-columns: minmax(0, 220px) 1fr;
+    gap: 44px;
+    padding: 44px 48px 48px;
     align-items: center;
   }
 }
-.toast-tier-label { display: flex; flex-direction: column; gap: 8px; }
+.toast-tier-label {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(201, 165, 92, 0.15);
+}
+@media (min-width: 560px) {
+  .toast-tier-label {
+    padding-bottom: 0;
+    border-bottom: none;
+    border-right: 1px solid rgba(201, 165, 92, 0.18);
+    padding-right: 36px;
+    margin-right: 0;
+  }
+}
+.toast-vip-seal {
+  align-self: flex-start;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  padding: 10px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 24px rgba(201, 165, 92, 0.25);
+}
 .toast-tier-rank {
   font-family: var(--mono);
   font-size: 10px;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
-  color: var(--ink-mute);
+  color: var(--gold);
+  margin-top: 4px;
 }
 .toast-tier-name.host {
   font-family: var(--serif);
-  font-size: clamp(28px, 5vw, 36px);
-  font-weight: 300;
+  font-size: clamp(26px, 5vw, 34px);
+  font-weight: 400;
   letter-spacing: -0.02em;
+  font-style: normal;
+  color: #faf8f4;
+  line-height: 1.12;
+}
+.toast-tier-name.host em {
   font-style: italic;
-  color: #fff;
-  line-height: 1.15;
+  color: var(--gold);
+  font-weight: 400;
+}
+.toast-tier-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(201, 165, 92, 0.65);
 }
 .toast-tier-body { min-width: 0; }
 .toast-text .toast-headline {
@@ -359,17 +440,22 @@ main {
   font-size: clamp(22px, 3.8vw, 32px);
   font-weight: 400;
   letter-spacing: -0.02em;
-  color: #fff;
-  line-height: 1.2;
-  margin: 0 0 16px;
+  color: #faf8f4;
+  line-height: 1.22;
+  margin: 0 0 18px;
+}
+.toast-text .toast-headline em {
+  font-style: italic;
+  color: var(--gold);
+  font-weight: 400;
 }
 .toast-text .toast-para {
-  font-family: var(--serif);
-  font-size: 16px;
-  font-weight: 300;
-  color: rgba(237, 237, 237, 0.9);
-  line-height: 1.6;
-  margin: 0 0 0.95em;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 400;
+  color: rgba(237, 235, 230, 0.88);
+  line-height: 1.65;
+  margin: 0 0 1em;
 }
 .toast-text .toast-para:last-of-type {
   margin-bottom: 0;
@@ -377,28 +463,29 @@ main {
 .toast-text .toast-tagline {
   display: block;
   font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  color: var(--ink-soft);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--gold-deep);
   text-transform: uppercase;
-  font-weight: 400;
+  font-weight: 500;
   font-style: normal;
-  line-height: 1.55;
-  margin-top: 20px;
-  padding-top: 18px;
-  border-top: 1px solid var(--rule);
+  line-height: 1.65;
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(201, 165, 92, 0.22);
 }
 .toast-text em {
   font-style: italic;
-  color: #fff;
+  color: var(--gold-light);
 }
 
 @media (max-width: 560px) {
   .form-grid { grid-template-columns: 1fr; }
   .form-card { padding: 28px 20px 24px; }
-  .toast-sponsor-layout { padding: 28px 22px; }
+  .toast-sponsor-layout { padding: 52px 22px 36px; }
   .toast-tier-name.host { font-size: clamp(24px, 8vw, 32px); }
   .toast-text .toast-headline { font-size: clamp(20px, 6vw, 28px); }
+  .toast-dismiss { top: 14px; right: 14px; }
 }
 </style>
 </head>
@@ -569,14 +656,17 @@ main {
 </main>
 
 <div class="vip-toast-backdrop" id="vipToastBackdrop" aria-hidden="true"></div>
-<div class="toast" id="vipToast" role="status" aria-live="polite">
+<div class="toast" id="vipToast" role="dialog" aria-modal="true" aria-label="VIP request confirmation">
+  <button type="button" class="toast-dismiss" id="vipToastDismiss">Close</button>
   <div class="toast-sponsor-layout">
     <div class="toast-tier-label">
-      <div class="toast-tier-rank">Request received</div>
-      <div class="toast-tier-name host">Horeca Store</div>
+      <div class="toast-vip-seal">VIP</div>
+      <div class="toast-tier-rank">Request secured</div>
+      <div class="toast-tier-name host">The Horeca <em>Meetup</em></div>
+      <div class="toast-tier-meta">Houston · Vol. II · Private review</div>
     </div>
     <div class="toast-tier-body">
-      <div class="toast-text" id="vipToastText"></div>
+      <div class="toast-text" id="vipToastText" aria-live="polite"></div>
     </div>
   </div>
 </div>
@@ -630,9 +720,16 @@ const supabaseClient =
     : null;
 
 let vipToastTimer = null;
+/** When true, next hideVipToast() sends the user to the VIP landing page. */
+let vipToastRedirectToLanding = false;
+
+const VIP_LANDING_HREF = new URL('vip.html', window.location.href).pathname;
+
 function hideVipToast() {
   const toast = document.getElementById('vipToast');
   const backdrop = document.getElementById('vipToastBackdrop');
+  const goToLanding = vipToastRedirectToLanding;
+  vipToastRedirectToLanding = false;
   if (vipToastTimer) {
     clearTimeout(vipToastTimer);
     vipToastTimer = null;
@@ -642,12 +739,17 @@ function hideVipToast() {
     backdrop.classList.remove('show');
     backdrop.setAttribute('aria-hidden', 'true');
   }
+  if (goToLanding) {
+    window.location.assign(VIP_LANDING_HREF);
+  }
 }
 
-function showVipToast(html) {
+/** @param {string} html @param {{ redirectToLanding?: boolean }} [opts] */
+function showVipToast(html, opts) {
   const toast = document.getElementById('vipToast');
   const backdrop = document.getElementById('vipToastBackdrop');
   const toastText = document.getElementById('vipToastText');
+  vipToastRedirectToLanding = Boolean(opts && opts.redirectToLanding);
   toastText.innerHTML = html;
   if (vipToastTimer) clearTimeout(vipToastTimer);
   if (backdrop) {
@@ -659,6 +761,7 @@ function showVipToast(html) {
 }
 
 document.getElementById('vipToastBackdrop').addEventListener('click', hideVipToast);
+document.getElementById('vipToastDismiss').addEventListener('click', hideVipToast);
 
 document.getElementById('plusOneToggle').addEventListener('change', function (e) {
   const wrap = document.getElementById('plusOneFields');
@@ -844,20 +947,20 @@ async function submitVipApply(e) {
   }
 
   let toastMsg =
-    '<div class="toast-headline">Your VIP request is in.</div>' +
+    '<div class="toast-headline">Your <em>VIP request</em> is with us.</div>' +
     '<p class="toast-para">We have received your application and our leadership team will review it with the care these evenings deserve. You should expect a <em>personal</em> reply at the email address you shared. Most notes go out within a few business days, though busy weeks can occasionally run a little longer.</p>' +
     '<p class="toast-para">There is nothing else you need to do on this page for now. Please watch your inbox (and, kindly, your spam or promotions folder) so our note does not slip past you.</p>' +
     '<p class="toast-para">If your plans change before you hear from us, simply reply once we write in, or reach out anytime to <em>events@thehorecastore.com</em>, and we will help.</p>' +
     '<p class="toast-tagline">Thank you for your interest in The Horeca Meetup. We are truly glad you are considering joining us at the table.</p>';
   if (hasPlusOne) {
     toastMsg =
-      '<div class="toast-headline">Your VIP application for you and your guest is in.</div>' +
+      '<div class="toast-headline">Your <em>VIP application</em> for you and your guest is with us.</div>' +
       '<p class="toast-para">We have captured both names and contact details. Our team will review your joint request carefully and reply to the <em>primary</em> email you entered, with clear next steps and anything we need for your guest.</p>' +
       '<p class="toast-para">You may step away from this page for now. When our message arrives, either of you can reply in that thread or write directly to <em>events@thehorecastore.com</em> if something shifts before the dinner.</p>' +
       '<p class="toast-para">Should dates, attendance, or dietary realities change for either of you, a quick note back lets us adjust your request without losing your place in line.</p>' +
       '<p class="toast-tagline">We appreciate you sharing The Horeca Meetup with someone you trust. That means a great deal to us.</p>';
   }
-  showVipToast(toastMsg);
+  showVipToast(toastMsg, { redirectToLanding: true });
 
   form.reset();
   plusOneToggle.checked = false;

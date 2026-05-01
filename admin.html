@@ -314,6 +314,34 @@ th.vip-apply-th {
 }
 
 .cell-name { font-family: var(--serif); font-size: 16px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+.cell-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.cell-name-row .cell-name { margin-bottom: 0; }
+.attendee-vip-pill {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 6px 11px;
+  border-radius: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.attendee-vip-pill--apply {
+  color: var(--gold);
+  border: 1px solid rgba(201, 165, 92, 0.9);
+  background: rgba(201, 165, 92, 0.16);
+}
+.attendee-vip-pill--roster {
+  color: var(--gold-light);
+  border: 1px solid rgba(201, 165, 92, 0.45);
+  background: rgba(201, 165, 92, 0.08);
+}
 .cell-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); display: flex; gap: 12px; flex-wrap: wrap; }
 .cell-business { font-size: 14px; color: var(--ink); margin-bottom: 4px; font-weight: 500; }
 .cell-role-locations { font-family: var(--mono); font-size: 11px; color: var(--ink-soft); }
@@ -852,8 +880,8 @@ function updateStats() {
   document.getElementById('statTotal').textContent = totalSeats;
 }
 
-/** True if marked VIP in DB or submitted via VIP apply path (fields or challenge). */
-function registrationVipAttention(r) {
+/** True if they used the VIP application form (fields or VIP fallback text in challenge). */
+function registrationSubmittedViaVipForm(r) {
   const hasVipFields =
     !!(r.vip_optional_note && String(r.vip_optional_note).trim()) ||
     !!r.vip_interest_keynote ||
@@ -861,8 +889,21 @@ function registrationVipAttention(r) {
     !!(r.vip_topic_note && String(r.vip_topic_note).trim());
   const ch = r.challenge && String(r.challenge);
   const challengeVip = !!(ch && /\[VIP apply/i.test(ch));
-  const appliedVipPath = hasVipFields || challengeVip;
-  return !!(r.is_vip || appliedVipPath);
+  return !!(hasVipFields || challengeVip);
+}
+
+function registrationVipAttention(r) {
+  return !!(r.is_vip || registrationSubmittedViaVipForm(r));
+}
+
+function attendeeVipLabelHtml(r) {
+  if (registrationSubmittedViaVipForm(r)) {
+    return '<span class="attendee-vip-pill attendee-vip-pill--apply" title="Came from the VIP apply page (events site / VIP path)">VIP apply</span>';
+  }
+  if (r.is_vip) {
+    return '<span class="attendee-vip-pill attendee-vip-pill--roster" title="Marked VIP in admin (main RSVP)">VIP guest</span>';
+  }
+  return '';
 }
 
 function registrationVipNeedsAction(r) {
@@ -878,11 +919,11 @@ function vipIndicatorForRegistrationsColumn(r) {
       '</div>'
     );
   }
-  if (registrationVipAttention(r)) {
+  if (registrationSubmittedViaVipForm(r)) {
     return (
-      '<div class="vip-badge vip-badge--pending" title="They applied via the VIP form. Open View, then Mark as VIP if they should be treated as VIP.">' +
+      '<div class="vip-badge vip-badge--pending" title="VIP application form. Use Mark as VIP in View if they should get VIP treatment.">' +
       '<span class="vip-badge-mono">VIP application</span>' +
-      '<span class="vip-badge-serif-sm">Review flag</span>' +
+      '<span class="vip-badge-serif-sm">Review / flag</span>' +
       '</div>'
     );
   }
@@ -894,8 +935,8 @@ function vipIndicatorForDoorName(r) {
   if (r.is_vip) {
     return ' <span class="status-pill" style="border-color:var(--gold);color:var(--gold);font-size:9px;padding:2px 7px;text-transform:uppercase;letter-spacing:0.05em">VIP</span>';
   }
-  if (registrationVipAttention(r)) {
-    return ' <span class="status-pill" style="border-color:rgba(212,165,116,0.45);color:var(--gold);font-size:9px;padding:2px 7px;text-transform:uppercase" title="VIP application: open guest and Mark as VIP">Apply</span>';
+  if (registrationSubmittedViaVipForm(r)) {
+    return ' <span class="status-pill" style="border-color:rgba(212,165,116,0.45);color:var(--gold);font-size:9px;padding:2px 7px;text-transform:uppercase" title="VIP apply">VIP apply</span>';
   }
   return '';
 }
@@ -947,7 +988,9 @@ function registrationTableRowsHtml(r) {
       <td>
         ${vipRibbon}
         ${r.has_plus_one ? '<div class="pair-slot-label">Primary guest</div>' : ''}
-        <div class="cell-name">${primaryName}</div>
+        <div class="cell-name-row">
+          <div class="cell-name">${primaryName}</div>${attendeeVipLabelHtml(r)}
+        </div>
         <div class="cell-meta">
           <span>${escape(r.role || 'Role not specified')}</span>
         </div>
@@ -974,7 +1017,9 @@ function registrationTableRowsHtml(r) {
     <tr class="reg-pair-guest${trVip}" data-registration-id="${id}" data-pair-role="plus-one">
       <td>
         <div class="pair-guest-slot-label">+1 · same party</div>
-        <div class="cell-name">${guestFirst} ${guestLast}</div>
+        <div class="cell-name-row">
+          <div class="cell-name">${guestFirst} ${guestLast}</div>${attendeeVipLabelHtml(r)}
+        </div>
         <div class="cell-meta">
           <span>${guestRole}</span>
         </div>
