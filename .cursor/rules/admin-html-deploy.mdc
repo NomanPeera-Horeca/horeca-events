@@ -1,0 +1,52 @@
+---
+description: Deploying admin.html — Render serves from a DIFFERENT repo
+globs: admin.html
+alwaysApply: true
+---
+
+# admin.html → Render deploys from a SEPARATE repo
+
+**Render's `horeca-admin` static site is connected to
+`github.com/NomanPeera-Horeca/horeca-admin.git`, NOT this repo.**
+The file there is named `index.html`, not `admin.html`.
+
+The `render.yaml` in this repo looks like it wires Render to
+`horeca-events`, but it does **not** — it's a stale blueprint. Render's
+dashboard is pinned to the other repo and ignores it. Pushing to
+`horeca-events/main` alone will not update the live admin.
+
+### The only correct workflow for admin.html
+
+1. Edit `admin.html` in this repo (`Horeca_Events`).
+2. Commit + push here (source of truth + lets Events site see any inline
+   references).
+3. **Run the sync script** from this repo root:
+   ```bash
+   ./scripts/sync-admin-to-render.sh "commit message"
+   ```
+   It copies `admin.html` → `../Horeca_Admin/index.html`, commits, and
+   pushes that sibling repo. Render auto-deploys within ~60 seconds.
+
+### Verify it actually went live
+
+```bash
+curl -sS "https://horeca-admin.onrender.com/?cb=$(date +%s)" | grep -c '<YOUR_NEW_MARKER>'
+```
+
+If this returns `0`, Render is still serving the old build — wait or
+trigger a manual deploy in the Render dashboard.
+
+### Do not
+
+- Do **not** assume a push to `horeca-events` triggers Render.
+- Do **not** rename the file on the `horeca-admin` side; the build
+  command there is `mkdir -p dist && cp index.html dist/index.html`.
+- Do **not** edit `../Horeca_Admin/index.html` directly — it will be
+  overwritten by the next sync. Edit `admin.html` here.
+
+### Repo layout (context)
+
+| Repo | Role | Path on disk |
+|---|---|---|
+| `NomanPeera-Horeca/horeca-events` | source of truth, events.thehorecastore.com | `/Users/nomanpeera/Downloads/Horeca_Events` |
+| `NomanPeera-Horeca/horeca-admin` | Render → horeca-admin.onrender.com | `/Users/nomanpeera/Downloads/Horeca_Admin` |
