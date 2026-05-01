@@ -1,0 +1,12 @@
+{
+  "name": "horeca-events",
+  "private": true,
+  "type": "module",
+  "description": "Static event site + tools. Use scripts/import-registrations-from-csv.mjs for bulk imports.",
+  "scripts": {
+    "import-registrations": "node scripts/import-registrations-from-csv.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1"
+  }
+}
