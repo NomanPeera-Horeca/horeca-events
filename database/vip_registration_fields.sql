@@ -1,4 +1,5 @@
--- VIP apply page: optional narrative + program-interest flags (run in Supabase SQL Editor)
+-- VIP apply page: optional narrative + program-interest flags (run in Supabase SQL Editor).
+-- If this is not run, the public form still saves (fallback) into `challenge` and may omit `is_vip` if RLS blocks it.
 ALTER TABLE public.registrations
   ADD COLUMN IF NOT EXISTS vip_optional_note text,
   ADD COLUMN IF NOT EXISTS vip_interest_keynote boolean NOT NULL DEFAULT false,

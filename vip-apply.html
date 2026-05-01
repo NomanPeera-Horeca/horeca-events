@@ -472,6 +472,41 @@ main {
 </div>
 
 <script>
+function vipProgramSummary(raw) {
+  const parts = [];
+  if (raw.vipOptionalNote && String(raw.vipOptionalNote).trim()) {
+    parts.push('Context: ' + String(raw.vipOptionalNote).trim());
+  }
+  if (raw.vipInterestKeynote === 'yes') {
+    parts.push('Interested: keynote / featured remarks');
+  }
+  if (raw.vipInterestQa === 'yes') {
+    parts.push('Interested: Q&A with audience');
+  }
+  if (raw.vipTopicNote && String(raw.vipTopicNote).trim()) {
+    parts.push('Topic: ' + String(raw.vipTopicNote).trim());
+  }
+  return parts.length ? parts.join(' | ') : null;
+}
+
+function isMissingVipColumnError(err) {
+  const msg = String((err && (err.message || err.details || err.hint)) || '');
+  const code = err && err.code;
+  if (code === 'PGRST204') return true;
+  if (/vip_optional_note|vip_interest_keynote|vip_interest_qa|vip_topic_note|\bis_vip\b/i.test(msg)) return true;
+  if (/Could not find the .+ column|column .+ does not exist/i.test(msg)) return true;
+  return false;
+}
+
+function isRlsOrPermissionError(err) {
+  const msg = String((err && (err.message || err.details || err.hint)) || '');
+  const code = err && err.code;
+  if (code === '42501') return true;
+  return /row-level security|violates row-level|RLS policy|permission denied|Insufficient privilege|not authorized/i.test(
+    msg
+  );
+}
+
 const SUPABASE_URL = 'https://hgvfixbopldwptnfpxwc.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_MI0yJ7Lw1j3HCwDveLZWLg_vs9n3ojJ';
 
@@ -572,7 +607,7 @@ async function submitVipApply(e) {
 
       if (eventError || !eventData) throw new Error('Event lookup failed');
 
-      const registration = {
+      const base = {
         event_id: eventData.id,
         form_type: 'rsvp',
         status: 'pending',
@@ -583,7 +618,6 @@ async function submitVipApply(e) {
         business_name: raw.business,
         role: raw.role || null,
         locations: raw.locations || null,
-        challenge: null,
         source: raw.source || null,
         has_plus_one: hasPlusOne,
         plus_one_first_name: hasPlusOne ? raw.plusOneFirstName : null,
@@ -592,22 +626,81 @@ async function submitVipApply(e) {
         plus_one_phone: hasPlusOne ? raw.plusOnePhone.trim() : null,
         plus_one_role: hasPlusOne ? raw.plusOneRole : null,
         attendee_count: hasPlusOne ? 2 : 1,
-        is_vip: true,
-        vip_optional_note: (raw.vipOptionalNote && raw.vipOptionalNote.trim()) || null,
-        vip_interest_keynote: raw.vipInterestKeynote === 'yes',
-        vip_interest_qa: raw.vipInterestQa === 'yes',
-        vip_topic_note: (raw.vipTopicNote && raw.vipTopicNote.trim()) || null,
         user_agent: navigator.userAgent,
         utm_source: new URLSearchParams(window.location.search).get('utm_source'),
         utm_medium: new URLSearchParams(window.location.search).get('utm_medium'),
         utm_campaign: new URLSearchParams(window.location.search).get('utm_campaign'),
       };
 
-      const { error: insertError } = await supabaseClient.from('registrations').insert([registration]);
+      const full = {
+        ...base,
+        challenge: null,
+        is_vip: true,
+        vip_optional_note: (raw.vipOptionalNote && raw.vipOptionalNote.trim()) || null,
+        vip_interest_keynote: raw.vipInterestKeynote === 'yes',
+        vip_interest_qa: raw.vipInterestQa === 'yes',
+        vip_topic_note: (raw.vipTopicNote && raw.vipTopicNote.trim()) || null,
+      };
+
+      let insertError = null;
+      ({ error: insertError } = await supabaseClient.from('registrations').insert([full]));
+
+      if (insertError && isMissingVipColumnError(insertError)) {
+        const summary = vipProgramSummary(raw);
+        const summaryText = summary ? '[VIP apply] ' + summary : '[VIP apply]';
+        const fallback = {
+          ...base,
+          is_vip: true,
+          challenge: summaryText,
+        };
+        console.warn(
+          'VIP apply: retrying without vip_* columns (run database/vip_registration_fields.sql in Supabase for full fields).',
+          insertError
+        );
+        ({ error: insertError } = await supabaseClient.from('registrations').insert([fallback]));
+
+        if (insertError && isMissingVipColumnError(insertError)) {
+          const fallbackNoIsVip = { ...base, challenge: summaryText };
+          console.warn(
+            'VIP apply: retrying without is_vip (run database/upsert_email_template_approval_vip.sql if that column is missing).',
+            insertError
+          );
+          ({ error: insertError } = await supabaseClient.from('registrations').insert([fallbackNoIsVip]));
+        }
+      }
+
+      if (insertError && isRlsOrPermissionError(insertError)) {
+        const summary = vipProgramSummary(raw);
+        const rlsFallback = {
+          ...base,
+          is_vip: false,
+          challenge: summary ? '[VIP apply — mark VIP in admin] ' + summary : '[VIP apply — mark VIP in admin]',
+        };
+        console.warn('VIP apply: retrying without is_vip (check RLS / anon insert policy).', insertError);
+        ({ error: insertError } = await supabaseClient.from('registrations').insert([rlsFallback]));
+      }
+
       if (insertError) throw insertError;
     } catch (err) {
       console.error('VIP apply failed:', err);
-      alert('Sorry, something went wrong. Please email events@thehorecastore.com or noman.peera@thehorecastore.com.');
+      let hint = 'unknown error';
+      if (err && typeof err === 'object') {
+        hint = String(
+          err.message ||
+            err.error_description ||
+            (err.error && err.error.message) ||
+            err.details ||
+            err.hint ||
+            JSON.stringify(err)
+        ).slice(0, 240);
+      } else if (err) {
+        hint = String(err).slice(0, 240);
+      }
+      alert(
+        'Sorry, something went wrong saving your request.\n\n' +
+          'Please email events@thehorecastore.com — and if you can, mention this detail: ' +
+          hint
+      );
       submitBtn.disabled = false;
       submitBtn.textContent = originalText;
       return;
