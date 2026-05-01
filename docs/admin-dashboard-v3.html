@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horeca Admin · Engagement Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-base: #0a0907;
+    --bg-elevated: #131110;
+    --bg-card: #1a1816;
+    --bg-card-hover: #221f1c;
+    --bg-row-hover: #1d1a17;
+    --bg-row-zebra: #0f0d0b;
+    --border: #2a2624;
+    --border-light: #3a3431;
+    --gold: #c9a55c;
+    --gold-bright: #e0b870;
+    --gold-dim: #8b6f3a;
+    --gold-soft: rgba(201, 165, 92, 0.1);
+    --cream: #f5f1e8;
+    --text-primary: #f5f1e8;
+    --text-secondary: #b8aea0;
+    --text-tertiary: #6b6358;
+    --text-dim: #4a4540;
+    --green: #6ba368;
+    --green-bg: rgba(107, 163, 104, 0.1);
+    --red: #c93838;
+    --red-bg: rgba(201, 56, 56, 0.12);
+    --orange: #ff8a3d;
+    --orange-bg: rgba(255, 138, 61, 0.12);
+    --blue: #5a8aa8;
+    --blue-bg: rgba(90, 138, 168, 0.1);
+  }
+
+  body {
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ───── HEADER ───── */
+  .top-bar {
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .brand { display: flex; align-items: center; gap: 14px; }
+
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+    background: var(--gold);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    color: var(--bg-base);
+    font-size: 18px;
+  }
+
+  .brand-text {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .brand-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 2px;
+  }
+
+  .top-tabs { display: flex; gap: 4px; }
+
+  .top-tab {
+    padding: 9px 18px;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 12px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .top-tab:hover { color: var(--text-secondary); background: var(--bg-card); }
+  .top-tab.active { color: var(--gold); background: var(--gold-soft); }
+
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  .avatar {
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bg-base);
+    font-weight: 600;
+    font-size: 11px;
+  }
+
+  /* ───── CONTAINER ───── */
+  .container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 28px 32px;
+  }
+
+  /* ───── PAGE HEADER ───── */
+  .page-header {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .page-header-left h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 38px;
+    font-weight: 500;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .page-header-left h1 em {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  .page-header-meta {
+    display: flex;
+    gap: 14px;
+    color: var(--text-tertiary);
+    font-size: 13px;
+    align-items: center;
+  }
+
+  .page-header-meta .dot { color: var(--gold-dim); }
+
+  .countdown {
+    background: var(--gold-soft);
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .countdown::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--gold);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ───── STATS STRIP ───── */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .stat-cell {
+    background: var(--bg-elevated);
+    padding: 16px 18px;
+  }
+
+  .stat-cell .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-bottom: 8px;
+  }
+
+  .stat-cell .num {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    color: var(--text-primary);
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .stat-cell .num.gold { color: var(--gold); }
+  .stat-cell .num.green { color: var(--green); }
+  .stat-cell .num.red { color: var(--red); }
+
+  .stat-cell .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 4px;
+  }
+
+  /* ───── INLINE FILTER BAR ───── */
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .filter-bar .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-right: 4px;
+  }
+
+  .pill {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .pill:hover { border-color: var(--border-light); color: var(--text-primary); }
+  .pill.active { background: var(--gold-soft); border-color: var(--gold); color: var(--gold); }
+
+  .pill .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+  }
+
+  .filter-spacer { flex: 1; }
+
+  .search {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    width: 240px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .search:focus { outline: none; border-color: var(--gold-dim); }
+
+  .btn {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .btn:hover { color: var(--gold); border-color: var(--gold-dim); }
+
+  /* ───── CAMPAIGN ACCORDION ───── */
+  .campaign {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+  }
+
+  .campaign.expanded { border-color: var(--gold-dim); }
+
+  .campaign-bar {
+    padding: 18px 22px;
+    display: grid;
+    grid-template-columns: 24px 1fr auto;
+    gap: 20px;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .campaign-bar:hover { background: var(--bg-card); }
+
+  .chevron {
+    color: var(--gold);
+    font-size: 14px;
+    transition: transform 0.25s ease;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .campaign.expanded .chevron { transform: rotate(90deg); }
+
+  .campaign-info { display: flex; align-items: center; gap: 18px; }
+
+  .campaign-icon {
+    width: 38px;
+    height: 38px;
+    background: var(--gold-soft);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .campaign-icon.scheduled {
+    background: var(--bg-card);
+    color: var(--text-dim);
+  }
+
+  .campaign-name {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+    line-height: 1.2;
+  }
+
+  .campaign-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .campaign-sub .dot { color: var(--gold-dim); }
+  .campaign-sub .live { color: var(--gold); }
+
+  /* ───── CAMPAIGN STATS (right side of bar) ───── */
+  .campaign-stats {
+    display: flex;
+    gap: 22px;
+    align-items: center;
+  }
+
+  .cs {
+    text-align: center;
+    min-width: 58px;
+  }
+
+  .cs .pct {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: var(--text-primary);
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .cs .pct.dim { color: var(--text-dim); }
+  .cs .pct.gold { color: var(--gold-bright); }
+  .cs .pct.red { color: var(--red); }
+
+  .cs .pct-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-top: 5px;
+  }
+
+  /* ───── EXPANDED TABLE ───── */
+  .recipient-table-wrap {
+    display: none;
+    border-top: 1px solid var(--border);
+    background: var(--bg-base);
+  }
+
+  .campaign.expanded .recipient-table-wrap { display: block; }
+
+  .table-toolbar {
+    padding: 12px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-card);
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .table-toolbar-left {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .filter-mini {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 4px 11px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .filter-mini:hover { color: var(--gold); border-color: var(--gold-dim); }
+  .filter-mini.active { background: var(--gold-soft); color: var(--gold); border-color: var(--gold); }
+
+  .table-toolbar-right {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* ───── ACTUAL TABLE ───── */
+  .recipient-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .recipient-table thead {
+    background: var(--bg-card);
+  }
+
+  .recipient-table thead th {
+    padding: 11px 16px;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .recipient-table thead th.center { text-align: center; }
+
+  .recipient-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s ease;
+  }
+
+  .recipient-table tbody tr:nth-child(even) { background: var(--bg-row-zebra); }
+  .recipient-table tbody tr:hover { background: var(--bg-row-hover); }
+  .recipient-table tbody tr:last-child { border-bottom: none; }
+
+  .recipient-table td {
+    padding: 13px 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .recipient-table td.center { text-align: center; }
+
+  .recipient-table td .name {
+    color: var(--text-primary);
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .recipient-table td .email {
+    color: var(--text-tertiary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+
+  .recipient-table td .biz {
+    color: var(--text-secondary);
+  }
+
+  .recipient-table td .role {
+    color: var(--text-tertiary);
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  /* ───── CHECK / X ICONS ───── */
+  .check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .check.yes { background: var(--green-bg); color: var(--green); }
+  .check.no { background: var(--bg-card); color: var(--text-dim); }
+  .check.bounce { background: var(--red-bg); color: var(--red); }
+  .check.pending { background: var(--bg-card); color: var(--text-dim); }
+
+  /* Forward indicator */
+  .fwd-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .fwd-pill.yes {
+    background: var(--orange-bg);
+    color: var(--orange);
+  }
+
+  .fwd-pill.maybe {
+    background: var(--blue-bg);
+    color: var(--blue);
+  }
+
+  .fwd-pill.no {
+    color: var(--text-dim);
+  }
+
+  .count-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-card);
+    border-radius: 100px;
+    padding: 3px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 36px;
+    justify-content: center;
+  }
+
+  .count-pill.active {
+    background: var(--gold-soft);
+    color: var(--gold);
+  }
+
+  .count-pill.zero {
+    background: transparent;
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+
+  .activity-cell {
+    color: var(--text-tertiary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+
+  .activity-cell.recent { color: var(--gold); }
+
+  /* ───── ROW ACTION BUTTONS ───── */
+  .action-btns {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+  }
+
+  .action-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-tertiary);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .action-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
+  .action-btn.primary { background: var(--gold); color: var(--bg-base); border-color: var(--gold); }
+  .action-btn.primary:hover { background: var(--gold-bright); }
+
+  /* ───── BULK ACTIONS ───── */
+  .bulk-bar {
+    padding: 14px 22px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-card);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .bulk-text {
+    color: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  .bulk-text .num { color: var(--gold); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+
+  .bulk-actions { display: flex; gap: 8px; }
+
+  /* ───── TOOLTIP ───── */
+  [data-tip] { position: relative; }
+  [data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    color: var(--text-primary);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    margin-bottom: 6px;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  /* ───── HINT BANNER ───── */
+  .hint {
+    background: linear-gradient(135deg, rgba(201, 165, 92, 0.08), rgba(201, 165, 92, 0.02));
+    border: 1px dashed var(--gold-dim);
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hint::before { content: '👆'; font-size: 16px; }
+  .hint .gold { color: var(--gold); font-weight: 600; }
+
+  /* ───── SCROLLBAR ───── */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg-base); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+
+  .table-scroll { overflow-x: auto; }
+
+  /* ───── MOBILE ───── */
+  @media (max-width: 1100px) {
+    .stats-strip { grid-template-columns: repeat(3, 1fr); }
+    .campaign-stats { gap: 12px; }
+    .cs .pct { font-size: 18px; }
+  }
+
+  @media (max-width: 768px) {
+    .container { padding: 16px; }
+    .top-tabs { display: none; }
+    .stats-strip { grid-template-columns: repeat(2, 1fr); }
+    .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .page-header-left h1 { font-size: 28px; }
+    .campaign-bar { grid-template-columns: 24px 1fr; }
+    .campaign-stats { display: none; }
+    .filter-bar .label { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ TOP BAR ═══ -->
+<div class="top-bar">
+  <div class="brand">
+    <div class="brand-mark">H</div>
+    <div>
+      <div class="brand-text">The Horeca Meetup</div>
+      <div class="brand-meta">Admin · Engagement</div>
+    </div>
+  </div>
+  <div class="top-tabs">
+    <div class="top-tab">RSVP</div>
+    <div class="top-tab">Door</div>
+    <div class="top-tab active">Engagement</div>
+  </div>
+  <div class="user-chip">
+    <span>Noman</span>
+    <div class="avatar">NP</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ═══ PAGE HEADER ═══ -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1>Engagement <em>Dashboard</em></h1>
+      <div class="page-header-meta">
+        <span>Houston Vol. II</span>
+        <span class="dot">·</span>
+        <span>Tuesday, May 5, 2026</span>
+        <span class="dot">·</span>
+        <span>47 of 100 seats confirmed</span>
+      </div>
+    </div>
+    <div class="countdown">5 days to event</div>
+  </div>
+
+  <!-- ═══ STATS STRIP ═══ -->
+  <div class="stats-strip">
+    <div class="stat-cell">
+      <div class="label">Sent</div>
+      <div class="num">47</div>
+      <div class="meta">total recipients</div>
+    </div>
+    <div class="stat-cell">
+      <div class="label">Delivered</div>
+      <div class="num green">45</div>
+      <div class="meta">96% delivery rate</div>
+    </div>
+    <div class="stat-cell">
+      <div class="label">Opened</div>
+      <div class="num gold">38</div>
+      <div class="meta">84% open rate</div>
+    </div>
+    <div class="stat-cell">
+      <div class="label">Clicked</div>
+      <div class="num gold">22</div>
+      <div class="meta">49% click rate</div>
+    </div>
+    <div class="stat-cell">
+      <div class="label">Forwarded</div>
+      <div class="num gold">6</div>
+      <div class="meta">13% likely shared</div>
+    </div>
+    <div class="stat-cell">
+      <div class="label">Bounced</div>
+      <div class="num red">2</div>
+      <div class="meta">4% needs cleanup</div>
+    </div>
+  </div>
+
+  <!-- ═══ HINT ═══ -->
+  <div class="hint">
+    <div>Click any <span class="gold">campaign bar below</span> to expand inline and see every recipient with their per-email engagement.</div>
+  </div>
+
+  <!-- ═══ CAMPAIGN ACCORDION ═══ -->
+
+  <!-- Campaign 1: Approval (LIVE / EXPANDED) -->
+  <div class="campaign expanded" id="c1">
+    <div class="campaign-bar" onclick="toggleCampaign('c1')">
+      <span class="chevron">▶</span>
+      <div class="campaign-info">
+        <div class="campaign-icon">📧</div>
+        <div>
+          <div class="campaign-name">Approval Email</div>
+          <div class="campaign-sub">
+            <span>Sent Apr 30 · 4:00 PM</span>
+            <span class="dot">·</span>
+            <span>47 recipients</span>
+            <span class="dot">·</span>
+            <span class="live">● Live · tracking</span>
+          </div>
+        </div>
+      </div>
+      <div class="campaign-stats">
+        <div class="cs"><div class="pct gold">96%</div><div class="pct-label">Delivered</div></div>
+        <div class="cs"><div class="pct gold">84%</div><div class="pct-label">Opened</div></div>
+        <div class="cs"><div class="pct gold">49%</div><div class="pct-label">Clicked</div></div>
+        <div class="cs"><div class="pct gold">38%</div><div class="pct-label">Cal Add</div></div>
+        <div class="cs"><div class="pct gold">13%</div><div class="pct-label">Fwd</div></div>
+        <div class="cs"><div class="pct red">4%</div><div class="pct-label">Bounced</div></div>
+      </div>
+    </div>
+
+    <div class="recipient-table-wrap">
+      <div class="table-toolbar">
+        <div class="table-toolbar-left">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.16em;margin-right:6px;">Filter:</span>
+          <div class="filter-mini active">All 47</div>
+          <div class="filter-mini">Opened 38</div>
+          <div class="filter-mini">Not Opened 7</div>
+          <div class="filter-mini">Clicked 22</div>
+          <div class="filter-mini">Forwarded 6</div>
+          <div class="filter-mini">Bounced 2</div>
+        </div>
+        <div class="table-toolbar-right">
+          <button class="btn">Export CSV</button>
+          <button class="btn">Resend to Cold</button>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="recipient-table">
+          <thead>
+            <tr>
+              <th>Recipient</th>
+              <th>Business</th>
+              <th class="center" data-tip="Email reached inbox">Delivered</th>
+              <th class="center" data-tip="At least one open">Opened</th>
+              <th class="center" data-tip="Total opens">Times</th>
+              <th class="center" data-tip="Link clicks">Clicked</th>
+              <th class="center" data-tip="Added event to their calendar">Cal Add</th>
+              <th class="center" data-tip="Email opened from multiple cities or devices — likely forwarded">Fwd</th>
+              <th>Last Activity</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="name">Bilal Khan</div>
+                <div class="email">bilal@pakfoods.com</div>
+              </td>
+              <td>
+                <div class="biz">Pak Foods</div>
+                <div class="role">CEO</div>
+              </td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="count-pill active">4</span></td>
+              <td class="center"><span class="count-pill active">2</span></td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="fwd-pill no">—</span></td>
+              <td><span class="activity-cell recent">2 hr ago</span></td>
+              <td><div class="action-btns"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="name">Tanveer Ahmed</div>
+                <div class="email">tanveer@pakfoods.com</div>
+              </td>
+              <td>
+                <div class="biz">Pak Foods</div>
+                <div class="role">Founder · Keynote</div>
+              </td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="count-pill active">5</span></td>
+              <td class="center"><span class="count-pill active">3</span></td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="fwd-pill yes" data-tip="Opens from 2+ cities">↗ Yes</span></td>
+              <td><span class="activity-cell recent">4 hr ago</span></td>
+              <td><div class="action-btns"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="name">Uzair Ahmed</div>
+                <div class="email">uzair@growthhospitality.com</div>
+              </td>
+              <td>
+                <div class="biz">Growth Hospitality</div>
+                <div class="role">Speaker</div>
+              </td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="count-pill active">3</span></td>
+              <td class="center"><span class="count-pill active">2</span></td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="fwd-pill no">—</span></td>
+              <td><span class="activity-cell recent">6 hr ago</span></td>
+              <td><div class="action-btns"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="name">Sarah Lee</div>
+                <div class="email">sarah@cafebonjour.com</div>
+              </td>
+              <td>
+                <div class="biz">Café Bonjour</div>
+                <div class="role">Owner</div>
+              </td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="count-pill active">2</span></td>
+              <td class="center"><span class="count-pill zero">0</span></td>
+              <td class="center"><span class="check no">—</span></td>
+              <td class="center"><span class="fwd-pill maybe" data-tip="Opens from different devices">↗ Maybe</span></td>
+              <td><span class="activity-cell">1 day ago</span></td>
+              <td><div class="action-btns"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="name">Carlos Mendez</div>
+                <div class="email">carlos@texmex.co</div>
+              </td>
+              <td>
+                <div class="biz">Tex-Mex Co.</div>
+                <div class="role">Co-Founder</div>
+              </td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="count-pill active">2</span></td>
+              <td class="center"><span class="count-pill zero">0</span></td>
+              <td class="center"><span class="check no">—</span></td>
+              <td class="center"><span class="fwd-pill no">—</span></td>
+              <td><span class="activity-cell">1 day ago</span></td>
+              <td><div class="action-btns"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="name">Jennifer Wong</div>
+                <div class="email">j.wong@westin.com</div>
+              </td>
+              <td>
+                <div class="biz">Westin Houston</div>
+                <div class="role">F&amp;B Director</div>
+              </td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="count-pill active">1</span></td>
+              <td class="center"><span class="count-pill active">1</span></td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="fwd-pill no">—</span></td>
+              <td><span class="activity-cell">2 days ago</span></td>
+              <td><div class="action-btns"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="name">David Kim</div>
+                <div class="email">david@koreanbbq.group</div>
+              </td>
+              <td>
+                <div class="biz">Korean BBQ Group</div>
+                <div class="role">Operations</div>
+              </td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="count-pill active">2</span></td>
+              <td class="center"><span class="count-pill zero">0</span></td>
+              <td class="center"><span class="check no">—</span></td>
+              <td class="center"><span class="fwd-pill yes" data-tip="Opens from 2+ cities">↗ Yes</span></td>
+              <td><span class="activity-cell">2 days ago</span></td>
+              <td><div class="action-btns"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="name">Mohammed Ali</div>
+                <div class="email">mo@halalbites.com</div>
+              </td>
+              <td>
+                <div class="biz">Halal Bites</div>
+                <div class="role">Founder</div>
+              </td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="check no">—</span></td>
+              <td class="center"><span class="count-pill zero">0</span></td>
+              <td class="center"><span class="count-pill zero">0</span></td>
+              <td class="center"><span class="check no">—</span></td>
+              <td class="center"><span class="fwd-pill no">—</span></td>
+              <td><span class="activity-cell">sent 2d ago</span></td>
+              <td><div class="action-btns"><button class="action-btn primary">Nudge</button></div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="name">Ahmed Patel</div>
+                <div class="email">ahmed@spicejunction.com</div>
+              </td>
+              <td>
+                <div class="biz">Spice Junction</div>
+                <div class="role">Owner</div>
+              </td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="check no">—</span></td>
+              <td class="center"><span class="count-pill zero">0</span></td>
+              <td class="center"><span class="count-pill zero">0</span></td>
+              <td class="center"><span class="check no">—</span></td>
+              <td class="center"><span class="fwd-pill no">—</span></td>
+              <td><span class="activity-cell">sent 3d ago</span></td>
+              <td><div class="action-btns"><button class="action-btn primary">Nudge</button></div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="name">Lisa Chen</div>
+                <div class="email">l.chen@sonesta.com</div>
+              </td>
+              <td>
+                <div class="biz">Hotel Sonesta</div>
+                <div class="role">GM</div>
+              </td>
+              <td class="center"><span class="check yes">✓</span></td>
+              <td class="center"><span class="check no">—</span></td>
+              <td class="center"><span class="count-pill zero">0</span></td>
+              <td class="center"><span class="count-pill zero">0</span></td>
+              <td class="center"><span class="check no">—</span></td>
+              <td class="center"><span class="fwd-pill no">—</span></td>
+              <td><span class="activity-cell">sent 2d ago</span></td>
+              <td><div class="action-btns"><button class="action-btn primary">Nudge</button></div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="name">Rajesh Khanna</div>
+                <div class="email">rajesh@royalcaterers.com</div>
+              </td>
+              <td>
+                <div class="biz">Royal Caterers</div>
+                <div class="role">Director</div>
+              </td>
+              <td class="center"><span class="check bounce">✗</span></td>
+              <td class="center"><span class="check no">—</span></td>
+              <td class="center"><span class="count-pill zero">0</span></td>
+              <td class="center"><span class="count-pill zero">0</span></td>
+              <td class="center"><span class="check no">—</span></td>
+              <td class="center"><span class="fwd-pill no">—</span></td>
+              <td><span class="activity-cell" style="color:var(--red);">bounced</span></td>
+              <td><div class="action-btns"><button class="action-btn">Fix Email</button></div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="name">Emily Rodriguez</div>
+                <div class="email">emily@invalid-mailbox.com</div>
+              </td>
+              <td>
+                <div class="biz">Sazon Latino</div>
+                <div class="role">Chef-Owner</div>
+              </td>
+              <td class="center"><span class="check bounce">✗</span></td>
+              <td class="center"><span class="check no">—</span></td>
+              <td class="center"><span class="count-pill zero">0</span></td>
+              <td class="center"><span class="count-pill zero">0</span></td>
+              <td class="center"><span class="check no">—</span></td>
+              <td class="center"><span class="fwd-pill no">—</span></td>
+              <td><span class="activity-cell" style="color:var(--red);">bounced</span></td>
+              <td><div class="action-btns"><button class="action-btn">Fix Email</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bulk-bar">
+        <div class="bulk-text">Showing <span class="num">12</span> of 47 recipients · scroll for more</div>
+        <div class="bulk-actions">
+          <button class="btn">Send WhatsApp to Cold (3)</button>
+          <button class="btn">Open Full View</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Campaign 2: 2-Week Reminder (collapsed, scheduled) -->
+  <div class="campaign" id="c2">
+    <div class="campaign-bar" onclick="toggleCampaign('c2')">
+      <span class="chevron">▶</span>
+      <div class="campaign-info">
+        <div class="campaign-icon scheduled">⏸</div>
+        <div>
+          <div class="campaign-name">2-Week Reminder</div>
+          <div class="campaign-sub">
+            <span>Scheduled · Apr 21, 9:00 AM</span>
+            <span class="dot">·</span>
+            <span>47 recipients queued</span>
+          </div>
+        </div>
+      </div>
+      <div class="campaign-stats">
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Delivered</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Opened</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Clicked</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Cal Add</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Fwd</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Bounced</div></div>
+      </div>
+    </div>
+    <div class="recipient-table-wrap">
+      <div style="padding:40px;text-align:center;color:var(--text-tertiary);font-size:13px;">
+        Campaign not yet sent. Recipient table will populate after Apr 21, 9:00 AM.
+      </div>
+    </div>
+  </div>
+
+  <!-- Campaign 3: 1-Week Reminder -->
+  <div class="campaign" id="c3">
+    <div class="campaign-bar" onclick="toggleCampaign('c3')">
+      <span class="chevron">▶</span>
+      <div class="campaign-info">
+        <div class="campaign-icon scheduled">⏸</div>
+        <div>
+          <div class="campaign-name">1-Week Reminder</div>
+          <div class="campaign-sub">
+            <span>Scheduled · Apr 28, 9:00 AM</span>
+            <span class="dot">·</span>
+            <span>47 recipients queued</span>
+          </div>
+        </div>
+      </div>
+      <div class="campaign-stats">
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Delivered</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Opened</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Clicked</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Cal Add</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Fwd</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Bounced</div></div>
+      </div>
+    </div>
+    <div class="recipient-table-wrap">
+      <div style="padding:40px;text-align:center;color:var(--text-tertiary);font-size:13px;">
+        Campaign not yet sent. Recipient table will populate after Apr 28, 9:00 AM.
+      </div>
+    </div>
+  </div>
+
+  <!-- Campaign 4: Day Before -->
+  <div class="campaign" id="c4">
+    <div class="campaign-bar" onclick="toggleCampaign('c4')">
+      <span class="chevron">▶</span>
+      <div class="campaign-info">
+        <div class="campaign-icon scheduled">⏸</div>
+        <div>
+          <div class="campaign-name">Day-Before Reminder</div>
+          <div class="campaign-sub">
+            <span>Scheduled · May 4, 6:00 PM</span>
+            <span class="dot">·</span>
+            <span>47 recipients queued</span>
+          </div>
+        </div>
+      </div>
+      <div class="campaign-stats">
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Delivered</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Opened</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Clicked</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Cal Add</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Fwd</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Bounced</div></div>
+      </div>
+    </div>
+    <div class="recipient-table-wrap">
+      <div style="padding:40px;text-align:center;color:var(--text-tertiary);font-size:13px;">
+        Campaign not yet sent. Recipient table will populate after May 4, 6:00 PM.
+      </div>
+    </div>
+  </div>
+
+  <!-- Campaign 5: Day Of -->
+  <div class="campaign" id="c5">
+    <div class="campaign-bar" onclick="toggleCampaign('c5')">
+      <span class="chevron">▶</span>
+      <div class="campaign-info">
+        <div class="campaign-icon scheduled">⏸</div>
+        <div>
+          <div class="campaign-name">Day-Of · QR Resend</div>
+          <div class="campaign-sub">
+            <span>Scheduled · May 5, 8:00 AM</span>
+            <span class="dot">·</span>
+            <span>47 recipients queued</span>
+          </div>
+        </div>
+      </div>
+      <div class="campaign-stats">
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Delivered</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Opened</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Clicked</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Cal Add</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Fwd</div></div>
+        <div class="cs"><div class="pct dim">—</div><div class="pct-label">Bounced</div></div>
+      </div>
+    </div>
+    <div class="recipient-table-wrap">
+      <div style="padding:40px;text-align:center;color:var(--text-tertiary);font-size:13px;">
+        Campaign not yet sent. Recipient table will populate after May 5, 8:00 AM.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggleCampaign(id) {
+    document.getElementById(id).classList.toggle('expanded');
+  }
+
+  document.querySelectorAll('.filter-mini').forEach(f => {
+    f.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const parent = f.parentElement;
+      parent.querySelectorAll('.filter-mini').forEach(x => x.classList.remove('active'));
+      f.classList.add('active');
+    });
+  });
+
+  // Prevent toolbar clicks from collapsing the campaign
+  document.querySelectorAll('.recipient-table-wrap').forEach(w => {
+    w.addEventListener('click', e => e.stopPropagation());
+  });
+</script>
+
+</body>
+</html>
