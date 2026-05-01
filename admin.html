@@ -173,7 +173,7 @@ header { flex-wrap: wrap; row-gap: 12px; }
 .event-selector select { background: var(--bg-card); border: 1px solid var(--rule); padding: 10px 14px; color: var(--ink); font-size: 14px; font-family: var(--sans); min-width: 320px; cursor: pointer; }
 .event-selector select:focus { outline: none; border-color: var(--gold); }
 
-.stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(152px, 1fr)); gap: 12px; }
 .stat-card { background: var(--bg-card); border: 1px solid var(--rule); padding: 18px; cursor: pointer; transition: all 0.3s; }
 .stat-card:hover { border-color: var(--rule-strong); }
 .stat-card.active { border-color: var(--gold); background: rgba(201, 165, 92, 0.05); }
@@ -184,9 +184,41 @@ header { flex-wrap: wrap; row-gap: 12px; }
 .stat-approved .stat-num { color: var(--green); }
 .stat-rejected .stat-num { color: var(--red); }
 .stat-needs_info .stat-num { color: var(--gold); }
+.stat-vip .stat-num { color: var(--gold); }
+.stat-vip.active { border-color: var(--gold); background: rgba(201, 165, 92, 0.12); }
+.vip-attention-ribbon {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold));
+  display: inline-block;
+  padding: 6px 14px;
+  margin-bottom: 10px;
+  border-radius: 1px;
+}
+.registrations-table tbody tr.reg-vip-attention.reg-pair-primary td,
+.registrations-table tbody tr.reg-vip-attention.reg-pair-single td {
+  background: linear-gradient(90deg, rgba(201, 165, 92, 0.16) 0%, rgba(201, 165, 92, 0.03) 55%, transparent 100%);
+  box-shadow: inset 4px 0 0 var(--gold);
+}
+.registrations-table tbody tr.reg-vip-attention.reg-pair-guest td {
+  background: linear-gradient(90deg, rgba(201, 165, 92, 0.14) 0%, rgba(201, 165, 92, 0.06) 40%, rgba(201, 165, 92, 0.045) 100%);
+  box-shadow: inset 4px 0 0 var(--gold);
+}
 
 /* ━━━ TABLE ━━━ */
-.table-controls { padding: 16px 32px; display: flex; gap: 16px; align-items: center; background: var(--bg); border-bottom: 1px solid var(--rule); }
+.table-controls { padding: 16px 32px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; background: var(--bg); border-bottom: 1px solid var(--rule); }
+.table-controls-hint {
+  flex: 1 1 220px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ink-mute);
+  max-width: 520px;
+}
+.table-controls-hint strong { color: var(--gold); font-weight: 600; }
 .search-box { flex: 1; max-width: 400px; }
 .search-box input { width: 100%; background: var(--bg-card); border: 1px solid var(--rule); padding: 10px 14px; color: var(--ink); font-size: 13px; }
 .search-box input:focus { outline: none; border-color: var(--gold); }
@@ -471,6 +503,10 @@ th.vip-apply-th {
   <div id="viewRegs" class="view-panel">
   <div class="controls-bar" style="padding-top: 16px;">
     <div class="stats-grid">
+      <div class="stat-card stat-vip" data-status="vip_priority">
+        <div class="stat-num" id="statVipAttention">0</div>
+        <div class="stat-label">VIP · needs action</div>
+      </div>
       <div class="stat-card stat-pending active" data-status="pending">
         <div class="stat-num" id="statPending">0</div>
         <div class="stat-label">Pending Review</div>
@@ -498,6 +534,7 @@ th.vip-apply-th {
     <div class="search-box">
       <input type="text" id="searchInput" placeholder="Search name, email, phone, business, or guest…">
     </div>
+    <p class="table-controls-hint">VIP applications (or guests marked VIP) get a <strong>gold banner</strong> and sort to the <strong>top</strong> in Pending. Tap <strong>VIP · needs action</strong> above to work that queue only.</p>
   </div>
 
   <div class="table-wrapper">
@@ -799,12 +836,15 @@ async function loadRegistrations() {
 function updateStats() {
   const counts = { pending: 0, approved: 0, rejected: 0, needs_info: 0 };
   let totalSeats = 0;
-  
+  let vipNeedsAction = 0;
+
   allRegistrations.forEach(r => {
     counts[r.status] = (counts[r.status] || 0) + 1;
     if (r.status === 'approved') totalSeats += (r.attendee_count || 1);
+    if (registrationVipNeedsAction(r)) vipNeedsAction += 1;
   });
-  
+
+  document.getElementById('statVipAttention').textContent = vipNeedsAction;
   document.getElementById('statPending').textContent = counts.pending;
   document.getElementById('statApproved').textContent = counts.approved;
   document.getElementById('statRejected').textContent = counts.rejected;
@@ -812,8 +852,8 @@ function updateStats() {
   document.getElementById('statTotal').textContent = totalSeats;
 }
 
-/** VIP column: confirmed flag, VIP-form data/challenge, or standard RSVP */
-function vipIndicatorForRegistrationsColumn(r) {
+/** True if marked VIP in DB or submitted via VIP apply path (fields or challenge). */
+function registrationVipAttention(r) {
   const hasVipFields =
     !!(r.vip_optional_note && String(r.vip_optional_note).trim()) ||
     !!r.vip_interest_keynote ||
@@ -822,7 +862,14 @@ function vipIndicatorForRegistrationsColumn(r) {
   const ch = r.challenge && String(r.challenge);
   const challengeVip = !!(ch && /\[VIP apply/i.test(ch));
   const appliedVipPath = hasVipFields || challengeVip;
+  return !!(r.is_vip || appliedVipPath);
+}
 
+function registrationVipNeedsAction(r) {
+  return registrationVipAttention(r) && (r.status === 'pending' || r.status === 'needs_info');
+}
+
+function vipIndicatorForRegistrationsColumn(r) {
   if (r.is_vip) {
     return (
       '<div class="vip-badge vip-badge--yes" title="Confirmed VIP in database">' +
@@ -831,7 +878,7 @@ function vipIndicatorForRegistrationsColumn(r) {
       '</div>'
     );
   }
-  if (appliedVipPath) {
+  if (registrationVipAttention(r)) {
     return (
       '<div class="vip-badge vip-badge--pending" title="They applied via the VIP form. Open View, then Mark as VIP if they should be treated as VIP.">' +
       '<span class="vip-badge-mono">VIP application</span>' +
@@ -844,19 +891,10 @@ function vipIndicatorForRegistrationsColumn(r) {
 
 /** Small VIP marker next to name on Door tab */
 function vipIndicatorForDoorName(r) {
-  const hasVipFields =
-    !!(r.vip_optional_note && String(r.vip_optional_note).trim()) ||
-    !!r.vip_interest_keynote ||
-    !!r.vip_interest_qa ||
-    !!(r.vip_topic_note && String(r.vip_topic_note).trim());
-  const ch = r.challenge && String(r.challenge);
-  const challengeVip = !!(ch && /\[VIP apply/i.test(ch));
-  const appliedVipPath = hasVipFields || challengeVip;
-
   if (r.is_vip) {
     return ' <span class="status-pill" style="border-color:var(--gold);color:var(--gold);font-size:9px;padding:2px 7px;text-transform:uppercase;letter-spacing:0.05em">VIP</span>';
   }
-  if (appliedVipPath) {
+  if (registrationVipAttention(r)) {
     return ' <span class="status-pill" style="border-color:rgba(212,165,116,0.45);color:var(--gold);font-size:9px;padding:2px 7px;text-transform:uppercase" title="VIP application: open guest and Mark as VIP">Apply</span>';
   }
   return '';
@@ -879,6 +917,15 @@ function registrationTableRowsHtml(r) {
   const telGuest = r.plus_one_phone ? `tel:${escape(String(r.plus_one_phone))}` : '#';
 
   const vipCell = vipIndicatorForRegistrationsColumn(r);
+  const vipAtt = registrationVipAttention(r);
+  const vipRibbon =
+    vipAtt
+      ? registrationVipNeedsAction(r)
+        ? '<div class="vip-attention-ribbon">VIP · confirm first</div>'
+        : '<div class="vip-attention-ribbon">VIP</div>'
+      : '';
+  const trVip = vipAtt ? ' reg-vip-attention' : '';
+
   const statusCell = `<span class="status-pill ${r.status}">${r.status.replace('_', ' ')}</span>`;
   const timeCell = `<span class="cell-time">${timeAgo(r.created_at)}</span>`;
   const actionsPrimary = `
@@ -896,8 +943,9 @@ function registrationTableRowsHtml(r) {
         </div>`;
 
   const primaryTr = `
-    <tr class="${r.has_plus_one ? 'reg-pair-primary' : 'reg-pair-single'}" data-registration-id="${id}">
+    <tr class="${r.has_plus_one ? 'reg-pair-primary' : 'reg-pair-single'}${trVip}" data-registration-id="${id}">
       <td>
+        ${vipRibbon}
         ${r.has_plus_one ? '<div class="pair-slot-label">Primary guest</div>' : ''}
         <div class="cell-name">${primaryName}</div>
         <div class="cell-meta">
@@ -923,7 +971,7 @@ function registrationTableRowsHtml(r) {
   if (!r.has_plus_one) return primaryTr;
 
   const guestTr = `
-    <tr class="reg-pair-guest" data-registration-id="${id}" data-pair-role="plus-one">
+    <tr class="reg-pair-guest${trVip}" data-registration-id="${id}" data-pair-role="plus-one">
       <td>
         <div class="pair-guest-slot-label">+1 · same party</div>
         <div class="cell-name">${guestFirst} ${guestLast}</div>
@@ -957,20 +1005,46 @@ function registrationTableRowsHtml(r) {
 function renderTable() {
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
   const tbody = document.getElementById('registrationsBody');
-  
-  let filtered = allRegistrations;
-  if (currentFilter !== 'all') {
-    filtered = filtered.filter(r => r.status === currentFilter);
+
+  let filtered = allRegistrations.slice();
+  if (currentFilter === 'vip_priority') {
+    filtered = filtered.filter((r) => registrationVipNeedsAction(r));
+  } else if (currentFilter !== 'all') {
+    filtered = filtered.filter((r) => r.status === currentFilter);
   }
   if (search) {
-    filtered = filtered.filter(r => registrationPartySearchHay(r).includes(search));
+    filtered = filtered.filter((r) => registrationPartySearchHay(r).includes(search));
   }
-  
+
+  const ts = (x) => new Date(x.created_at).getTime();
+  filtered.sort((a, b) => {
+    if (currentFilter === 'vip_priority') {
+      return ts(a) - ts(b);
+    }
+    const va = registrationVipNeedsAction(a) ? 0 : 1;
+    const vb = registrationVipNeedsAction(b) ? 0 : 1;
+    if (va !== vb) return va - vb;
+    return ts(b) - ts(a);
+  });
+
+  let emptyTitle = 'No registrations';
+  if (currentFilter === 'vip_priority') {
+    emptyTitle = 'No VIP items need action';
+  } else if (currentFilter !== 'all') {
+    emptyTitle = `No registrations (${currentFilter})`;
+  }
+
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><h3>No registrations${currentFilter !== 'all' ? ` (${currentFilter})` : ''}</h3><p>${search ? 'Try a different search term' : 'Submissions will appear here as they come in.'}</p></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><h3>${emptyTitle}</h3><p>${
+      search
+        ? 'Try a different search term'
+        : currentFilter === 'vip_priority'
+          ? 'All VIP applications are approved or none are waiting. Try Pending Review for the full list.'
+          : 'Submissions will appear here as they come in.'
+    }</p></td></tr>`;
     return;
   }
-  
+
   tbody.innerHTML = filtered.map(registrationTableRowsHtml).join('');
 }
 
