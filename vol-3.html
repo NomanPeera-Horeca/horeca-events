@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Horeca Meetup · Houston Vol. III · September 8 2026</title>
+<meta name="description" content="Reserve early for The Horeca Meetup Houston Vol. III, September 8 2026 at the Marriott Energy Corridor. A private dinner series for restaurant and hotel owners. By invitation only." />
+<meta property="og:title" content="The Horeca Meetup · Houston Vol. III · September 8 2026" />
+<meta property="og:description" content="Reserve early for Vol. III. A private dinner series for restaurant and hotel owners. By invitation only." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://events.thehorecastore.com/vol-3.html" />
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230a0a0a'/%3E%3Ctext x='50' y='65' font-family='Georgia,serif' font-size='52' font-weight='700' fill='%23d4a574' text-anchor='middle'%3EH%3C/text%3E%3C/svg%3E" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0a0a0a;
+  --bg-elev: #141414;
+  --bg-card: #1a1a1a;
+  --ink: #ededed;
+  --ink-soft: #a8a8a8;
+  --ink-mute: #6b6b6b;
+  --gold: #c9a55c;
+  --gold-light: #e0c186;
+  --gold-deep: #8b6f3a;
+  --burgundy: #722f37;
+  --rule: rgba(255,255,255,0.08);
+  --rule-strong: rgba(255,255,255,0.16);
+  --serif: 'Fraunces', 'Times New Roman', serif;
+  --sans: 'Inter Tight', -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.6; overflow-x: hidden; }
+::selection { background: var(--gold); color: var(--bg); }
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+
+/* NAV */
+nav { position: sticky; top: 0; z-index: 90; background: rgba(10,10,10,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--rule); }
+.nav-inner { max-width: 1400px; margin: 0 auto; padding: 22px 40px; display: flex; align-items: center; justify-content: space-between; }
+.logo { font-family: var(--serif); font-size: 22px; font-weight: 600; letter-spacing: -0.02em; display: flex; align-items: baseline; gap: 10px; }
+.logo-mark { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1.5px solid var(--gold); color: var(--gold); font-size: 16px; font-weight: 700; position: relative; top: 4px; }
+.nav-links { display: flex; gap: 38px; align-items: center; }
+.nav-links a { font-size: 13px; font-weight: 500; letter-spacing: 0.02em; color: var(--ink-soft); transition: color 0.3s ease; }
+.nav-links a:hover { color: var(--gold); }
+.nav-cta { background: var(--gold); color: var(--bg) !important; padding: 11px 20px; font-weight: 600 !important; font-size: 12px !important; letter-spacing: 0.08em !important; text-transform: uppercase; transition: all 0.3s ease; }
+.nav-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+/* HERO */
+.hero { position: relative; min-height: 88vh; display: flex; align-items: center; padding: 80px 40px 60px; overflow: hidden; }
+.hero-bg-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(201, 165, 92, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(114, 47, 55, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(139, 111, 58, 0.12) 0%, transparent 60%),
+    linear-gradient(135deg, #0a0a0a 0%, #1a1410 50%, #0a0a0a 100%);
+}
+.hero-bg-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.6) 60%, rgba(10,10,10,0.85) 100%);
+}
+.hero-bg-image::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0);
+  background-size: 32px 32px;
+  opacity: 0.4;
+  z-index: 2;
+}
+.hero-inner { max-width: 1400px; margin: 0 auto; width: 100%; position: relative; z-index: 5; display: grid; grid-template-columns: 1.4fr 1fr; gap: 80px; align-items: center; }
+.hero-eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); margin-bottom: 32px; display: flex; align-items: center; gap: 14px; animation: fadeUp 0.8s ease; }
+.hero-eyebrow::before { content: ''; flex: 0 0 32px; height: 1px; background: var(--gold); }
+.hero h1 { font-family: var(--serif); font-size: clamp(48px, 7.5vw, 112px); font-weight: 300; line-height: 0.96; letter-spacing: -0.035em; margin-bottom: 36px; animation: fadeUp 1s ease 0.1s backwards; }
+.hero h1 em { font-style: italic; font-weight: 400; color: var(--gold); }
+.hero-sub { font-family: var(--serif); font-size: clamp(18px, 1.6vw, 22px); font-weight: 300; line-height: 1.5; color: var(--ink-soft); max-width: 560px; margin-bottom: 48px; animation: fadeUp 1s ease 0.2s backwards; }
+.hero-sub em { color: var(--ink); font-style: italic; }
+.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; animation: fadeUp 1s ease 0.3s backwards; }
+.btn { display: inline-flex; align-items: center; gap: 12px; padding: 18px 32px; font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1.5px solid transparent; position: relative; overflow: hidden; }
+.btn-primary { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+.btn-primary:hover { background: var(--gold-light); border-color: var(--gold-light); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(201, 165, 92, 0.25); }
+.btn-ghost { background: rgba(20,20,20,0.6); color: var(--ink); border-color: var(--rule-strong); backdrop-filter: blur(10px); }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); background: rgba(20,20,20,0.8); }
+.btn-arrow { transition: transform 0.3s ease; }
+.btn:hover .btn-arrow { transform: translateX(4px); }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.hero-card { background: rgba(20,20,20,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--rule-strong); padding: 40px; position: relative; animation: fadeUp 1s ease 0.4s backwards; }
+.hero-card::before { content: ''; position: absolute; top: -1px; left: -1px; right: -1px; height: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold)); }
+.hero-card-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.save-dot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; }
+.hero-card-title { font-family: var(--serif); font-size: 32px; font-weight: 400; line-height: 1.1; margin-bottom: 24px; letter-spacing: -0.02em; }
+.hero-card-vol { color: var(--gold); font-style: italic; }
+.hero-card-meta { display: grid; grid-template-columns: auto 1fr; gap: 14px 20px; padding: 24px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); margin-bottom: 24px; }
+.hero-card-meta dt { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); padding-top: 3px; }
+.hero-card-meta dd { font-size: 14px; color: var(--ink); font-weight: 500; }
+.hero-card-cta { display: block; width: 100%; text-align: center; padding: 16px; background: var(--gold); color: var(--bg); font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease; }
+.hero-card-cta:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 12px 28px rgba(201,165,92,0.22); }
+
+/* SECTIONS */
+section { padding: 120px 40px; position: relative; }
+.container { max-width: 1400px; margin: 0 auto; }
+.section-head { display: grid; grid-template-columns: auto 1fr; gap: 80px; margin-bottom: 80px; align-items: end; }
+.section-num { font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); padding-bottom: 12px; border-bottom: 2px solid var(--gold); }
+.section-title { font-family: var(--serif); font-size: clamp(36px, 5vw, 72px); font-weight: 300; line-height: 1.05; letter-spacing: -0.025em; }
+.section-title em { font-style: italic; color: var(--gold); }
+
+/* WHY ATTEND (compact) */
+.why { background: var(--bg-elev); }
+.why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+.why-card { background: var(--bg-elev); padding: 56px 40px; transition: background 0.3s ease; }
+.why-card:hover { background: var(--bg-card); }
+.why-card-num { font-family: var(--serif); font-size: 40px; font-style: italic; color: var(--gold); line-height: 1; margin-bottom: 28px; opacity: 0.85; }
+.why-card h3 { font-family: var(--serif); font-size: 26px; font-weight: 400; letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 18px; }
+.why-card h3 em { font-style: italic; color: var(--gold); }
+.why-card p { font-size: 15px; color: var(--ink-soft); line-height: 1.65; }
+.why-card p strong { color: var(--ink); font-weight: 500; }
+
+/* DETAILS SECTION */
+.details { background: var(--bg); }
+.details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+.details-block h3 { font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid var(--rule); }
+.details-list { list-style: none; }
+.details-list li { font-family: var(--serif); font-size: 20px; font-weight: 300; line-height: 1.5; padding: 18px 0; border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: 110px 1fr; gap: 24px; align-items: baseline; }
+.details-list li:last-child { border-bottom: none; }
+.details-list dt { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); }
+.details-list dd { color: var(--ink); font-size: 18px; line-height: 1.5; }
+.details-list dd em { font-style: italic; color: var(--gold); }
+
+/* RESERVE FORM */
+.reserve { background: var(--bg-elev); padding: 120px 40px; }
+.reserve-inner { max-width: 720px; margin: 0 auto; }
+.reserve-eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); text-align: center; margin-bottom: 24px; }
+.reserve h2 { font-family: var(--serif); font-size: clamp(40px, 5.5vw, 72px); font-weight: 300; line-height: 1; letter-spacing: -0.03em; text-align: center; margin-bottom: 20px; }
+.reserve h2 em { font-style: italic; color: var(--gold); }
+.reserve-sub { font-family: var(--serif); font-size: 18px; font-style: italic; color: var(--ink-soft); text-align: center; margin-bottom: 56px; line-height: 1.5; max-width: 560px; margin-left: auto; margin-right: auto; }
+
+.form-card { background: var(--bg-card); border: 1px solid var(--rule-strong); padding: 48px 40px; position: relative; }
+.form-card::before { content: ''; position: absolute; top: -1px; left: -1px; right: -1px; height: 3px; background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light)); }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.field-full { grid-column: 1 / -1; }
+.field label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft); }
+.field label .required { color: var(--gold); }
+.field input, .field select, .field textarea { background: var(--bg); border: 1px solid var(--rule); padding: 14px 16px; color: var(--ink); font-family: var(--sans); font-size: 14px; transition: border-color 0.3s ease; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--gold); }
+.field textarea { resize: vertical; min-height: 80px; }
+.field-hint { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; color: var(--ink-mute); margin-top: 4px; }
+.field-hint.error { color: #d4626a; }
+.field input.error, .field select.error { border-color: #d4626a; }
+
+.submit-btn { width: 100%; background: var(--gold); color: var(--bg); border: none; padding: 18px; font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; margin-top: 16px; transition: all 0.3s ease; }
+.submit-btn:hover { background: var(--gold-light); transform: translateY(-2px); }
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.form-fine { font-family: var(--serif); font-size: 13px; font-style: italic; color: var(--ink-mute); text-align: center; margin-top: 20px; line-height: 1.5; }
+
+/* PLUS ONE */
+.plus-one-section { margin: 24px 0; padding: 24px; border: 1px solid var(--rule); background: rgba(20,20,20,0.4); position: relative; }
+.plus-one-section::before { content: ''; position: absolute; top: -1px; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-deep), transparent); }
+.plus-one-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.plus-one-label { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.plus-one-eyebrow { font-family: var(--mono); font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); }
+.plus-one-title { font-family: var(--serif); font-size: 17px; font-weight: 400; color: var(--ink); font-style: italic; }
+.plus-one-toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--ink-soft); text-transform: uppercase; user-select: none; }
+.plus-one-toggle input { display: none; }
+.toggle-slider { width: 38px; height: 22px; background: var(--rule-strong); border-radius: 11px; position: relative; transition: background 0.3s ease; flex-shrink: 0; }
+.toggle-slider::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: var(--ink-soft); border-radius: 50%; transition: transform 0.3s ease, background 0.3s ease; }
+.plus-one-toggle input:checked + .toggle-slider { background: var(--gold); }
+.plus-one-toggle input:checked + .toggle-slider::after { transform: translateX(16px); background: var(--bg); }
+.plus-one-toggle input:checked ~ .toggle-text { color: var(--gold); }
+.plus-one-fields { display: none; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--rule); }
+.plus-one-fields.active { display: block; animation: fadeIn 0.4s ease; }
+.plus-one-note { font-family: var(--serif); font-size: 14px; font-style: italic; color: var(--ink-soft); margin-bottom: 20px; line-height: 1.5; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* SUCCESS STATE */
+.form-success { text-align: center; padding: 60px 0; display: none; }
+.form-success.active { display: block; }
+.success-mark { width: 72px; height: 72px; margin: 0 auto 28px; border: 1.5px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; color: var(--gold); font-family: var(--serif); }
+.form-success h3 { font-family: var(--serif); font-size: 36px; font-weight: 300; color: var(--ink); margin-bottom: 20px; letter-spacing: -0.02em; }
+.form-success h3 em { font-style: italic; color: var(--gold); }
+.form-success p { font-family: var(--serif); font-size: 17px; color: var(--ink-soft); line-height: 1.6; margin-bottom: 14px; font-style: italic; }
+.form-success p strong { color: var(--gold); font-weight: 500; font-style: normal; }
+
+/* CALENDAR BAR */
+.calendar-bar { margin-top: 32px; padding: 20px 24px; background: var(--bg); border: 1px solid var(--rule-strong); display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.calendar-bar-text { font-family: var(--serif); font-size: 15px; color: var(--ink-soft); font-style: italic; }
+.calendar-bar a { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold); padding: 10px 18px; transition: all 0.3s ease; }
+.calendar-bar a:hover { background: var(--gold); color: var(--bg); }
+
+/* FOOTER */
+footer { border-top: 1px solid var(--rule); padding: 80px 40px 40px; }
+.footer-grid { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; padding-bottom: 60px; border-bottom: 1px solid var(--rule); margin-bottom: 32px; }
+.footer-brand .logo { margin-bottom: 24px; }
+.footer-brand p { font-family: var(--serif); font-size: 16px; font-style: italic; color: var(--ink-soft); max-width: 360px; line-height: 1.6; }
+.footer-col h4 { font-family: var(--mono); font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 12px; }
+.footer-col a { font-size: 14px; color: var(--ink-soft); transition: color 0.3s ease; }
+.footer-col a:hover { color: var(--gold); }
+.footer-bottom { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: var(--ink-mute); text-transform: uppercase; }
+.footer-bottom span { display: flex; gap: 24px; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(120%); background: var(--bg-card); border: 1px solid var(--gold); border-left: 4px solid var(--gold); padding: 18px 28px; z-index: 2000; min-width: 320px; max-width: 90vw; box-shadow: 0 24px 60px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 16px; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast-icon { width: 28px; height: 28px; border: 1.5px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 14px; flex-shrink: 0; font-family: var(--serif); }
+.toast-text { font-size: 13px; color: var(--ink); line-height: 1.4; }
+.toast-text strong { color: var(--gold); font-weight: 600; }
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .hero-inner, .details-grid, .why-grid { grid-template-columns: 1fr; gap: 60px; }
+  .why-grid { gap: 1px; }
+  .nav-links { display: none; }
+  .nav-cta { display: inline-flex; }
+  .section-head { grid-template-columns: 1fr; gap: 24px; }
+  section { padding: 80px 24px; }
+  .hero { padding: 60px 24px; }
+  .reserve { padding: 80px 24px; }
+}
+@media (max-width: 640px) {
+  .nav-inner { padding: 18px 20px; }
+  .logo { font-size: 18px; }
+  .logo-mark { width: 28px; height: 28px; font-size: 14px; }
+  .hero { min-height: auto; padding: 50px 20px; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .btn { justify-content: center; }
+  .hero-card { padding: 28px; }
+  .hero-card-title { font-size: 24px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-card { padding: 32px 24px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+  .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+  .details-list li { grid-template-columns: 1fr; gap: 6px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo">
+      <span class="logo-mark">H</span>
+      <span>The Horeca Meetup</span>
+    </a>
+    <div class="nav-links">
+      <a href="/#why">Why Attend</a>
+      <a href="/#host">The Host</a>
+      <a href="/#calendar">The Series</a>
+      <a href="/#testimonials">Voices</a>
+      <a href="/vip.html">VIP</a>
+      <a href="#reserve" class="nav-cta">Reserve Early</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-image"></div>
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-eyebrow">Save the Date · Vol. III · Houston</div>
+      <h1>One Tuesday.<br>One hundred operators.<br>A longer <em>table.</em></h1>
+      <p class="hero-sub">The third Houston edition of The Horeca Meetup. <em>September 8, 2026</em> at the Marriott Energy Corridor. Formal invitations go out in early July. Reserve your name now and we will hold your place in line.</p>
+      <div class="hero-actions">
+        <a href="#reserve" class="btn btn-primary">
+          Reserve Your Name
+          <span class="btn-arrow">→</span>
+        </a>
+        <a href="/#why" class="btn btn-ghost">What is The Horeca Meetup</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-card">
+        <div class="hero-card-label">
+          <span class="save-dot"></span>
+          Save the Date · Early Reserve
+        </div>
+        <div class="hero-card-title">
+          Houston <span class="hero-card-vol">Vol. III</span><br>
+          September 8, 2026
+        </div>
+        <dl class="hero-card-meta">
+          <dt>Venue</dt>
+          <dd>Marriott Energy Corridor</dd>
+          <dt>Time</dt>
+          <dd>6:30 PM · Doors 6:00 PM</dd>
+          <dt>Format</dt>
+          <dd>Buffet dinner · Welcome reception</dd>
+          <dt>Admission</dt>
+          <dd>Complimentary, by invitation</dd>
+        </dl>
+        <a href="#reserve" class="hero-card-cta">Reserve Your Name</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY (compact, 3 cards) -->
+<section class="why" id="why">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num">01 · Why Reserve Early</div>
+      <h2 class="section-title">We keep the room small <em>on purpose.</em></h2>
+    </div>
+
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-card-num">i.</div>
+        <h3>One hundred <em>operators.</em></h3>
+        <p>One room. Restaurant and hotel owners, founders, and multi-unit operators from across Houston and the Gulf Coast. The conversations you cannot have at a trade show, over an unhurried evening.</p>
+      </div>
+
+      <div class="why-card">
+        <div class="why-card-num">ii.</div>
+        <h3>Every seat is <em>reviewed.</em></h3>
+        <p>Vol. III is invitation-only. Reserving now puts your name on the shortlist. When formal invitations open around <strong>early July 2026</strong>, you hear from us personally.</p>
+      </div>
+
+      <div class="why-card">
+        <div class="why-card-num">iii.</div>
+        <h3>You become <em>part of the series.</em></h3>
+        <p>Vol. I brought 60 operators. Vol. II, 100. Vol. III continues the build. The earlier you join, the deeper the relationships compound across editions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DETAILS -->
+<section class="details">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-num">02 · The Evening</div>
+      <h2 class="section-title">A private dinner, <em>done right.</em></h2>
+    </div>
+
+    <div class="details-grid">
+      <div class="details-block">
+        <h3>The night</h3>
+        <dl class="details-list">
+          <li><dt>Date</dt><dd><em>Tuesday, September 8 2026</em></dd></li>
+          <li><dt>Doors</dt><dd>6:00 PM, welcome reception</dd></li>
+          <li><dt>Dinner</dt><dd>6:30 PM, buffet served</dd></li>
+          <li><dt>Format</dt><dd>Curated room flow, conversations arranged by operator profile</dd></li>
+          <li><dt>Close</dt><dd>Late. Stay as long as the conversation goes.</dd></li>
+        </dl>
+      </div>
+
+      <div class="details-block">
+        <h3>The venue</h3>
+        <dl class="details-list">
+          <li><dt>Venue</dt><dd><em>Marriott Energy Corridor</em></dd></li>
+          <li><dt>City</dt><dd>Houston, Texas</dd></li>
+          <li><dt>Dress</dt><dd>Smart business. Jacket optional.</dd></li>
+          <li><dt>Admission</dt><dd>Complimentary, by invitation only.</dd></li>
+          <li><dt>Bring</dt><dd>Your appetite, your questions, your cards.</dd></li>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESERVE FORM -->
+<section class="reserve" id="reserve">
+  <div class="reserve-inner">
+    <div class="reserve-eyebrow">Early Reservation · Vol. III</div>
+    <h2>Save your name for <em>September.</em></h2>
+    <p class="reserve-sub">Formal invitations go out in early July. Reserve your name now and we will hold your place. You will hear from us personally when the window opens.</p>
+
+    <div class="form-card">
+      <form id="reserveForm" onsubmit="submitReserve(event)">
+        <input type="hidden" name="eventSlug" value="houston-vol-3-sep-2026">
+
+        <div class="form-grid">
+          <div class="field">
+            <label>First Name <span class="required">*</span></label>
+            <input type="text" name="firstName" required autocomplete="given-name">
+          </div>
+          <div class="field">
+            <label>Last Name <span class="required">*</span></label>
+            <input type="text" name="lastName" required autocomplete="family-name">
+          </div>
+        </div>
+
+        <div class="field field-full">
+          <label>Email <span class="required">*</span></label>
+          <input type="email" name="email" required autocomplete="email">
+        </div>
+
+        <div class="field field-full">
+          <label>Mobile / WhatsApp <span class="required">*</span></label>
+          <input type="tel" name="phone" required autocomplete="tel">
+        </div>
+
+        <div class="field field-full">
+          <label>Restaurant or Business Name <span class="required">*</span></label>
+          <input type="text" name="business" required>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label>Your Role <span class="required">*</span></label>
+            <select name="role" required>
+              <option value="">Select...</option>
+              <option>Owner / Founder</option>
+              <option>General Manager</option>
+              <option>F&amp;B Director</option>
+              <option>Operations Manager</option>
+              <option>Multi-Unit Operator</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Locations <span class="required">*</span></label>
+            <select name="locations" required>
+              <option value="">Select...</option>
+              <option>1 location</option>
+              <option>2-5 locations</option>
+              <option>6-10 locations</option>
+              <option>10+ locations</option>
+              <option>Pre-opening</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field field-full">
+          <label>Biggest challenge in your business right now?</label>
+          <textarea name="challenge" rows="3" placeholder="Optional, but helps us curate the room"></textarea>
+        </div>
+
+        <!-- PLUS ONE -->
+        <div class="plus-one-section">
+          <div class="plus-one-header">
+            <div class="plus-one-label">
+              <span class="plus-one-eyebrow">Optional</span>
+              <span class="plus-one-title">Bringing someone with you?</span>
+            </div>
+            <label class="plus-one-toggle">
+              <input type="checkbox" id="plusOneToggle" name="hasPlusOne" value="yes">
+              <span class="toggle-slider"></span>
+              <span class="toggle-text">Add a guest</span>
+            </label>
+          </div>
+
+          <div class="plus-one-fields" id="plusOneFields">
+            <p class="plus-one-note">We will note your guest's name now. Their seat is confirmed alongside yours when formal invitations open.</p>
+
+            <div class="form-grid">
+              <div class="field">
+                <label>Guest First Name <span class="required">*</span></label>
+                <input type="text" name="plusOneFirstName" id="plusOneFirstName">
+              </div>
+              <div class="field">
+                <label>Guest Last Name <span class="required">*</span></label>
+                <input type="text" name="plusOneLastName" id="plusOneLastName">
+              </div>
+            </div>
+
+            <div class="field field-full">
+              <label>Guest Email <span class="required">*</span></label>
+              <input type="email" name="plusOneEmail" id="plusOneEmail">
+              <small class="field-hint" id="plusOneEmailHint">Must be different from your email above</small>
+            </div>
+
+            <div class="field field-full">
+              <label>Guest Mobile / WhatsApp <span class="required">*</span></label>
+              <input type="tel" name="plusOnePhone" id="plusOnePhone">
+              <small class="field-hint" id="plusOnePhoneHint">Must be different from your phone above</small>
+            </div>
+
+            <div class="field field-full">
+              <label>Guest Role at Their Business</label>
+              <select name="plusOneRole" id="plusOneRole">
+                <option value="">Select...</option>
+                <option>Owner / Founder</option>
+                <option>Co-Founder / Partner</option>
+                <option>General Manager</option>
+                <option>F&amp;B Director</option>
+                <option>Operations Manager</option>
+                <option>Spouse / Family</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field field-full">
+          <label>How did you hear about Vol. III?</label>
+          <select name="source">
+            <option value="">Select...</option>
+            <option>Printed banner at Vol. II</option>
+            <option>WhatsApp invitation</option>
+            <option>LinkedIn</option>
+            <option>Instagram</option>
+            <option>Email from Horeca Store</option>
+            <option>Word of mouth · Referral</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Reserve My Name →</button>
+
+        <p class="form-fine">By submitting, you understand every seat is reviewed and invitations are sent around 60 days before the event. You will hear from us in early July.</p>
+      </form>
+
+      <div class="form-success" id="formSuccess">
+        <div class="success-mark">✓</div>
+        <h3>Your name is <em>on the list.</em></h3>
+        <p>Thank you for reserving early for Houston Vol. III. We have sent a confirmation to <strong id="successEmail">your inbox</strong>. If it does not arrive in the next few minutes, please check spam.</p>
+        <p>Formal invitations open in early July 2026. You will hear from us personally.</p>
+        <div class="calendar-bar">
+          <span class="calendar-bar-text">Save the date in your calendar</span>
+          <a href="#" id="calendarGoogle" target="_blank" rel="noopener">Add to Google Calendar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo">
+        <span class="logo-mark">H</span>
+        <span>The Horeca Meetup</span>
+      </div>
+      <p>A private quarterly dinner series for restaurant and hotel owners. Hosted in select cities across the world. <strong style="color:var(--gold);font-style:normal;">Hosted by <a href="https://thehorecastore.com" target="_blank" style="color:var(--gold);text-decoration:underline;text-underline-offset:3px;">Horeca Store</a></strong>, the global hospitality supply partner trusted by 15,000+ hotels and restaurants across 11 countries.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>The Series</h4>
+      <ul>
+        <li><a href="/#vol2">Houston Vol. II</a></li>
+        <li><a href="/vol-3.html">Houston Vol. III</a></li>
+        <li><a href="/#calendar">Los Angeles Vol. II</a></li>
+        <li><a href="/#calendar">Dubai Vol. VIII</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>About</h4>
+      <ul>
+        <li><a href="/#host">The Host · Horeca Store</a></li>
+        <li><a href="/#manifesto">Manifesto</a></li>
+        <li><a href="/#testimonials">Voices</a></li>
+        <li><a href="https://thehorecastore.com" target="_blank">thehorecastore.com</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:events@thehorecastore.com">events@thehorecastore.com</a></li>
+        <li><a href="tel:8664467322">+1 866 446 7322</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2026 Horeca Store USA · The Horeca Meetup Series</span>
+    <span>
+      <a href="/">Home</a>
+      <a href="/vip.html">VIP</a>
+    </span>
+  </div>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-icon">✓</div>
+  <div class="toast-text"><strong>Reservation saved.</strong> Check your email for confirmation.</div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://hgvfixbopldwptnfpxwc.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_MI0yJ7Lw1j3HCwDveLZWLg_vs9n3ojJ';
+
+const supabaseClient =
+  typeof window !== 'undefined' && window.supabase
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
+
+const VOL3_EVENT_SLUG = 'houston-vol-3-sep-2026';
+
+const plusOneToggle = document.getElementById('plusOneToggle');
+const plusOneFields = document.getElementById('plusOneFields');
+if (plusOneToggle && plusOneFields) {
+  plusOneToggle.addEventListener('change', () => {
+    if (plusOneToggle.checked) {
+      plusOneFields.classList.add('active');
+      ['plusOneFirstName','plusOneLastName','plusOneEmail','plusOnePhone'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.required = true;
+      });
+    } else {
+      plusOneFields.classList.remove('active');
+      ['plusOneFirstName','plusOneLastName','plusOneEmail','plusOnePhone'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.required = false; el.value = ''; }
+      });
+    }
+  });
+}
+
+function buildGoogleCalendarLink() {
+  const title = encodeURIComponent('The Horeca Meetup · Houston Vol. III');
+  const details = encodeURIComponent('A private dinner for restaurant and hotel owners. By invitation only. Formal confirmations go out in early July 2026.');
+  const location = encodeURIComponent('Marriott Energy Corridor, Houston, TX');
+  const start = '20260908T230000Z';
+  const end = '20260909T030000Z';
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${location}`;
+}
+
+async function submitReserve(e) {
+  e.preventDefault();
+  const form = e.target;
+  const submitBtn = document.getElementById('submitBtn');
+  const originalBtnText = submitBtn.textContent;
+
+  const hasPlusOne = plusOneToggle && plusOneToggle.checked;
+
+  if (hasPlusOne) {
+    const mainEmail = form.querySelector('[name="email"]').value.trim().toLowerCase();
+    const mainPhone = form.querySelector('[name="phone"]').value.replace(/\s|-|\(|\)/g, '');
+    const guestEmail = document.getElementById('plusOneEmail').value.trim().toLowerCase();
+    const guestPhone = document.getElementById('plusOnePhone').value.replace(/\s|-|\(|\)/g, '');
+
+    if (guestEmail && guestEmail === mainEmail) {
+      const emailField = document.getElementById('plusOneEmail');
+      const emailHint = document.getElementById('plusOneEmailHint');
+      emailField.classList.add('error');
+      emailHint.classList.add('error');
+      emailHint.textContent = 'Guest email cannot be the same as yours';
+      emailField.focus();
+      return;
+    }
+    if (guestPhone && guestPhone === mainPhone) {
+      const phoneField = document.getElementById('plusOnePhone');
+      const phoneHint = document.getElementById('plusOnePhoneHint');
+      phoneField.classList.add('error');
+      phoneHint.classList.add('error');
+      phoneHint.textContent = 'Guest phone cannot be the same as yours';
+      phoneField.focus();
+      return;
+    }
+  }
+
+  const formData = new FormData(form);
+  const raw = Object.fromEntries(formData);
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Reserving...';
+
+  if (!supabaseClient) {
+    alert('Sorry, we could not save your reservation. Please email events@thehorecastore.com directly.');
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalBtnText;
+    return;
+  }
+
+  try {
+    const { data: eventData, error: eventError } = await supabaseClient
+      .from('events')
+      .select('id')
+      .eq('slug', VOL3_EVENT_SLUG)
+      .single();
+    if (eventError || !eventData) throw new Error('Event lookup failed');
+
+    const params = new URLSearchParams(window.location.search);
+    const registration = {
+      event_id: eventData.id,
+      form_type: 'rsvp',
+      status: 'pending',
+      first_name: raw.firstName,
+      last_name: raw.lastName,
+      email: raw.email.toLowerCase().trim(),
+      phone: raw.phone.trim(),
+      business_name: raw.business,
+      role: raw.role || null,
+      locations: raw.locations || null,
+      challenge: raw.challenge || null,
+      source: raw.source || 'vol3-early-reserve',
+      has_plus_one: hasPlusOne,
+      plus_one_first_name: hasPlusOne ? raw.plusOneFirstName : null,
+      plus_one_last_name: hasPlusOne ? raw.plusOneLastName : null,
+      plus_one_email: hasPlusOne && raw.plusOneEmail ? raw.plusOneEmail.toLowerCase().trim() : null,
+      plus_one_phone: hasPlusOne && raw.plusOnePhone ? raw.plusOnePhone.trim() : null,
+      plus_one_role: hasPlusOne ? (raw.plusOneRole || null) : null,
+      attendee_count: hasPlusOne ? 2 : 1,
+      is_vip: false,
+      user_agent: navigator.userAgent,
+      utm_source: params.get('utm_source'),
+      utm_medium: params.get('utm_medium'),
+      utm_campaign: params.get('utm_campaign')
+    };
+
+    const { data: inserted, error: insertError } = await supabaseClient
+      .from('registrations')
+      .insert([registration])
+      .select('id')
+      .single();
+    if (insertError) throw insertError;
+
+    try {
+      const { error: fnErr } = await supabaseClient.functions.invoke('send-vol3-interest', {
+        body: { registration_id: inserted.id }
+      });
+      if (fnErr) {
+        console.warn('send-vol3-interest invoke error (non-blocking):', fnErr);
+      }
+    } catch (fnCrash) {
+      console.warn('send-vol3-interest crashed (non-blocking):', fnCrash);
+    }
+
+    document.getElementById('successEmail').textContent = raw.email;
+    const calendarLink = document.getElementById('calendarGoogle');
+    if (calendarLink) calendarLink.href = buildGoogleCalendarLink();
+
+    form.style.display = 'none';
+    document.getElementById('formSuccess').classList.add('active');
+
+    const toast = document.getElementById('toast');
+    const toastText = toast.querySelector('.toast-text');
+    toastText.innerHTML = hasPlusOne
+      ? '<strong>Reservation saved for you and your guest.</strong> Check your email.'
+      : '<strong>Reservation saved.</strong> Check your email for confirmation.';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 6000);
+
+    document.getElementById('reserve').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (err) {
+    console.error('Vol III reserve submission failed:', err);
+    alert('Sorry, we could not save your reservation. Please try again or email events@thehorecastore.com directly.');
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalBtnText;
+  }
+}
+</script>
+</body>
+</html>
