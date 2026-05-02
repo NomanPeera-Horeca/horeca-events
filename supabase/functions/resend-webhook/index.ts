@@ -215,16 +215,62 @@ async function recomputeEngagement(
   if (upErr) console.error("[resend-webhook] reg update", upErr);
 }
 
+/** Fire-and-forget debug logger. Never throws, never blocks the response. */
+async function debugLog(
+  supabase: ReturnType<typeof createClient> | null,
+  row: Record<string, unknown>,
+) {
+  try {
+    if (!supabase) return;
+    await supabase.from("webhook_debug_log").insert(row);
+  } catch (_) {
+    /* swallow */
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: cors });
   }
+
+  // Early bootstrap of service-role client so we can log even on auth failure.
+  let supa: ReturnType<typeof createClient> | null = null;
+  try {
+    const u = Deno.env.get("SUPABASE_URL");
+    const k = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (u && k) supa = createClient(u, k);
+  } catch (_) {
+    /* ignore */
+  }
+
+  const svixIdHdr = req.headers.get("svix-id") || "";
+  const svixTsHdr = req.headers.get("svix-timestamp") || "";
+
   if (req.method !== "POST") {
+    await debugLog(supa, {
+      phase: "entry",
+      http_status: 405,
+      note: "method_not_allowed",
+      method: req.method,
+      user_agent: req.headers.get("user-agent"),
+      svix_id: svixIdHdr,
+      svix_timestamp: svixTsHdr,
+    });
     return new Response("method_not_allowed", {
       status: 405,
       headers: cors,
     });
   }
+
+  await debugLog(supa, {
+    phase: "entry",
+    http_status: 0,
+    note: "POST received",
+    method: "POST",
+    user_agent: req.headers.get("user-agent"),
+    svix_id: svixIdHdr,
+    svix_timestamp: svixTsHdr,
+  });
 
   const secret = Deno.env.get("RESEND_WEBHOOK_SECRET");
   if (!secret) {
@@ -250,8 +296,24 @@ Deno.serve(async (req) => {
       "svix-timestamp": svixTimestamp,
       "svix-signature": svixSignature,
     }) as ResendEvent;
+    await debugLog(supa, {
+      phase: "sig_ok",
+      http_status: 0,
+      resend_event_type: (event as ResendEvent).type,
+      svix_id: svixId,
+      svix_timestamp: svixTimestamp,
+      body_preview: bodyText.slice(0, 300),
+    });
   } catch (err) {
     console.error("[resend-webhook] invalid signature", err);
+    await debugLog(supa, {
+      phase: "sig_fail",
+      http_status: 401,
+      note: String((err as Error)?.message || err).slice(0, 500),
+      svix_id: svixId,
+      svix_timestamp: svixTimestamp,
+      body_preview: bodyText.slice(0, 300),
+    });
     return new Response("invalid_signature", { status: 401 });
   }
 
@@ -275,6 +337,12 @@ Deno.serve(async (req) => {
         "[resend-webhook] skipping untagged event",
         { type: event.type, tags: tagsMap },
       );
+      await debugLog(supabase, {
+        phase: "skip_untagged",
+        http_status: 200,
+        note: JSON.stringify(tagsMap).slice(0, 400),
+        resend_event_type: event.type,
+      });
       return new Response(JSON.stringify({ ok: true, skipped: "untagged" }), {
         status: 200,
         headers: { ...cors, "Content-Type": "application/json" },
@@ -327,7 +395,19 @@ Deno.serve(async (req) => {
       const msg = String(insErr.message || "");
       if (!/duplicate key|conflict/i.test(msg)) {
         console.error("[resend-webhook] insert failed", insErr);
+        await debugLog(supabase, {
+          phase: "insert_fail",
+          http_status: 200,
+          note: msg.slice(0, 500),
+          resend_event_type: event.type,
+        });
       }
+    } else {
+      await debugLog(supabase, {
+        phase: "insert_ok",
+        http_status: 200,
+        resend_event_type: event.type,
+      });
     }
 
     try {

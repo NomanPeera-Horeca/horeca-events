@@ -22,6 +22,13 @@ type Body = {
   registration_id: string;
   template_id: string;
   action_type: string;
+  /**
+   * Which recipient this invocation targets.
+   * - 'main' (default): send to reg.email using primary QR.
+   * - 'plus_one': send to reg.plus_one_email using plus-one QR.
+   * Each invocation sends to exactly ONE recipient. There is no auto fan-out.
+   */
+  recipient_type?: "main" | "plus_one";
   custom_message?: string;
   admin_email?: string;
 };
@@ -196,6 +203,35 @@ function sanitiseTagValue(v: unknown): string {
     .slice(0, 256);
 }
 
+/** Loose RFC-5322-ish email format check. Rejects whitespace and missing @. */
+function looksLikeEmail(s: unknown): boolean {
+  const v = String(s ?? "").trim();
+  if (!v) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+
+/** Insert a row into public.send_email_log via PostgREST. Best-effort, never throws. */
+async function logSend(
+  supabaseUrl: string,
+  serviceKey: string,
+  row: Record<string, unknown>,
+): Promise<void> {
+  try {
+    await fetch(`${supabaseUrl}/rest/v1/send_email_log`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify(row),
+    });
+  } catch (_) { /* swallow */ }
+}
+
+/** Send via Resend with up to 2 retries on transient 5xx / network errors.
+ * Each attempt is logged. Throws final error after exhausting retries. */
 async function sendResend(params: {
   apiKey: string;
   from: string;
@@ -210,32 +246,119 @@ async function sendResend(params: {
     content_id?: string;
     content_type?: string;
   }[];
+  logCtx?: {
+    supabaseUrl: string;
+    serviceKey: string;
+    registration_id?: string;
+    template_id?: string;
+    template_slug?: string;
+    action_type?: string;
+    recipient_email?: string;
+    recipient_type?: string;
+  };
 }) {
-  const { apiKey, from, fromName, to, subject, html, attachments, tags } =
-    params;
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: `${fromName} <${from}>`,
-      to,
-      subject,
-      html,
-      attachments: attachments ?? [],
-      tags: (tags ?? []).map((t) => ({
-        name: t.name,
-        value: sanitiseTagValue(t.value),
-      })),
-    }),
-  });
-  if (!res.ok) {
-    const txt = await res.text();
-    throw new Error(`resend ${res.status}: ${txt}`);
+  const {
+    apiKey,
+    from,
+    fromName,
+    to,
+    subject,
+    html,
+    attachments,
+    tags,
+    logCtx,
+  } = params;
+  const MAX_ATTEMPTS = 3;
+  let lastErr: unknown = null;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const t0 = Date.now();
+    try {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: `${fromName} <${from}>`,
+          to,
+          subject,
+          html,
+          attachments: attachments ?? [],
+          tags: (tags ?? []).map((t) => ({
+            name: t.name,
+            value: sanitiseTagValue(t.value),
+          })),
+        }),
+      });
+      const dur = Date.now() - t0;
+      if (res.ok) {
+        const json = await res.json();
+        if (logCtx) {
+          await logSend(logCtx.supabaseUrl, logCtx.serviceKey, {
+            registration_id: logCtx.registration_id ?? null,
+            template_id: logCtx.template_id ?? null,
+            template_slug: logCtx.template_slug ?? null,
+            action_type: logCtx.action_type ?? null,
+            recipient_email: logCtx.recipient_email ?? to[0] ?? null,
+            recipient_type: logCtx.recipient_type ?? null,
+            attempt_number: attempt,
+            outcome: "ok",
+            http_status: res.status,
+            error_phase: null,
+            error_detail: null,
+            resend_email_id: (json as { id?: string }).id ?? null,
+            duration_ms: dur,
+          });
+        }
+        return json;
+      }
+      const txt = await res.text();
+      const transient = res.status === 429 || res.status >= 500;
+      if (logCtx) {
+        await logSend(logCtx.supabaseUrl, logCtx.serviceKey, {
+          registration_id: logCtx.registration_id ?? null,
+          template_id: logCtx.template_id ?? null,
+          template_slug: logCtx.template_slug ?? null,
+          action_type: logCtx.action_type ?? null,
+          recipient_email: logCtx.recipient_email ?? to[0] ?? null,
+          recipient_type: logCtx.recipient_type ?? null,
+          attempt_number: attempt,
+          outcome: transient && attempt < MAX_ATTEMPTS ? "retrying" : "failed",
+          http_status: res.status,
+          error_phase: "resend_http",
+          error_detail: txt.slice(0, 2000),
+          resend_email_id: null,
+          duration_ms: dur,
+        });
+      }
+      lastErr = new Error(`resend ${res.status}: ${txt}`);
+      if (!transient || attempt === MAX_ATTEMPTS) throw lastErr;
+    } catch (e) {
+      const dur = Date.now() - t0;
+      lastErr = e;
+      if (logCtx) {
+        await logSend(logCtx.supabaseUrl, logCtx.serviceKey, {
+          registration_id: logCtx.registration_id ?? null,
+          template_id: logCtx.template_id ?? null,
+          template_slug: logCtx.template_slug ?? null,
+          action_type: logCtx.action_type ?? null,
+          recipient_email: logCtx.recipient_email ?? to[0] ?? null,
+          recipient_type: logCtx.recipient_type ?? null,
+          attempt_number: attempt,
+          outcome: attempt < MAX_ATTEMPTS ? "retrying" : "failed",
+          http_status: null,
+          error_phase: "network",
+          error_detail: String(e).slice(0, 2000),
+          resend_email_id: null,
+          duration_ms: dur,
+        });
+      }
+      if (attempt === MAX_ATTEMPTS) throw e;
+    }
+    await new Promise((r) => setTimeout(r, 500 * attempt));
   }
-  return res.json();
+  throw lastErr ?? new Error("resend send failed");
 }
 
 Deno.serve(async (req) => {
@@ -256,8 +379,15 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, serviceKey);
 
     const body = (await req.json()) as Body;
-    const { registration_id, template_id, action_type, custom_message = "" } =
-      body;
+    const {
+      registration_id,
+      template_id,
+      action_type,
+      custom_message = "",
+    } = body;
+    const recipient_type: "main" | "plus_one" = body.recipient_type === "plus_one"
+      ? "plus_one"
+      : "main";
 
     if (!registration_id || !template_id || !action_type) {
       return corsJson({ error: "missing_fields" }, 400);
@@ -323,22 +453,9 @@ Deno.serve(async (req) => {
     let pngPlusBytes: Uint8Array | null = null;
 
     if (action_type === "resend_approval") {
-      const slug = String(template.slug || "");
-      const okResendSlug =
-        slug === "approval" ||
-        slug === "approval-vip" ||
-        (slug.startsWith("approval") && slug !== "approval-plus-one");
-      if (!okResendSlug) {
-        return corsJson(
-          {
-            error: "resend_approval_bad_template",
-            detail:
-              "Template slug must be approval, approval-vip, or approval-* (not approval-plus-one)",
-            slug,
-          },
-          400,
-        );
-      }
+      // Template/recipient consistency is enforced upstream by the admin UI's
+      // audience filter, and re-verified below by the per-recipient routing.
+      // We only require that the registration is approved.
       if (String(reg.status || "") !== "approved") {
         return corsJson(
           { error: "resend_approval_not_approved", status: reg.status },
@@ -590,17 +707,130 @@ Deno.serve(async (req) => {
     }
 
     if (
-      (action_type === "approve" || action_type === "resend_approval") &&
-      pngMainBytes
+      action_type === "approve" || action_type === "resend_approval"
     ) {
-      // Inline PNG as data-URL so Outlook shows the QR without CID / external fetch.
-      const mainDataUrl =
-        `data:image/png;base64,${uint8ToBase64(pngMainBytes)}`;
+      // Per-recipient routing. Each invocation sends to exactly ONE person.
+      // No auto fan-out. Admin must independently action +1 if needed.
+
+      if (recipient_type === "plus_one") {
+        if (!hasPlus) {
+          return corsJson(
+            {
+              error: "no_plus_one",
+              detail:
+                "This registration does not have a +1 — cannot send a plus-one email.",
+            },
+            400,
+          );
+        }
+        if (!looksLikeEmail(reg.plus_one_email)) {
+          const poRaw = String(reg.plus_one_email ?? "").trim();
+          return corsJson(
+            {
+              error: "invalid_plus_one_email",
+              detail: poRaw
+                ? `plus_one_email "${poRaw}" is not a valid email address. Edit the registration to add a real email for the +1.`
+                : "plus_one_email is missing on this registration. Edit the registration to add the +1's email.",
+            },
+            400,
+          );
+        }
+        if (!pngPlusBytes) {
+          return corsJson(
+            {
+              error: "no_plus_one_qr",
+              detail:
+                "Plus-one QR could not be generated. Approve the primary first so the +1 token exists.",
+            },
+            400,
+          );
+        }
+        const poEmail = String(reg.plus_one_email).trim().toLowerCase();
+        const plusCid = `qr-plus-${String(reg.id).slice(0, 8)}`;
+        const plusCidRef = `cid:${plusCid}`;
+        const plusBase64 = uint8ToBase64(pngPlusBytes);
+        const plusVars: Record<string, string> = {
+          ...vars,
+          plus_one_first_name: reg.plus_one_first_name ?? "",
+          plus_one_full_name: plusOneFull,
+          host_first_name: reg.first_name ?? "",
+          host_last_name: reg.last_name ?? "",
+          host_full_name: vars.full_name,
+          host_business: reg.business_name ?? "",
+          plus_one_qr_code_url: plusCidRef,
+          qr_code_url: plusCidRef,
+        };
+        let pHtml = applyIfBlocks(String(rawHtml), { has_plus_one: true });
+        pHtml = interpolate(pHtml, plusVars);
+        pHtml = stripUnresolvedSimpleTags(pHtml);
+        const pSub = interpolate(String(rawSubject), plusVars);
+        try {
+          await sendResend({
+            apiKey: resendKey,
+            from: fromEmail,
+            fromName,
+            to: [poEmail],
+            subject: pSub,
+            html: pHtml,
+            attachments: [
+              {
+                filename: "qr-plus.png",
+                content: plusBase64,
+                content_id: plusCid,
+                content_type: "image/png",
+              },
+            ],
+            tags: [
+              { name: "registration_id", value: String(reg.id) },
+              { name: "event_slug", value: String(ev?.slug ?? "") },
+              { name: "template_slug", value: String(template.slug) },
+              { name: "recipient_type", value: "plus_one" },
+            ],
+            logCtx: {
+              supabaseUrl,
+              serviceKey,
+              registration_id: String(reg.id),
+              template_id: template.id,
+              template_slug: String(template.slug),
+              action_type,
+              recipient_email: poEmail,
+              recipient_type: "plus_one",
+            },
+          });
+        } catch (e) {
+          console.error("plus-one send", e);
+          return corsJson(
+            { error: "resend_failed", detail: String(e) },
+            502,
+          );
+        }
+        return corsJson({
+          ok: true,
+          recipient_type: "plus_one",
+          plus_one_qr_code_url: plusOneUrl,
+          plus_one_qr_token: plusOneToken,
+        });
+      }
+
+      // recipient_type === "main"
+      if (!pngMainBytes) {
+        return corsJson(
+          {
+            error: "no_main_qr",
+            detail: "Main QR could not be generated.",
+          },
+          500,
+        );
+      }
+      const mainCid = `qr-main-${String(reg.id).slice(0, 8)}`;
+      const mainCidRef = `cid:${mainCid}`;
+      const mainBase64 = uint8ToBase64(pngMainBytes);
       const emailVars: Record<string, string> = {
         ...vars,
-        qr_code_url: mainDataUrl,
-        // If approval template row mistakenly uses +1 img variable, still show the guest QR.
-        plus_one_qr_code_url: mainDataUrl,
+        qr_code_url: mainCidRef,
+        // If a primary template still references {{plus_one_qr_code_url}},
+        // render it as the same main QR rather than leaving the placeholder.
+        plus_one_qr_code_url: mainCidRef,
       };
       let emailHtml = applyIfBlocks(String(rawHtml), { has_plus_one: hasPlus });
       emailHtml = interpolate(emailHtml, emailVars);
@@ -613,12 +843,30 @@ Deno.serve(async (req) => {
           to: [reg.email as string],
           subject,
           html: emailHtml,
+          attachments: [
+            {
+              filename: "qr-main.png",
+              content: mainBase64,
+              content_id: mainCid,
+              content_type: "image/png",
+            },
+          ],
           tags: [
             { name: "registration_id", value: String(reg.id) },
             { name: "event_slug", value: String(ev?.slug ?? "") },
             { name: "template_slug", value: String(template.slug) },
             { name: "recipient_type", value: "main" },
           ],
+          logCtx: {
+            supabaseUrl,
+            serviceKey,
+            registration_id: String(reg.id),
+            template_id: template.id,
+            template_slug: String(template.slug),
+            action_type,
+            recipient_email: String(reg.email),
+            recipient_type: "main",
+          },
         });
       } catch (e) {
         console.error(e);
@@ -627,86 +875,13 @@ Deno.serve(async (req) => {
           502,
         );
       }
-
-      let plusOneEmailSent = false;
-      let plusOneEmailDetail: string | null = null;
-
-      if (
-        hasPlus && pngPlusBytes && reg.plus_one_email &&
-        String(reg.plus_one_email).trim()
-      ) {
-        const { data: plusTpl } = await supabase
-          .from("email_templates")
-          .select("id, slug, subject, body_html")
-          .eq("slug", "approval-plus-one")
-          .eq("is_active", true)
-          .maybeSingle();
-
-        if (plusTpl?.body_html && String(plusTpl.body_html).trim()) {
-          const poEmail = String(reg.plus_one_email).trim().toLowerCase();
-          const plusDataUrl =
-            `data:image/png;base64,${uint8ToBase64(pngPlusBytes)}`;
-          const plusVars: Record<string, string> = {
-            ...vars,
-            plus_one_first_name: reg.plus_one_first_name ?? "",
-            plus_one_full_name: plusOneFull,
-            host_first_name: reg.first_name ?? "",
-            host_last_name: reg.last_name ?? "",
-            host_full_name: vars.full_name,
-            host_business: reg.business_name ?? "",
-            plus_one_qr_code_url: plusDataUrl,
-            qr_code_url: plusDataUrl,
-          };
-          let pHtml = applyIfBlocks(String(plusTpl.body_html), {
-            has_plus_one: true,
-          });
-          pHtml = interpolate(pHtml, plusVars);
-          pHtml = stripUnresolvedSimpleTags(pHtml);
-          const pSub = interpolate(String(plusTpl.subject ?? ""), plusVars);
-          try {
-            await sendResend({
-              apiKey: resendKey,
-              from: fromEmail,
-              fromName,
-              to: [poEmail],
-              subject: pSub,
-              html: pHtml,
-              tags: [
-                { name: "registration_id", value: String(reg.id) },
-                { name: "event_slug", value: String(ev?.slug ?? "") },
-                { name: "template_slug", value: String(plusTpl.slug) },
-                { name: "recipient_type", value: "plus_one" },
-              ],
-            });
-            plusOneEmailSent = true;
-          } catch (e) {
-            console.error("plus-one resend", e);
-            return corsJson(
-              {
-                error: "resend_failed_plus_one",
-                detail: String(e),
-                main_sent: true,
-              },
-              502,
-            );
-          }
-        } else {
-          plusOneEmailDetail =
-            "Plus-one email was not sent: no active email_templates row with slug approval-plus-one and non-empty body_html. Paste emails/approval-plus-one.html in Supabase.";
-        }
-      } else if (hasPlus) {
-        plusOneEmailDetail =
-          "Plus-one email was not sent: plus_one_email is missing on this registration.";
-      }
-
       return corsJson({
         ok: true,
+        recipient_type: "main",
         qr_code_url: qrUrl,
         plus_one_qr_code_url: plusOneUrl,
         qr_token: qrToken,
         plus_one_qr_token: plusOneToken,
-        plus_one_email_sent: plusOneEmailSent,
-        plus_one_email_detail: plusOneEmailDetail,
       });
     }
 
@@ -725,6 +900,16 @@ Deno.serve(async (req) => {
           { name: "template_slug", value: String(template.slug) },
           { name: "recipient_type", value: "main" },
         ],
+        logCtx: {
+          supabaseUrl,
+          serviceKey,
+          registration_id: String(reg.id),
+          template_id: template.id,
+          template_slug: String(template.slug),
+          action_type,
+          recipient_email: to,
+          recipient_type: "main",
+        },
       });
       return corsJson({ ok: true, id: (sent as { id?: string }).id });
     } catch (e) {
@@ -733,6 +918,19 @@ Deno.serve(async (req) => {
     }
   } catch (e) {
     console.error(e);
+    try {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+      const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+      if (supabaseUrl && serviceKey) {
+        await logSend(supabaseUrl, serviceKey, {
+          attempt_number: 1,
+          outcome: "crashed",
+          http_status: null,
+          error_phase: "handler",
+          error_detail: String(e).slice(0, 2000),
+        });
+      }
+    } catch (_) { /* swallow */ }
     return corsJson({ error: "internal", detail: String(e) }, 500);
   }
 });

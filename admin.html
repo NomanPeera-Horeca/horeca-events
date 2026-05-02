@@ -1278,6 +1278,7 @@ let currentFilter = 'pending';
 let currentEventId = null;
 let emailTemplates = [];
 let activeRegistration = null;
+let activeRecipientType = 'main'; // 'main' | 'plus_one' — set by openAction()
 let mainTab = 'rsvp';
 let doorFilter = 'pending';
 let doorChannel = null;
@@ -1647,8 +1648,13 @@ function registrationTableRowsHtml(r) {
       <td>${statusCell}</td>
       <td>${timeCell}</td>
       <td>
-        <div class="reg-pair-actions-muted">Actions above apply to both</div>
-        <button type="button" class="action-btn view" style="margin-top:6px" onclick="viewDetail('${id}')">View party</button>
+        <div class="action-buttons">
+          <button type="button" class="action-btn view" onclick="viewDetail('${id}')">View party</button>
+          ${r.status === 'approved' ? `
+            <button type="button" class="action-btn approve" onclick="openAction('${id}', 'resend_approval', 'plus_one')">Send confirmation to +1</button>
+            <button type="button" class="action-btn" onclick="openAction('${id}', 'reminder', 'plus_one')">📧 Reminder for +1</button>
+          ` : ''}
+        </div>
       </td>
     </tr>`;
 
@@ -2111,29 +2117,46 @@ function closeDetail() {
 // ═══════════════════════════════════════════════════════════════
 // ACTIONS: Approve / Reject / Question / Reminder
 // ═══════════════════════════════════════════════════════════════
-function openAction(id, actionType) {
+function openAction(id, actionType, recipientType) {
   activeRegistration = allRegistrations.find(x => x.id === id);
   if (!activeRegistration) return;
-  
+
+  // Each modal targets exactly ONE recipient. Default = main attendee.
+  // For +1 row buttons we pass 'plus_one'.
+  activeRecipientType = recipientType === 'plus_one' ? 'plus_one' : 'main';
+
   const categoryMap = { approve: 'approval', resend_approval: 'approval', reject: 'rejection', question: 'question', reminder: 'reminder' };
   const category = categoryMap[actionType];
-  const templates = emailTemplates.filter(t => t.category === category);
+
+  // Audience filter: approval-type modals show only templates tagged for the
+  // selected recipient. Other categories (reject/question/reminder) keep
+  // their full category list.
+  let templates = emailTemplates.filter(t => t.category === category);
+  if (actionType === 'approve' || actionType === 'resend_approval') {
+    const wantAudience = activeRecipientType === 'plus_one' ? 'plus_one' : 'primary';
+    templates = templates.filter(t => (t.audience || 'primary') === wantAudience);
+  }
 
   let orderedTemplates = templates;
   let defaultTplId = templates[0]?.id;
   if ((actionType === 'approve' || actionType === 'resend_approval') && templates.length) {
-    const tplRank = (t) => {
-      if (t.slug === 'approval-vip') return 0;
-      if (t.slug === 'approval') return 1;
-      return 2;
-    };
-    orderedTemplates = [...templates].sort((a, b) => tplRank(a) - tplRank(b));
-    if (activeRegistration.is_vip) {
-      const vip = orderedTemplates.find((t) => t.slug === 'approval-vip');
-      defaultTplId = vip ? vip.id : orderedTemplates[0].id;
+    if (activeRecipientType === 'plus_one') {
+      const po = orderedTemplates.find((t) => t.slug === 'approval-plus-one');
+      defaultTplId = po ? po.id : orderedTemplates[0].id;
     } else {
-      const std = orderedTemplates.find((t) => t.slug === 'approval');
-      defaultTplId = std ? std.id : orderedTemplates[0].id;
+      const tplRank = (t) => {
+        if (t.slug === 'approval-vip') return 0;
+        if (t.slug === 'approval') return 1;
+        return 2;
+      };
+      orderedTemplates = [...templates].sort((a, b) => tplRank(a) - tplRank(b));
+      if (activeRegistration.is_vip) {
+        const vip = orderedTemplates.find((t) => t.slug === 'approval-vip');
+        defaultTplId = vip ? vip.id : orderedTemplates[0].id;
+      } else {
+        const std = orderedTemplates.find((t) => t.slug === 'approval');
+        defaultTplId = std ? std.id : orderedTemplates[0].id;
+      }
     }
   }
 
@@ -2158,13 +2181,27 @@ function openAction(id, actionType) {
     reminder: '📧 Send Reminder'
   };
   
+  const isPlusOne = activeRecipientType === 'plus_one';
+  const recipientName = isPlusOne
+    ? `${escape(activeRegistration.plus_one_first_name || '')} ${escape(activeRegistration.plus_one_last_name || '')}`.trim() || 'Plus-One Guest'
+    : `${escape(activeRegistration.first_name)} ${escape(activeRegistration.last_name)}`;
+  const recipientEmail = isPlusOne
+    ? (activeRegistration.plus_one_email || '')
+    : (activeRegistration.email || '');
+  const recipientLabel = isPlusOne ? '+1 Guest' : 'Primary attendee';
+
   let html = `
-    <div class="modal-eyebrow">Action</div>
+    <div class="modal-eyebrow">Action${isPlusOne ? ' · +1 only' : ''}</div>
     <h2 class="modal-title">${titleMap[actionType]}</h2>
     <div class="modal-body">
       <p style="color: var(--ink-soft); margin-bottom: 20px; font-size: 14px;">
-        For <strong style="color: var(--ink);">${escape(activeRegistration.first_name)} ${escape(activeRegistration.last_name)}</strong> · ${escape(activeRegistration.business_name)}
+        ${recipientLabel}: <strong style="color: var(--ink);">${recipientName}</strong>${recipientEmail ? ` · <span style="color:var(--ink-mute)">${escape(recipientEmail)}</span>` : ''} · ${escape(activeRegistration.business_name)}
       </p>
+      ${isPlusOne ? `
+      <p style="color: var(--gold); margin: -8px 0 16px 0; font-size: 13px; line-height: 1.5; padding: 12px 14px; border: 1px solid rgba(201,165,92,0.35); background: rgba(201,165,92,0.08); border-radius: 2px;">
+        This will send <strong>only to the +1 guest</strong> at <strong>${escape(recipientEmail || '(no email on file)')}</strong>. The primary attendee will not be re-emailed.
+      </p>
+      ` : ''}
       ${actionType === 'resend_approval' ? `
       <p style="color: var(--ink-soft); margin: -8px 0 16px 0; font-size: 13px; line-height: 1.55; padding: 12px 14px; border: 1px solid var(--rule); background: var(--bg-card); border-radius: 2px;">
         Sends the selected <strong>approval</strong> template again. Existing check-in QR codes and tokens are <strong>not</strong> changed. Use this after marking someone VIP or if they did not receive the first email.
@@ -2279,14 +2316,16 @@ async function confirmAction(actionType) {
     return;
   }
 
-  if (actionType === 'resend_approval') {
+  // Audience guard: dropdown is already filtered, but defend in depth.
+  if (actionType === 'approve' || actionType === 'resend_approval') {
     const s = tpl.slug || '';
-    const ok =
-      s === 'approval' ||
-      s === 'approval-vip' ||
-      (s.startsWith('approval') && s !== 'approval-plus-one');
-    if (!ok) {
-      alert('Resend confirmation only works with an approval template for the main guest (not plus-one).');
+    const aud = tpl.audience || 'primary';
+    if (activeRecipientType === 'plus_one' && aud !== 'plus_one') {
+      alert('This template is for the main attendee. Pick a +1 template (e.g. "Approval · Plus-One Guest").');
+      return;
+    }
+    if (activeRecipientType !== 'plus_one' && aud === 'plus_one') {
+      alert('This template is for the +1 guest only. Pick a main-attendee template (e.g. "Approval · Main Attendee").');
       return;
     }
   }
@@ -2301,6 +2340,7 @@ async function confirmAction(actionType) {
           registration_id: activeRegistration.id,
           template_id: templateId,
           action_type: 'resend_approval',
+          recipient_type: activeRecipientType || 'main',
           custom_message: customMessage,
           admin_email: currentUser.email
         }
@@ -2390,6 +2430,7 @@ async function confirmAction(actionType) {
         registration_id: activeRegistration.id,
         template_id: templateId,
         action_type: actionType,
+        recipient_type: activeRecipientType || 'main',
         custom_message: customMessage,
         admin_email: currentUser.email
       }
