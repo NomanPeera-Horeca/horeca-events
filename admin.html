@@ -2538,14 +2538,17 @@ function showToast(message) {
 // Wires to public.v_campaign_summary + public.v_recipient_engagement.
 // ═══════════════════════════════════════════════════════════════
 
-/** Campaign slugs that we surface on the dashboard (first is the "sent"
- *  approval, the four after it are the scheduled reminders for Vol. II). */
+/** Campaign slugs we surface on the dashboard. Order controls visual order.
+ *  The rendering code pulls data for each slug from v_campaign_summary, so any
+ *  slug added here will get its own expandable bar with per-recipient engagement. */
 const ENG_CAMPAIGNS = [
-  { slug: 'approval',          name: 'Approval Email',          schedule: null },
-  { slug: 'reminder-2weeks',   name: '2-Week Reminder',         schedule: null },
-  { slug: 'reminder-1week',    name: '1-Week Reminder',         schedule: null },
+  { slug: 'approval',            name: 'Approval Email',        schedule: null },
+  { slug: 'approval-vip',        name: 'VIP Approval',          schedule: null },
+  { slug: 'approval-plus-one',   name: '+1 Approval',           schedule: null },
+  { slug: 'reminder-2weeks',     name: '2-Week Reminder',       schedule: null },
+  { slug: 'reminder-1week',      name: '1-Week Reminder',       schedule: null },
   { slug: 'reminder-day-before', name: 'Day-Before Reminder',   schedule: null },
-  { slug: 'reminder-day-of',   name: 'Day-Of · QR Resend',      schedule: null },
+  { slug: 'reminder-day-of',     name: 'Day-Of · QR Resend',    schedule: null },
 ];
 
 function engPct(num, denom) {
