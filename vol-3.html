@@ -687,7 +687,16 @@ async function submitReserve(e) {
     if (eventError || !eventData) throw new Error('Event lookup failed');
 
     const params = new URLSearchParams(window.location.search);
+    const registrationId = (crypto && typeof crypto.randomUUID === 'function')
+      ? crypto.randomUUID()
+      : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          const r = (Math.random() * 16) | 0;
+          const v = c === 'x' ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+
     const registration = {
+      id: registrationId,
       event_id: eventData.id,
       form_type: 'rsvp',
       status: 'pending',
@@ -714,16 +723,14 @@ async function submitReserve(e) {
       utm_campaign: params.get('utm_campaign')
     };
 
-    const { data: inserted, error: insertError } = await supabaseClient
+    const { error: insertError } = await supabaseClient
       .from('registrations')
-      .insert([registration])
-      .select('id')
-      .single();
+      .insert([registration]);
     if (insertError) throw insertError;
 
     try {
       const { error: fnErr } = await supabaseClient.functions.invoke('send-vol3-interest', {
-        body: { registration_id: inserted.id }
+        body: { registration_id: registrationId }
       });
       if (fnErr) {
         console.warn('send-vol3-interest invoke error (non-blocking):', fnErr);
